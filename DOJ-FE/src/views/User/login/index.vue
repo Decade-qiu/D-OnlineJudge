@@ -70,7 +70,7 @@ const handleSubmit = async () => {
                 }
             );
             ElMessage.success("登录成功!");
-            router.push({ path: '/' });
+            router.replace({ path: '/' });
         });
     } catch (error) {
         ElMessage.error("请重新填写表单!");
