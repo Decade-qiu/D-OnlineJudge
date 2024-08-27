@@ -1,0 +1,14 @@
+spring:
+    application:
+        name: gateway-service
+    profiles:
+        active: dev
+    cloud:
+        nacos:
+            server-addr: 192.168.74.131:8848
+        gateway:
+            routes:
+                -   id: user
+                    uri: lb://user-service
+                    predicates:
+                        - Path=/user/**

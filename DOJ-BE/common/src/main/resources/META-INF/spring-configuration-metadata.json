@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "doj.db"
+    },
+    {
+      "name": "doj.nacos"
+    },
+    {
+      "name": "doj.swagger"
+    }
+  ],
+  "properties": [
+    {
+      "name": "doj.db.host",
+      "type": "java.lang.String",
+      "description": "rabbitmq的地址",
+      "defaultValue": "192.168.150.101"
+    }
+  ],
+  "hints": []
+}

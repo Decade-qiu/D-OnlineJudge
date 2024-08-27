@@ -26,16 +26,25 @@
     </el-card>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref } from 'vue';
-import { ElForm, ElFormItem, ElInput, ElButton, ElCard } from 'element-plus';
+import { ElForm, ElFormItem, ElInput, ElButton, ElCard, ElMessage } from 'element-plus';
 import { Lock, Avatar } from '@element-plus/icons-vue';
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
+
+const userStore = useUserStore();
+
+const router = useRouter();
 
 // 表单数据
 const form = ref({
     username: '',
     password: ''
 });
+
+type FormRef = InstanceType<typeof ElForm>;
+const formRef = ref<FormRef>();
 
 // 表单验证规则
 const rules = ref({
@@ -49,13 +58,22 @@ const rules = ref({
 
 // 表单提交处理
 const handleSubmit = async () => {
-    const formRef = ref(null);
     try {
-        await formRef.value.validate();
-        // 表单验证成功后，执行登录操作
-        console.log('表单数据:', form.value);
+        formRef.value!.validate(async valid => {
+            if (!valid) {
+                return;
+            }
+            await userStore.getUserInfo(
+                {
+                    username: form.value.username,
+                    password: form.value.password
+                }
+            );
+            ElMessage.success("登录成功!");
+            router.push({ path: '/' });
+        });
     } catch (error) {
-        console.log('表单验证失败:', error);
+        ElMessage.error("请重新填写表单!");
     }
 };
 </script>

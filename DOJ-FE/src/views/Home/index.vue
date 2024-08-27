@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 // 你可以在此处导入需要的其他组件或工具函数
 </script>
 

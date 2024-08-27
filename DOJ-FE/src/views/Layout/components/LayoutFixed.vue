@@ -1,4 +1,23 @@
-<script setup>
+<script lang="ts" setup>
+import { useUserStore } from '@/stores/userStore'
+import { ElDropdown, ElDropdownMenu, ElDropdownItem, ElMessage } from 'element-plus';
+import { DropdownInstance } from 'element-plus';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const userStore = useUserStore();
+const dropdown = ref<DropdownInstance>();
+
+const closeDropdown = (command:string) => {
+    dropdown.value?.handleClose();
+    router.push(command);
+};
+
+const logout = () => {
+    userStore.clearUserInfo();
+    window.location.href = '/login';
+};
 </script>
 
 <template>
@@ -10,15 +29,33 @@
             </a>
             <!-- Navigation items -->
             <div class="nav-items">
-                <a class="nav-item active" href="/"><i class="fas fa-home"></i> 主页</a>
-                <a class="nav-item" href="#"><i class="fas fa-book"></i> 题库</a>
-                <a class="nav-item" href="#"><i class="fas fa-trophy"></i> 竞赛</a>
-                <a class="nav-item" href="#"><i class="fas fa-tasks"></i> 状态</a>
-                <a class="nav-item" href="#"><i class="fas fa-chart-bar"></i> 排名</a>
-                <a class="nav-item" href="#"><i class="fas fa-info-circle"></i> 关于</a>
+                <router-link class="nav-item" :to="{ path: '/' }" exact-active-class="active"><i class="fas fa-home"></i>
+                    主页</router-link>
+                <router-link class="nav-item" :to="{ path: '/question-bank' }"><i class="fas fa-book"></i> 题库</router-link>
+                <router-link class="nav-item" :to="{ path: '/competitions' }"><i class="fas fa-trophy"></i> 竞赛</router-link>
+                <router-link class="nav-item" :to="{ path: '/status' }"><i class="fas fa-tasks"></i> 状态</router-link>
+                <router-link class="nav-item" :to="{ path: '/rankings' }"><i class="fas fa-chart-bar"></i> 排名</router-link>
+                <router-link class="nav-item" :to="{ path: '/about' }"><i class="fas fa-info-circle"></i> 关于</router-link>
             </div>
-            <!-- Authentication buttons -->
-            <div class="auth-buttons">
+            <div v-if="userStore.userInfo != undefined">
+                <el-dropdown trigger="click" @command="closeDropdown" ref="dropdown">
+                    <div class="self-ada">
+                        <button class="user-info">
+                            <span>{{ userStore.userInfo.username }}</span>
+                            <i class="fa fa-caret-down" aria-hidden="true">
+                            </i>
+                        </button>
+                    </div>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item>个人主页</el-dropdown-item>
+                            <el-dropdown-item command="/login">修改信息</el-dropdown-item>
+                            <el-dropdown-item divided @click="logout" class="logout">退出</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </div>
+            <div v-else class="auth-buttons">
                 <button class="login"><i class="fas fa-sign-in-alt"></i> <a href="/login">登录</a></button>
                 <button class="register"><i class="fas fa-user-plus"></i> <a href="/register">注册</a></button>
             </div>
@@ -39,6 +76,45 @@
     /* Subtle shadow */
     height: 60px;
     /* Fixed height for the header */
+
+    .self-ada {
+        display: flex;
+        justify-content: end;
+        width: 100px;
+
+        .user-info {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 5px;
+            /* 添加圆角 */
+            // width: 50px;
+            height: 40px;
+
+            /* 确保内容超出时显示省略号 */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            span {
+                margin-right: 5px;
+            }
+
+            &:hover {
+                color: #00aaff;
+            }
+
+            &:focus {
+                outline: none;
+                border: 2px solid #D3E6FA;
+            }
+        }
+    }
 
     /* Navigation styling */
     nav {
@@ -74,7 +150,7 @@
         /* Flexbox layout for items */
         gap: 30px;
         /* Spacing between items */
-        margin-right: 120px;
+        margin-right: 220px;
         /* Margin to align with the auth-buttons */
         margin-top: 18px;
         /* Align items vertically */
@@ -90,6 +166,7 @@
         /* Font size for items */
         position: relative;
         /* For positioning active border */
+        padding-bottom: 18px;
 
         i {
             margin-right: 5px;
@@ -143,6 +220,7 @@
             /* Border color */
             background-color: #5f5f60;
             color: #fff;
+
             a {
                 color: #fff;
             }
@@ -154,9 +232,11 @@
             /* Border color */
             background-color: #28a745;
             color: #fff;
+
             a {
                 color: #fff;
             }
         }
     }
-}</style>
+}
+</style>

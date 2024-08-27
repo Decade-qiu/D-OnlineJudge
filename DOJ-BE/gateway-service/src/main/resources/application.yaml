@@ -1,0 +1,12 @@
+server:
+    port: 8080
+
+doj:
+    jwt:
+        location: classpath:doj.jks
+        alias: decade
+        password: doj123
+        tokenTTL: 30m
+    auth:
+        excludePaths:
+            - /**/*

@@ -6,7 +6,7 @@
             </div>
         </template>
         <el-form :model="form" :rules="rules" ref="formRef" label-width="0px" class="register-form">
-            <el-form-item prop="nickname">
+            <el-form-item prop="username">
                 <el-input v-model="form.username" placeholder="用户名" :prefix-icon="Avatar">
                 </el-input>
             </el-form-item>
@@ -33,22 +33,36 @@
     </el-card>
 </template>
   
-<script setup>
+<script lang="ts" setup>
 import { ref } from 'vue';
-import { ElForm, ElFormItem, ElInput, ElButton, ElCard } from 'element-plus';
+import { ElForm, ElFormItem, ElInput, ElButton, ElCard, ElMessage, FormRules } from 'element-plus';
 import { Lock, Avatar, Message, Opportunity } from '@element-plus/icons-vue';
+import { reqRegister } from '@/api/user';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+type ElForm = InstanceType<typeof ElForm>;
+const formRef = ref<ElForm>();
+
+type FormT = {
+    username: string;
+    password: string;
+    email: string;
+    signature: string;
+};
 
 // 表单数据
-const form = ref({
-    nickname: '',
+const form = ref<FormT>({
+    username: '',
     password: '',
     email: '',
     signature: ''
 });
 
 // 表单验证规则
-const rules = ref({
-    nickname: [
+const rules = ref<FormRules<FormT>>({
+    username: [
         { required: true, message: '请输入昵称', trigger: 'blur' }
     ],
     password: [
@@ -62,13 +76,14 @@ const rules = ref({
 
 // 表单提交处理
 const handleSubmit = async () => {
-    const formRef = ref(null);
     try {
-        await formRef.value.validate();
+        await formRef.value!.validate();
         // 表单验证成功后的处理逻辑
-        console.log('注册数据:', form.value);
+        await reqRegister(form.value);
+        ElMessage.success("注册成功!");
+        router.push('/login');
     } catch (error) {
-        console.log('表单验证失败:', error);
+        ElMessage.error("请重新填写表单!");
     }
 };
 </script>

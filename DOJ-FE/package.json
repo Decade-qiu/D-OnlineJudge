@@ -1,31 +1,40 @@
 {
-  "name": "vue-rabbit",
-  "version": "0.0.0",
+  "name": "duck_online_judge",
   "private": true,
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "lint": "eslint src",
+    "fix": "eslint src --fix",
+    "dev": "vite --open",
+    "build": "vue-tsc && vite build",
+    "build:test": "vue-tsc && vite build --mode test",
+    "build:pro": "vue-tsc && vite build --mode production",
     "preview": "vite preview",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    "preinstall": "node ./scripts/preinstall.js"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
-    "@vueuse/core": "^9.12.0",
-    "axios": "^1.2.6",
-    "dayjs": "^1.11.7",
-    "element-plus": "^2.2.28",
-    "pinia": "^2.0.28",
-    "pinia-plugin-persistedstate": "^3.0.2",
-    "vue": "^3.2.45",
-    "vue-router": "^4.1.6"
+    "axios": "^1.6.5",
+    "element-plus": "^2.5.1",
+    "pinia": "^2.2.2",
+    "pinia-plugin-persistedstate": "^3.2.1",
+    "vue": "^3.3.11",
+    "vue-router": "^4.4.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.0.0",
-    "eslint": "^8.22.0",
-    "eslint-plugin-vue": "^9.3.0",
-    "sass": "^1.57.1",
-    "unplugin-auto-import": "^0.13.0",
-    "unplugin-vue-components": "^0.23.0",
-    "vite": "^4.0.0"
+    "@babel/eslint-parser": "^7.23.3",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@vitejs/plugin-vue": "^4.5.2",
+    "eslint": "^8.56.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-vue": "^9.20.1",
+    "sass": "^1.69.7",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8",
+    "vite-plugin-svg-icons": "^2.0.1",
+    "vue-tsc": "^1.8.25"
   }
 }

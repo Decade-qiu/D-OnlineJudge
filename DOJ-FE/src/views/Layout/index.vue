@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import LayoutFooter from '@/views/Layout/components/LayoutFooter.vue'
 import LayoutFixed from '@/views/Layout/components/LayoutFixed.vue'
 </script>
