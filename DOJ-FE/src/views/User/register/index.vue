@@ -84,6 +84,7 @@ const handleSubmit = async () => {
         ElMessage.success("注册成功!");
         router.push('/login');
     } catch (error) {
+        console.log(error);
         ElMessage.error("请重新填写表单!");
     }
 };

@@ -1,4 +1,4 @@
-package com.decade.doj.common.config;
+package com.decade.doj.common.config.custom;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

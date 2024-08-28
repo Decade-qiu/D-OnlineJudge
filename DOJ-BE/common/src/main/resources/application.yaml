@@ -1,0 +1,4 @@
+doj:
+    resource:
+        location: "D:/files/"
+        request: "/static/"

@@ -2,10 +2,11 @@ package com.decade.doj.gateway.filters;
 
 import cn.hutool.core.text.AntPathMatcher;
 import com.decade.doj.common.exception.UnauthorizedException;
-import com.decade.doj.gateway.config.AuthProperties;
-import com.decade.doj.gateway.utils.JwtTool;
+import com.decade.doj.common.config.custom.JwtTool;
+import com.decade.doj.gateway.config.properties.AuthProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
+@EnableConfigurationProperties(AuthProperties.class)
 @Slf4j
 public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
@@ -26,31 +28,23 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // 1.获取请求路径
         String path = exchange.getRequest().getURI().getPath();
-        // 2.判断是否需要校验
         if (isExcludedPath(path)) {
-            // 3.不需要校验
             return chain.filter(exchange);
         }
-        // 4.需要校验
-        // 4.1.获取token
-        log.debug("path:{}", path);
-        log.debug("headers:{}", exchange.getRequest().getHeaders());
+        log.info("path:{}", path);
+        log.info("headers:{}", exchange.getRequest().getHeaders());
         String token = exchange.getRequest().getHeaders().getFirst("authorization");
-        // 4.2.校验token
         Long userId;
         try {
             userId = jwtTool.parseToken(token);
         } catch (UnauthorizedException e) {
-            // 4.3.校验失败
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
-        // 4.4.校验成功
-        // 4.4.1.将userId放入请求头
+        // 校验成功，将userId放入请求头
         ServerWebExchange build = exchange.mutate()
-                .request(builder -> builder.header("user-id", String.valueOf(userId)))
+                .request(builder -> builder.header("uid", String.valueOf(userId)))
                 .build();
         return chain.filter(build);
     }
@@ -66,6 +60,6 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return 10;
+        return 0;
     }
 }

@@ -1,4 +1,4 @@
-package com.decade.doj.user.utils;
+package com.decade.doj.common.config.custom;
 
 import cn.hutool.core.exceptions.ValidateException;
 import cn.hutool.jwt.JWT;
@@ -6,6 +6,7 @@ import cn.hutool.jwt.JWTValidator;
 import cn.hutool.jwt.signers.JWTSigner;
 import cn.hutool.jwt.signers.JWTSignerUtil;
 import com.decade.doj.common.exception.UnauthorizedException;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyPair;
@@ -13,6 +14,7 @@ import java.time.Duration;
 import java.util.Date;
 
 @Component
+@Import(SecurityConfig.class)
 public class JwtTool {
 
     private final JWTSigner jwtSigner;

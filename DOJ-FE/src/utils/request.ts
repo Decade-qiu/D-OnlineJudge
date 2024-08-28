@@ -1,6 +1,7 @@
 // 二次封装axios：使用请求与响应拦截器
 import axios from "axios";
 import { ElMessage } from "element-plus";
+import { useUserStore } from "@/stores/userStore";
 // 创建axios实例 配置一些基础项
 const request = axios.create({
     baseURL: import.meta.env.VITE_APP_URL,
@@ -10,6 +11,11 @@ const request = axios.create({
 request.interceptors.request.use((config) => {
     // config配置对象
     // headers属性请求头对象
+    const userStore = useUserStore();
+    const token = userStore.userInfo?.token;
+    if (token) {
+        config.headers.Authorization = token;
+    }
     return config;
 });
 // 响应拦截器
@@ -18,6 +24,7 @@ request.interceptors.response.use((response) => {
     return response;
 }, (error) => {
     // 响应失败 处理网络错误的
+    console.log(error);
     let error_info = error.response.data;
     let msg = error_info.msg;
     ElMessage({

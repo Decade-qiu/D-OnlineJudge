@@ -1,4 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.decade.doj.common.config.MVCConfig,\
-    com.decade.doj.common.config.MybatisConfig,\
-    com.decade.doj.common.advice.CommonExceptionAdvice
+  com.decade.doj.common.config.global.CommonExceptionConfig

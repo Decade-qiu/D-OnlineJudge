@@ -9,4 +9,7 @@ doj:
         tokenTTL: 30m
     auth:
         excludePaths:
-            - /**/*
+            - /
+            - /static/**
+            - /user/login
+            - /user/register

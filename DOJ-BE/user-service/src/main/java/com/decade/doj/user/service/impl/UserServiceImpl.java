@@ -1,10 +1,11 @@
 package com.decade.doj.user.service.impl;
 
+import com.decade.doj.common.config.properties.JwtProperties;
 import com.decade.doj.common.domain.R;
 import com.decade.doj.common.exception.BadRequestException;
 import com.decade.doj.common.exception.CommonException;
 import com.decade.doj.common.exception.ForbiddenException;
-import com.decade.doj.user.config.JwtProperties;
+import com.decade.doj.common.config.custom.JwtTool;
 import com.decade.doj.user.domain.dto.LoginDTO;
 import com.decade.doj.user.domain.dto.RegisterDTO;
 import com.decade.doj.user.domain.dto.UpdPwdDTO;
@@ -14,7 +15,6 @@ import com.decade.doj.user.domain.po.User;
 import com.decade.doj.user.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.decade.doj.user.utils.AESTool;
-import com.decade.doj.user.utils.JwtTool;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

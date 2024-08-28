@@ -1,9 +1,10 @@
-package com.decade.doj.common.advice;
+package com.decade.doj.common.config.global;
 
 import com.decade.doj.common.domain.R;
 import com.decade.doj.common.exception.BadRequestException;
 import com.decade.doj.common.exception.CommonException;
 import com.decade.doj.common.exception.DbException;
+import com.decade.doj.common.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
-public class CommonExceptionAdvice {
+public class CommonExceptionConfig {
 
     @ExceptionHandler(DbException.class)
     public Object handleDbException(DbException e) {
@@ -52,6 +53,12 @@ public class CommonExceptionAdvice {
     public Object handleRuntimeException(Exception e) {
         log.error("其他异常 uri : {}", e.getMessage());
         return processResponse(new CommonException("服务器内部异常", 500));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public Object handleUnauthorizedException(UnauthorizedException e) {
+        log.error("未授权异常 -> {}", e.getMessage());
+        return processResponse(e);
     }
 
     private ResponseEntity<R<Void>> processResponse(CommonException e){

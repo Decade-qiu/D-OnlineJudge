@@ -1,5 +1,6 @@
-package com.decade.doj.common.config;
+package com.decade.doj.common.config.custom;
 
+import com.decade.doj.common.config.properties.ResourceProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

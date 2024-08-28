@@ -2,9 +2,8 @@ package com.decade.doj.user.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
-import com.decade.doj.common.config.ResourceProperties;
+import com.decade.doj.common.config.properties.ResourceProperties;
 import com.decade.doj.common.domain.R;
-import com.decade.doj.common.exception.CommonException;
 import com.decade.doj.user.domain.dto.LoginDTO;
 import com.decade.doj.user.domain.dto.RegisterDTO;
 import com.decade.doj.user.domain.dto.UpdPwdDTO;
@@ -16,14 +15,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
