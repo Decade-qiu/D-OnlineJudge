@@ -27,6 +27,6 @@ public class RegisterDTO {
     private String email;
 
     @ApiModelProperty(value = "签名")
-    private String signature;
+    private String sign;
 
 }

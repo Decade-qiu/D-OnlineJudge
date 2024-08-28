@@ -3,7 +3,7 @@ import axios from "axios";
 import { ElMessage } from "element-plus";
 // 创建axios实例 配置一些基础项
 const request = axios.create({
-    baseURL: 'http://localhost:8080/',
+    baseURL: import.meta.env.VITE_APP_URL,
     timeout: 5000,
 });
 // 请求拦截器
@@ -15,7 +15,7 @@ request.interceptors.request.use((config) => {
 // 响应拦截器
 request.interceptors.response.use((response) => {
     // 成功获取到数据 可以对数据进行处理
-    return response.data;
+    return response;
 }, (error) => {
     // 响应失败 处理网络错误的
     let error_info = error.response.data;

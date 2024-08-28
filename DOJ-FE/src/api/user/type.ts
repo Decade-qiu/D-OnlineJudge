@@ -21,25 +21,47 @@ export type registerForm = {
     username: string,
     password: string,
     email: string
-    signature: string
+    sign: string
 };
 // 注册接口返回数据类型
 export type registerResponseData = BaseResponse & {
-    data: String
+    data: string
+};
+
+// 头像上传接口返回数据类型
+export type uploadAvatarResponseData = BaseResponse & {
+    data: string
 };
 
 // 用户信息接口返回数据类型
-type userType = {
-    userId: number,
+export type userType = {
+    id: number,
     username: string,
     avatar: string,
+    email: string,
     password: string,
-    desc: string,
-    roles: string[],
-    buttons: string[],
-    routers: string[],
-    token: string
+    score: number,
+    ranks: number,
+    school: string,
+    gender: boolean,
+    easySolve: number,
+    middleSolve: number,
+    hardSolve: number,
+    role: string,
+    url: string,
+    sign: string,
+    fans: number,
+    subscribe: number,
+    ban: boolean,
 };
+
 export type userInfoResponseData = BaseResponse & {
     data: userType
+};
+
+// 修改密码接口请求数据类型
+export type updPwdForm = {
+    id: number,
+    oldPassword: string,
+    newPassword: string
 };

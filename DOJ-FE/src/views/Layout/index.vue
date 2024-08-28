@@ -1,6 +1,13 @@
 <script lang="ts" setup>
 import LayoutFooter from '@/views/Layout/components/LayoutFooter.vue'
 import LayoutFixed from '@/views/Layout/components/LayoutFixed.vue'
+import { provide, ref } from 'vue';
+
+const refresh = ref(0);
+const triggerRefresh = () => {
+    refresh.value += 1;
+};
+provide('triggerRefresh', triggerRefresh);
 </script>
 
 <template>
@@ -8,7 +15,7 @@ import LayoutFixed from '@/views/Layout/components/LayoutFixed.vue'
         <LayoutFixed />
         <main class="content">
             <!-- <RouterView /> -->
-            <router-view v-slot="{ Component }">
+            <router-view v-slot="{ Component }" :key="refresh">
                 <transition name="fade" mode="out-in">
                     <keep-alive>
                         <component :is="Component" />

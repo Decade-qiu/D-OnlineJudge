@@ -2,10 +2,12 @@ package com.decade.doj.user.service.impl;
 
 import com.decade.doj.common.domain.R;
 import com.decade.doj.common.exception.BadRequestException;
+import com.decade.doj.common.exception.CommonException;
 import com.decade.doj.common.exception.ForbiddenException;
 import com.decade.doj.user.config.JwtProperties;
 import com.decade.doj.user.domain.dto.LoginDTO;
 import com.decade.doj.user.domain.dto.RegisterDTO;
+import com.decade.doj.user.domain.dto.UpdPwdDTO;
 import com.decade.doj.user.domain.vo.LoginVO;
 import com.decade.doj.user.mapper.UserMapper;
 import com.decade.doj.user.domain.po.User;
@@ -61,7 +63,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String username = registerDTO.getUsername();
         String password = registerDTO.getPassword();
         String email = registerDTO.getEmail();
-        String signature = registerDTO.getSignature();
+        String signature = registerDTO.getSign();
         boolean exist = lambdaQuery().eq(User::getUsername, username).exists();
         if (exist) {
             throw new BadRequestException("用户名已存在");
@@ -72,6 +74,45 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .setEmail(email)
                 .setSign(signature);
         save(user);
+        return R.ok();
+    }
+
+    @Override
+    public R updatePwd(UpdPwdDTO updPwdDTO) {
+        String oldPassword = updPwdDTO.getOldPassword();
+        String newPassword = updPwdDTO.getNewPassword();
+        User user = getById(updPwdDTO.getId());
+        if (user == null) {
+            return R.error("用户不存在!");
+        }
+        if (!aesTool.match(oldPassword, user.getPassword())) {
+            return R.error("原密码错误!");
+        }
+        user.setPassword(aesTool.encode(newPassword, aesTool.fnv1aHash(newPassword)));
+        updateById(user);
+        return R.ok();
+    }
+
+    @Override
+    public R updateUser(User user) {
+        if (user.getId() == null) {
+            throw new CommonException("用户ID不能为空!", 404);
+        }
+        User col = lambdaQuery().eq(User::getUsername, user.getUsername()).one();
+        if (col != null && !col.getId().equals(user.getId())) {
+            return R.error("用户名已存在!");
+        }
+        user.setBan(null)
+                .setPassword(null)
+                .setScore(null)
+                .setRanks(null)
+                .setEasySolve(null)
+                .setMiddleSolve(null)
+                .setHardSolve(null)
+                .setRole(null)
+                .setFans(null)
+                .setSubscribe(null);
+        updateById(user);
         return R.ok();
     }
 }

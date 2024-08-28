@@ -9,8 +9,8 @@ declare module "*.vue" {
 }
 
 // 定义import.meta.env类型
-// interface ImportMetaEnv{
-//     readonly VITE_APP_BASE_API:string,
-//     readonly VITE_APP_TITLE:string,
-//     readonly NODE_ENV:string,
-// }
+interface ImportMetaEnv{
+    readonly VITE_APP_URL:string,
+    readonly VITE_APP_TITLE:string,
+    readonly NODE_ENV:string,
+}

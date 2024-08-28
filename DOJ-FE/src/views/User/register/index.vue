@@ -19,8 +19,8 @@
                 <el-input v-model="form.email" placeholder="邮箱" :prefix-icon="Message" />
             </el-form-item>
 
-            <el-form-item prop="signature">
-                <el-input v-model="form.signature" placeholder="签名（可不填）" :prefix-icon="Opportunity"/>
+            <el-form-item prop="sign">
+                <el-input v-model="form.sign" placeholder="签名（可不填）" :prefix-icon="Opportunity"/>
             </el-form-item>
 
             <el-form-item>
@@ -49,7 +49,7 @@ type FormT = {
     username: string;
     password: string;
     email: string;
-    signature: string;
+    sign: string;
 };
 
 // 表单数据
@@ -57,7 +57,7 @@ const form = ref<FormT>({
     username: '',
     password: '',
     email: '',
-    signature: ''
+    sign: ''
 });
 
 // 表单验证规则
@@ -66,7 +66,8 @@ const rules = ref<FormRules<FormT>>({
         { required: true, message: '请输入昵称', trigger: 'blur' }
     ],
     password: [
-        { required: true, message: '请输入密码', trigger: 'blur' }
+        { required: true, message: '请输入密码', trigger: 'blur' },
+        { min: 1, max: 20, message: '密码长度在 1 到 20 个字符之间', trigger: 'blur' },
     ],
     email: [
         { required: true, message: '请输入邮箱', trigger: 'blur' },
