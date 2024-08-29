@@ -56,7 +56,7 @@ const logout = () => {
                         </div>
                         <template #dropdown>
                             <el-dropdown-menu>
-                                <el-dropdown-item>个人主页</el-dropdown-item>
+                                <el-dropdown-item command="/home">个人主页</el-dropdown-item>
                                 <el-dropdown-item command="/info">修改信息</el-dropdown-item>
                                 <el-dropdown-item divided @click="logout" class="logout">退出</el-dropdown-item>
                             </el-dropdown-menu>

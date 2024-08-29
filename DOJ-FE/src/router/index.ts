@@ -11,7 +11,7 @@ import Home from '@/views/Home/index.vue'
 import Login from '@/views/User/login/index.vue'
 import Register from '@/views/User/register/index.vue'
 import Info from '@/views/User/info/index.vue'
-
+import UserHome from '@/views/User/home/index.vue'
 
 
 const router = createRouter({
@@ -34,6 +34,9 @@ const router = createRouter({
                 },{
                     path: '/info',
                     component: Info
+                },{
+                    path: '/home',
+                    component: UserHome
                 }
             ]
         }
