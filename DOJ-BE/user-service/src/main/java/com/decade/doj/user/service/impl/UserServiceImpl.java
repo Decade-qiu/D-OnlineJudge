@@ -6,6 +6,7 @@ import com.decade.doj.common.exception.BadRequestException;
 import com.decade.doj.common.exception.CommonException;
 import com.decade.doj.common.exception.ForbiddenException;
 import com.decade.doj.common.config.custom.JwtTool;
+import com.decade.doj.common.utils.UserContext;
 import com.decade.doj.user.domain.dto.LoginDTO;
 import com.decade.doj.user.domain.dto.RegisterDTO;
 import com.decade.doj.user.domain.dto.UpdPwdDTO;
@@ -81,7 +82,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public R updatePwd(UpdPwdDTO updPwdDTO) {
         String oldPassword = updPwdDTO.getOldPassword();
         String newPassword = updPwdDTO.getNewPassword();
-        User user = getById(updPwdDTO.getId());
+        User user = getById(UserContext.getCurrentUser());
         if (user == null) {
             return R.error("用户不存在!");
         }
@@ -95,9 +96,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public R updateUser(User user) {
-        if (user.getId() == null) {
-            throw new CommonException("用户ID不能为空!", 404);
-        }
+        user.setId(UserContext.getCurrentUser());
         User col = lambdaQuery().eq(User::getUsername, user.getUsername()).one();
         if (col != null && !col.getId().equals(user.getId())) {
             return R.error("用户名已存在!");

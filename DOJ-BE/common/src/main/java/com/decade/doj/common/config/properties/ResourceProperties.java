@@ -10,7 +10,7 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "doj.resource")
 public class ResourceProperties {
 
-    private String request = "/static/";
-    private String location = "D:/files/";
+    private String request;
+    private String location;
 
 }

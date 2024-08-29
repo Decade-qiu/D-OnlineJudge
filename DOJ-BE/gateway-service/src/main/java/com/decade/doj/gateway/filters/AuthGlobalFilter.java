@@ -1,6 +1,7 @@
 package com.decade.doj.gateway.filters;
 
 import cn.hutool.core.text.AntPathMatcher;
+import com.decade.doj.common.config.properties.JwtProperties;
 import com.decade.doj.common.exception.UnauthorizedException;
 import com.decade.doj.common.config.custom.JwtTool;
 import com.decade.doj.gateway.config.properties.AuthProperties;
@@ -23,6 +24,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     private final JwtTool jwtTool;
     private final AuthProperties authProperties;
+    private final JwtProperties jwtProperties;
 
     private AntPathMatcher antPathMatcher = new AntPathMatcher();
 
@@ -30,11 +32,14 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
         if (isExcludedPath(path)) {
-            return chain.filter(exchange);
+            ServerWebExchange build = exchange.mutate()
+                    .request(builder -> builder.header(jwtProperties.getSecretKey(), String.valueOf(0)))
+                    .build();
+            return chain.filter(build);
         }
         log.info("path:{}", path);
-        log.info("headers:{}", exchange.getRequest().getHeaders());
-        String token = exchange.getRequest().getHeaders().getFirst("authorization");
+        log.info("headers:{}", exchange.getRequest().getHeaders().entrySet());
+        String token = exchange.getRequest().getHeaders().getFirst(jwtProperties.getAuthorization());
         Long userId;
         try {
             userId = jwtTool.parseToken(token);
@@ -44,7 +49,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         }
         // 校验成功，将userId放入请求头
         ServerWebExchange build = exchange.mutate()
-                .request(builder -> builder.header("uid", String.valueOf(userId)))
+                .request(builder -> builder.header(jwtProperties.getSecretKey(), String.valueOf(userId)))
                 .build();
         return chain.filter(build);
     }

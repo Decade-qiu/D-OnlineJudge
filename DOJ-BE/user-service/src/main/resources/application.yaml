@@ -1,11 +1,6 @@
 server:
-    port: 8081
+    port: ${doj.port.user-service}
 doj:
-    jwt:
-        location: classpath:doj.jks
-        alias: decade
-        password: doj123
-        tokenTTL: 30m
     db:
         host: 192.168.74.131
         name: doj_user

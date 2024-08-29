@@ -16,7 +16,7 @@
                 简介设置
             </div>
             <el-upload class="upload-demo" drag ref="upload" :before-upload="beforeUpload" :on-success="handleSuccess"
-                :action="avatarURL" :limit="1" :on-exceed="handleExceed" :on-remove="handleRemove">
+                :action="avatarURL" :limit="1" :on-exceed="handleExceed" :on-remove="handleRemove" :headers="uploadHeaders">
                 <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                 <div class="el-upload__text">
                     在这里拖放文件或单击<em>上传</em>头像
@@ -131,6 +131,9 @@ let form: Ref<userInfoResponseData['data']> = ref({
 });
 
 // 上传头像
+const uploadHeaders = {
+    Authorization: userStore.userInfo?.token
+};
 const beforeUpload = (file: File) => {
     const isJPG = file.type === 'image/jpeg';
     const isPNG = file.type === 'image/png';
@@ -176,7 +179,13 @@ const handleSubmit = () => {
         }
         await updUserInfo(form.value);
         ElMessage.success('保存成功');
-        triggerRefresh();
+        // update user info
+        imageUrl.value = '';
+        upload.value?.clearFiles();
+        if (form.value.avatar) {
+            avatarImage.value!.src = import.meta.env.VITE_APP_URL + form.value.avatar;
+        }
+        // triggerRefresh();
     });
 };
 

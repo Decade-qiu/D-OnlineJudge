@@ -24,6 +24,8 @@ public class CrossFilter {
         configuration.addAllowedMethod("*");
         // 允许跨域的请求来源
         configuration.addAllowedOrigin("http://localhost:5174");
+        // 预检请求的有效期，单位为秒
+        configuration.setMaxAge(3600L);
         // 是否允许携带cookie跨域
         configuration.setAllowCredentials(true);
         // 任意url都要进行跨域配置

@@ -14,10 +14,6 @@ import javax.validation.constraints.NotNull;
 @ApiModel(value = "UpdPwdDTO", description = "修改密码DTO")
 public class UpdPwdDTO {
 
-    @ApiModelProperty(value = "用户ID", required = true)
-    @NotNull(message = "用户ID不能为空")
-    private Long id;
-
     @ApiModelProperty(value = "旧密码", required = true)
     @NotBlank(message = "旧密码不能为空")
     private String oldPassword;
