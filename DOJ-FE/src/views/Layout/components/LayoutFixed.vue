@@ -87,6 +87,9 @@ const logout = () => {
     /* Subtle shadow */
     height: 60px;
     /* Fixed height for the header */
+    z-index: 1000;
+    position: fixed;
+    top: 0;
 
     .self-ada {
         display: flex;
