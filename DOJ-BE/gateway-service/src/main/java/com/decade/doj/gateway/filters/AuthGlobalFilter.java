@@ -2,19 +2,27 @@ package com.decade.doj.gateway.filters;
 
 import cn.hutool.core.text.AntPathMatcher;
 import com.decade.doj.common.config.properties.JwtProperties;
+import com.decade.doj.common.domain.R;
 import com.decade.doj.common.exception.UnauthorizedException;
 import com.decade.doj.common.config.custom.JwtTool;
 import com.decade.doj.gateway.config.properties.AuthProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -44,14 +52,31 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         try {
             userId = jwtTool.parseToken(token);
         } catch (UnauthorizedException e) {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return exchange.getResponse().setComplete();
+            return handleUnauthorizedResponse(exchange);
         }
         // 校验成功，将userId放入请求头
         ServerWebExchange build = exchange.mutate()
                 .request(builder -> builder.header(jwtProperties.getSecretKey(), String.valueOf(userId)))
                 .build();
         return chain.filter(build);
+    }
+
+    public Mono<Void> handleUnauthorizedResponse(ServerWebExchange exchange) {
+        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        R<String> response = R.error(401, "登陆过期，请重新登陆！");
+
+        DataBufferFactory bufferFactory = exchange.getResponse().bufferFactory();
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            byte[] bytes = objectMapper.writeValueAsBytes(response);
+            DataBuffer dataBuffer = bufferFactory.wrap(bytes);
+            return exchange.getResponse().writeWith(Mono.just(dataBuffer));
+        } catch (Exception e) {
+            return exchange.getResponse().setComplete();
+        }
     }
 
     private boolean isExcludedPath(String path) {

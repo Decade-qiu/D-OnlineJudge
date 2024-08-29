@@ -223,7 +223,7 @@ const handlePwdSubmit = () => {
         if (valid) {
             // 提交表单数据
             await updUserPwd({
-                id: userStore.userInfo!.userId,
+                id: 0,
                 oldPassword: pwdForm.value.oldPassword,
                 newPassword: pwdForm.value.newPassword1,
             });
@@ -236,7 +236,7 @@ const handlePwdSubmit = () => {
 
 
 onMounted(async () => {
-    const userInfoResponseData = await reqUserInfo(userStore.userInfo!.userId);
+    const userInfoResponseData = await reqUserInfo(userStore.userInfo?.userId ? userStore.userInfo!.userId : 0);
     form.value = userInfoResponseData.data.data;
     if (form.value.avatar) {
         avatarImage.value!.src = import.meta.env.VITE_APP_URL + form.value.avatar;

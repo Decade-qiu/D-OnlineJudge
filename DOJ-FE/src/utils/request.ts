@@ -2,6 +2,7 @@
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/userStore";
+import router from "@/router";
 // 创建axios实例 配置一些基础项
 const request = axios.create({
     baseURL: import.meta.env.VITE_APP_URL,
@@ -24,13 +25,17 @@ request.interceptors.response.use((response) => {
     return response;
 }, (error) => {
     // 响应失败 处理网络错误的
-    console.log(error);
     let error_info = error.response.data;
     let msg = error_info.msg;
     ElMessage({
         type: 'error',
         message: msg
     });
+    if (error_info.code === 401) {
+        const userStore = useUserStore();
+        userStore.clearUserInfo();
+        router.push('/login');
+    }
     return Promise.reject(error);
 });
 
