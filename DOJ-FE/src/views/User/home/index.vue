@@ -96,6 +96,9 @@
                 </div>
             </div>
         </div>
+        <div class="user-submits">
+            
+        </div>
     </div>
 </template>
   
@@ -156,16 +159,24 @@ const generatePieChart = () => {
         { name: '未知错误', value: 0 },
     ];
     const data = _data.filter(item => item.value !== 0);
+    const correct = _data.find(item => item.name === '正确');
+    const error = _data.reduce((prev, curr) => prev + curr.value, 0) - correct!.value;
+    const dataT = [
+        { name: '正确', value: correct!.value },
+        { name: '错误', value: error },
+    ];
 
     // 自定义颜色数组
-    const colorArray = ['#5470C6', '#91CC75', '#FAC858', '#EE6666', '#73C0DE', '#3BA272'];
-    const richColor: any = {}
+    const colorArray = ['#5470C6', '#91CC75', '#FAC858', '#9900CC', '#73C0DE', '#3BA272'];
+    const richColor: any = {};
     colorArray.forEach((item, idx) => {
         richColor[`color${idx}`] = {
             fontSize: 14,
+            fontWeight: 'bold',
             color: item
         }
-    })
+    });
+    const colorArrayT = ['#5470C6', '#EE6666'];
 
     const option = {
         tooltip: {
@@ -181,12 +192,9 @@ const generatePieChart = () => {
             }
         },
         legend: {
-            top: 20,
-            left: 30,
-            right: 50,
+            top: 10,
             icon: 'circle',
-            show: false,
-            padding: 4,
+            show: true,
             data: data.map((item) => item.name),
             formatter: function (name: string) {
                 const item = data.find((item) => item.name === name);
@@ -196,14 +204,16 @@ const generatePieChart = () => {
                 return name;
             },
             textStyle: {
-                fontSize: 18,
-                width: 110
+                fontSize: 16,
+                fontWeight: 'bold',
+                lineHeight: '25',
             }
         },
         series: [
             {
                 type: 'pie',
-                center: ['50%', '50%'],
+                center: ['50%', '60%'],
+                radius: ['40%', '65%'],
                 label: {
                     show: true,
                     position: 'outside',
@@ -230,6 +240,45 @@ const generatePieChart = () => {
                     color: function (params: any) {
                         const colorIndex = data.findIndex(item => item.name === params.name);
                         return colorArray[colorIndex % colorArray.length];
+                    }
+                }
+            },
+            {
+                type: 'pie',
+                radius: ['0%', '30%'],
+                center: ['50%', '60%'],
+                label: {
+                    show: true,
+                    position: 'inside',
+                    formatter: function (params: any) {
+                        return `{color|${params.name}}`;
+                    },
+                    rich: {
+                        color: {
+                            color: '#FFF',
+                            fontSize: 14,
+                            fontWeight: 'bold'
+                        }
+                    }
+                },
+                labelLine: {
+                    lineStyle: {
+                        width: 2
+                    }
+                },
+                data: dataT,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                itemStyle: {
+                    // 将饼图的颜色设置为与自定义颜色数组对应
+                    color: function (params: any) {
+                        const colorIndex = dataT.findIndex(item => item.name === params.name);
+                        return colorArrayT[colorIndex % colorArrayT.length];
                     }
                 }
             }
