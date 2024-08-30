@@ -52,6 +52,9 @@ const router = createRouter({
 // 在路由导航前，启动进度条
 router.beforeEach((to, from, next) => {
     NProgress.start();
+    if (to.path === '/login') {
+        sessionStorage.setItem('redirect', from.path);
+    }
     next();
 });
 

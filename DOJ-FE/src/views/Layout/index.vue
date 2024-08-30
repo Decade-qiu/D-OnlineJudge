@@ -17,9 +17,9 @@ provide('triggerRefresh', triggerRefresh);
             <!-- <RouterView /> -->
             <router-view v-slot="{ Component }" :key="refresh">
                 <transition name="fade" mode="out-in">
-                    <keep-alive>
+                    <!-- <keep-alive> -->
                         <component :is="Component" />
-                    </keep-alive>
+                    <!-- </keep-alive> -->
                 </transition>
             </router-view>
         </main>

@@ -63,14 +63,21 @@ const handleSubmit = async () => {
             if (!valid) {
                 return;
             }
-            await userStore.getUserInfo(
+            userStore.getUserInfo(
                 {
                     username: form.value.username,
                     password: form.value.password
                 }
-            );
-            ElMessage.success("登录成功!");
-            router.replace({ path: '/' });
+            ).then(() => {
+                ElMessage.success("登录成功!");
+                const redirect = sessionStorage.getItem("redirect");
+                if (redirect) {
+                    router.push(redirect);
+                    sessionStorage.removeItem("redirect");
+                } else {
+                    router.push("/");
+                }
+            });
         });
     } catch (error) {
         ElMessage.error("请重新填写表单!");
@@ -98,6 +105,7 @@ const handleSubmit = async () => {
         font-size: 14px;
         color: #409EFF;
         cursor: pointer;
+
         a {
             color: #409EFF;
         }
