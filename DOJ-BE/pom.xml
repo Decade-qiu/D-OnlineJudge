@@ -12,6 +12,7 @@
         <module>user-service</module>
         <module>gateway-service</module>
         <module>common</module>
+        <module>sandbox-service</module>
     </modules>
 
     <parent>
