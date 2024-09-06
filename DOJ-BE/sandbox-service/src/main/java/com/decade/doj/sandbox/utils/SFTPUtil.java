@@ -4,13 +4,16 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 
+@Slf4j
 public class SFTPUtil {
 
     public static void uploadFile(String host, String user, String password, String localFilePath, String remoteDir) {
+        log.info("localFilePath: {}, remoteDir: {}", localFilePath, remoteDir);
         try {
             JSch jsch = new JSch();
             Session session = jsch.getSession(user, host, 22);

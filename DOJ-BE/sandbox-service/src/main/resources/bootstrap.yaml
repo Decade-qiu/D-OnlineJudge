@@ -1,0 +1,13 @@
+spring:
+    application:
+        name: sandbox-service
+    profiles:
+        active: dev, common
+    cloud:
+        nacos:
+            server-addr: 192.168.74.131:8848
+            config:
+                file-extension: yaml
+                shared-configs:
+                    - dataId: shared-jdbc.yaml
+                    - dataId: shared-swagger.yaml

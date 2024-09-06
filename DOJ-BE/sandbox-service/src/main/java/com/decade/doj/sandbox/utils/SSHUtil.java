@@ -4,10 +4,12 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+@Slf4j
 public class SSHUtil {
 
     public static String executeRemoteCommand(String host, String user, String password, String command) {

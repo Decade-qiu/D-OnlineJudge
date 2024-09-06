@@ -28,6 +28,17 @@
 <!--            <artifactId>docker-java-transport-httpclient5</artifactId>-->
 <!--            <version>3.3.0</version>-->
 <!--        </dependency>-->
+        <!--common-->
+        <dependency>
+            <groupId>com.decade</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--web-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
