@@ -7,3 +7,5 @@ doj:
     resource:
         location: "D:/files/"
         request: "/static/"
+
+        code-path: "D:/files/code/"

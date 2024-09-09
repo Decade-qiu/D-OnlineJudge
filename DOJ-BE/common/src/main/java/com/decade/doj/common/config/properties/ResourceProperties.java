@@ -12,5 +12,6 @@ public class ResourceProperties {
 
     private String request;
     private String location;
+    private String codePath;
 
 }

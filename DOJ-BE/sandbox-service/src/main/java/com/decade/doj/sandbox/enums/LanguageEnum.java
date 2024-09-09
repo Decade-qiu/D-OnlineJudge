@@ -26,4 +26,22 @@ public class LanguageEnum {
 
     public static final List<LanguageEnum> values = Arrays.asList(JAVA, PYTHON, CPP);
 
+    public static boolean isValidLanguage(String lang) {
+        for (LanguageEnum language : LanguageEnum.values) {
+            if (language.language.equalsIgnoreCase(lang)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static LanguageEnum getLanguageEnum(String lang) {
+        for (LanguageEnum language : LanguageEnum.values) {
+            if (language.language.equalsIgnoreCase(lang)) {
+                return language;
+            }
+        }
+        return null;
+    }
+
 }

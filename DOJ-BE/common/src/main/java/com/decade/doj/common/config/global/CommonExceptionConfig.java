@@ -52,7 +52,7 @@ public class CommonExceptionConfig {
     @ExceptionHandler(Exception.class)
     public Object handleRuntimeException(Exception e) {
         log.error("其他异常 uri : {}", e.getMessage());
-        return processResponse(new CommonException("服务器内部异常", 500));
+        return processResponse(new CommonException(e.getMessage(), 500));
     }
 
     @ExceptionHandler(UnauthorizedException.class)

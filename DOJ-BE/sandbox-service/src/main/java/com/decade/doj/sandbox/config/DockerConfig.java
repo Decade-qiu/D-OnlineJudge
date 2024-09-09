@@ -2,6 +2,7 @@ package com.decade.doj.sandbox.config;
 
 import com.decade.doj.common.utils.LocalResource;
 import com.decade.doj.sandbox.config.properties.RemoteProperty;
+import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.utils.SFTPUtil;
 import com.decade.doj.sandbox.utils.SSHUtil;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import com.decade.doj.sandbox.enums.LanguageEnum;
 import javax.annotation.PostConstruct;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Configuration
 @EnableConfigurationProperties(RemoteProperty.class)
@@ -31,7 +33,7 @@ public class DockerConfig {
         // create file directory
         r = mkdir(remoteProperty.getScriptPath());
         log.info("mkdir script path: {}", r);
-        r = mkdir(Paths.get(remoteProperty.getScriptPath(), "/run").toString().replace("\\", "/"));
+        r = mkdir(remoteProperty.getScriptPath() + "/run");
         log.info("mkdir /run: {}", r);
         // create run.py
         upload("docker/run.py", "/run");
@@ -42,11 +44,14 @@ public class DockerConfig {
     }
 
     public void createDockerContainer(LanguageEnum language) {
-        String cmd = "docker ps --format {{.Names}} | grep " + language.getDockerName();
+        String cmd = "docker ps -a --format {{.Names}} | grep " + language.getDockerName();
         log.info("check docker container cmd: {}", cmd);
         String res = SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
         if (res != null && res.strip().equals(language.getDockerName())) {
             log.info("docker container {} already exists", language.getDockerName());
+            // restart container
+            cmd = "docker start " + language.getDockerName();
+            SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
             return;
         }
 
@@ -75,7 +80,7 @@ public class DockerConfig {
 
     public void upload(String local, String remote) {
         local = LocalResource.getLocalFilePath(local);
-        SFTPUtil.uploadFile(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), local, Paths.get(remoteProperty.getScriptPath(), remote).toString().replace("\\", "/"));
+        SFTPUtil.uploadFile(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), local, remoteProperty.getScriptPath() + remote);
     }
 
     public String mkdir(String path) {
@@ -85,15 +90,15 @@ public class DockerConfig {
     }
 
     public interface RunCodeWithoutInput {
-        String run(LanguageEnum language, String source);
+        ExecuteMessage run(LanguageEnum language, String source);
     }
 
     @Bean
     public RunCodeWithoutInput runCode(RemoteProperty remoteProperty) {
         return (language, source) -> {
             // script path
-            Path script = Paths.get(remoteProperty.getScriptPath(), WITHOUT_INPUT_FILE);
-            String cmd = "python3 " + script.toString().replace("\\", "/") + " ";
+            String script = remoteProperty.getScriptPath() + WITHOUT_INPUT_FILE;
+            String cmd = "python3 " + script + " ";
             // specify language
             if (language.equals(LanguageEnum.JAVA)) {
                 cmd += language.getLanguage();
@@ -104,9 +109,22 @@ public class DockerConfig {
             }
             // specify source file
             cmd += " " + source;
+            log.info(cmd);
             // execute command
-            return SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
+            String origin = SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
+            if (origin != null) {
+                List<String> res = List.of(origin.split("\n"));
+                List<String> status = List.of(res.get(0).split(" "));
+                return new ExecuteMessage()
+                        .setExitValue(Integer.parseInt(status.get(0).strip()))
+                        .setTime(Double.parseDouble(status.get(1).strip()))
+                        .setMemory(Long.valueOf(status.get(2).strip()))
+                        .setMessage(
+                                res.subList(1, res.size()).stream().reduce((a, b) -> a + "\n" + b).orElse("")
+                        );
+            }
+            return new ExecuteMessage()
+                    .setMessage("执行失败!");
         };
     }
-
 }
