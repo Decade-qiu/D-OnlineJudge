@@ -12,17 +12,21 @@ public class LanguageEnum {
     private String dockerImage;
     private String dockerName;
     private String suffix;
+    private Integer memoryLimit;
+    private Integer timeLimit;
 
-    public LanguageEnum(String language, String image, String script, String suffix) {
+    public LanguageEnum(String language, String image, String script, String suffix, Integer memoryLimit, Integer timeLimit) {
         this.language = language;
         this.dockerImage = image;
         this.dockerName = script;
         this.suffix = suffix;
+        this.memoryLimit = memoryLimit;
+        this.timeLimit = timeLimit;
     }
 
-    public static final LanguageEnum JAVA = new LanguageEnum("java", "openjdk:11-slim", "java11", ".java");
-    public static final LanguageEnum PYTHON = new LanguageEnum("python", "python:3.8-slim", "python3", ".py");
-    public static final LanguageEnum CPP = new LanguageEnum("cpp", "gcc:13", "gcc13", ".cpp");
+    public static final LanguageEnum JAVA = new LanguageEnum("java", "openjdk:11-slim", "java11", ".java", 256, 2);
+    public static final LanguageEnum PYTHON = new LanguageEnum("python", "python:3.8-slim", "python3", ".py", 256, 10);
+    public static final LanguageEnum CPP = new LanguageEnum("cpp", "gcc:13", "gcc13", ".cpp", 256, 1);
 
     public static final List<LanguageEnum> values = Arrays.asList(JAVA, PYTHON, CPP);
 

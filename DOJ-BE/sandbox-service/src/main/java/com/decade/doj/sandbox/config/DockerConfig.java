@@ -7,6 +7,7 @@ import com.decade.doj.sandbox.utils.SFTPUtil;
 import com.decade.doj.sandbox.utils.SSHUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +40,9 @@ public class DockerConfig {
         upload("docker/run.py", "/run");
         // install docker container
         for (LanguageEnum language : LanguageEnum.values) {
+            // if (!language.equals(LanguageEnum.PYTHON)) {
+            //     continue;
+            // }
             createDockerContainer(language);
         }
     }
@@ -60,6 +64,7 @@ public class DockerConfig {
                 + " -v "
                 + remoteProperty.getScriptPath()
                 + ":/usr/src/app "
+                + "--memory=" + language.getMemoryLimit() + "m "
                 + language.getDockerImage()
                 + " tail -f /dev/null";
         log.info("create docker container cmd: {}", cmd);
@@ -97,18 +102,7 @@ public class DockerConfig {
     public RunCodeWithoutInput runCode(RemoteProperty remoteProperty) {
         return (language, source) -> {
             // script path
-            String script = remoteProperty.getScriptPath() + WITHOUT_INPUT_FILE;
-            String cmd = "python3 " + script + " ";
-            // specify language
-            if (language.equals(LanguageEnum.JAVA)) {
-                cmd += language.getLanguage();
-            } else if (language.equals(LanguageEnum.PYTHON)) {
-                cmd += language.getLanguage();
-            } else if (language.equals(LanguageEnum.CPP)) {
-                cmd += language.getLanguage();
-            }
-            // specify source file
-            cmd += " " + source;
+            String cmd = getCmd(remoteProperty, language, source);
             log.info(cmd);
             // execute command
             String origin = SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
@@ -126,5 +120,22 @@ public class DockerConfig {
             return new ExecuteMessage()
                     .setMessage("执行失败!");
         };
+    }
+
+    @NotNull
+    private String getCmd(RemoteProperty remoteProperty, LanguageEnum language, String source) {
+        String script = remoteProperty.getScriptPath() + WITHOUT_INPUT_FILE;
+        String cmd = "python3 " + script + " ";
+        // specify language
+        if (language.equals(LanguageEnum.JAVA)) {
+            cmd += language.getLanguage();
+        } else if (language.equals(LanguageEnum.PYTHON)) {
+            cmd += language.getLanguage();
+        } else if (language.equals(LanguageEnum.CPP)) {
+            cmd += language.getLanguage();
+        }
+        // specify source file
+        cmd += " " + source;
+        return cmd;
     }
 }
