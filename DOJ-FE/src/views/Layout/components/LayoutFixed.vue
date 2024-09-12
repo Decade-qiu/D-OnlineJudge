@@ -33,7 +33,7 @@ const logout = () => {
                     <router-link class="nav-item" :to="{ path: '/' }" exact-active-class="active"><i
                             class="fas fa-home"></i>
                         主页</router-link>
-                    <router-link class="nav-item" :to="{ path: '/question-bank' }"><i class="fas fa-book"></i>
+                    <router-link class="nav-item" :to="{ path: '/online' }"><i class="fas fa-book"></i>
                         题库</router-link>
                     <router-link class="nav-item" :to="{ path: '/competitions' }"><i class="fas fa-trophy"></i>
                         竞赛</router-link>
@@ -64,7 +64,7 @@ const logout = () => {
                     </el-dropdown>
                 </div>
                 <div v-else class="auth-buttons">
-                    <button class="login"><i class="fas fa-sign-in-alt"></i><router-link to="/login">登录</router-link> 
+                    <button class="login"><i class="fas fa-sign-in-alt"></i><router-link to="/login">登录</router-link>
                     </button>
                     <button class="register"><i class="fas fa-user-plus"></i><router-link to="/register">注册</router-link>
                     </button>
