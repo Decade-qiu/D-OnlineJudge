@@ -14,3 +14,12 @@ interface ImportMetaEnv{
     readonly VITE_APP_TITLE:string,
     readonly NODE_ENV:string,
 }
+
+
+// 自定义组件类型
+import CodeEditor from '@/components/CodeEditor/index.vue';
+declare module 'vue' {
+  export interface GlobalComponents {
+    CodeEditor: typeof CodeEditor
+  }
+}

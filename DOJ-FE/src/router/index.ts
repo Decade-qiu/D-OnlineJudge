@@ -12,7 +12,7 @@ import Login from '@/views/User/login/index.vue'
 import Register from '@/views/User/register/index.vue'
 import Info from '@/views/User/info/index.vue'
 import UserHome from '@/views/User/home/index.vue'
-import Online from '@/views/Online/index.vue'
+import OnlineEditor from '@/views/OnlineEditor/index.vue'
 
 
 const router = createRouter({
@@ -40,7 +40,7 @@ const router = createRouter({
                     component: UserHome
                 },{
                     path: '/online',
-                    component: Online
+                    component: OnlineEditor
                 }
             ]
         }

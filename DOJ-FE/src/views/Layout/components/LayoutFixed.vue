@@ -33,8 +33,10 @@ const logout = () => {
                     <router-link class="nav-item" :to="{ path: '/' }" exact-active-class="active"><i
                             class="fas fa-home"></i>
                         主页</router-link>
-                    <router-link class="nav-item" :to="{ path: '/online' }"><i class="fas fa-book"></i>
+                    <router-link class="nav-item" :to="{ path: '/problems' }"><i class="fas fa-book"></i>
                         题库</router-link>
+                    <router-link class="nav-item" :to="{ path: '/online' }"><i class="fas fa-code"></i>
+                        编码</router-link>
                     <router-link class="nav-item" :to="{ path: '/competitions' }"><i class="fas fa-trophy"></i>
                         竞赛</router-link>
                     <router-link class="nav-item" :to="{ path: '/status' }"><i class="fas fa-tasks"></i> 状态</router-link>
@@ -139,7 +141,7 @@ const logout = () => {
         /* Center items vertically */
         height: 100%;
         /* Full height of the header */
-        width: 780px;
+        width: 840px;
     }
 
     .var {
