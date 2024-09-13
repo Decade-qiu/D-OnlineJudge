@@ -7,11 +7,11 @@ import { ref } from 'vue';
 
 const config = ref({
     tabSize: 2,
-    disabled: true,
+    disabled: false,
     height: '62vh',
     width: '100%',
     language: 'cpp',
-    theme: 'default'
+    theme: 'oneDark'
 })
 </script>
 

@@ -2,8 +2,7 @@
     <div class="toolbar">
         <div class="item">
             <label for="language">language:</label>
-            <select name="language" id="language" :value="config.language"
-                @change="handleSelectLanguage">
+            <select name="language" id="language" :value="config.language" @change="handleSelectLanguage">
                 <option :value="option" :key="option" v-for="option in languages">
                     {{ option }}
                 </option>
@@ -25,12 +24,20 @@
                 </option>
             </select>
         </div>
+        <div class="item">
+            <button class="full-button" @click="handleFullScreen">
+                <el-icon class="full-icon">
+                    <FullScreen />
+                </el-icon>
+            </button>
+        </div>
     </div>
 </template>
   
 <script lang="ts" setup>
 import { toRefs } from 'vue';
 import { defineProps, defineEmits } from 'vue';
+import { FullScreen } from '@element-plus/icons-vue';
 import { configType } from './index.vue';
 
 const props = defineProps<{
@@ -39,12 +46,16 @@ const props = defineProps<{
     themes: Array<string>,
 }>();
 
-const emit = defineEmits(['language']);
+const emit = defineEmits(['language', 'fullscreen']);
 const { config, languages, themes } = toRefs(props);
 
 const handleSelectLanguage = (event: Event) => {
     const target = event.target as HTMLSelectElement;
     emit('language', target.value);
+};
+
+const handleFullScreen = () => {
+    emit('fullscreen');
 };
 </script>
   
@@ -65,6 +76,19 @@ const handleSelectLanguage = (event: Event) => {
         label {
             display: inline-block;
             margin-right: 0.2em;
+        }
+
+        .full-button {
+            border: none;
+            background: none;
+
+            .full-icon {
+                font-size: 1.5rem;
+            }
+        }
+
+        &:last-child {
+            margin-left: auto;
         }
     }
 
