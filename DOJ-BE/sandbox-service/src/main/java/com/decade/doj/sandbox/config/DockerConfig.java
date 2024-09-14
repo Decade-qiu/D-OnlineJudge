@@ -106,16 +106,22 @@ public class DockerConfig {
             log.info(cmd);
             // execute command
             String origin = SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
+            log.info(origin);
             if (origin != null) {
                 List<String> res = List.of(origin.split("\n"));
                 List<String> status = List.of(res.get(0).split(" "));
+                Integer exitValue = Integer.parseInt(status.get(0).strip());
+                String message = res.subList(1, res.size()).stream().reduce((a, b) -> a + "\n" + b).orElse("");
+                if (exitValue != 0){
+                    return new ExecuteMessage()
+                            .setExitValue(exitValue)
+                            .setMessage(message);
+                }
                 return new ExecuteMessage()
-                        .setExitValue(Integer.parseInt(status.get(0).strip()))
+                        .setExitValue(exitValue)
                         .setTime(Double.parseDouble(status.get(1).strip()))
                         .setMemory(Long.valueOf(status.get(2).strip()))
-                        .setMessage(
-                                res.subList(1, res.size()).stream().reduce((a, b) -> a + "\n" + b).orElse("")
-                        );
+                        .setMessage(message);
             }
             return new ExecuteMessage()
                     .setMessage("执行失败!");

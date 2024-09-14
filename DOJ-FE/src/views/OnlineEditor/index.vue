@@ -6,7 +6,7 @@
 import { ref } from 'vue';
 
 const config = ref({
-    tabSize: 2,
+    tabSize: 4,
     disabled: false,
     height: '62vh',
     width: '100%',

@@ -44,6 +44,7 @@ public class SandboxController {
         }
 
         String filename = UUID.randomUUID() + file.getOriginalFilename();
+        if (lang.equals("java")) filename = file.getOriginalFilename();
         Path path = Paths.get(resourceProperties.getCodePath() + filename);
 
         try {

@@ -44,6 +44,9 @@ dependencies:
   codemirror:
     specifier: ^6.0.1
     version: 6.0.1(@lezer/common@1.2.1)
+  cropperjs:
+    specifier: ^1.6.2
+    version: 1.6.2
   echarts:
     specifier: ^5.5.1
     version: 5.5.1
@@ -1837,6 +1840,10 @@ packages:
 
   /crelt@1.0.6:
     resolution: {integrity: sha512-VQ2MBenTq1fWZUH9DJNGti7kKv6EeAuYr3cLwxUWhIu1baTaXh4Ib5W2CqHVqib4/MqbYGJqiL3Zb8GJZr3l4g==, tarball: https://registry.npmmirror.com/crelt/-/crelt-1.0.6.tgz}
+    dev: false
+
+  /cropperjs@1.6.2:
+    resolution: {integrity: sha512-nhymn9GdnV3CqiEHJVai54TULFAE3VshJTXSqSJKa8yXAKyBKDWdhHarnlIPrshJ0WMFTGuFvG02YjLXfPiuOA==, tarball: https://registry.npmmirror.com/cropperjs/-/cropperjs-1.6.2.tgz}
     dev: false
 
   /cross-spawn@7.0.3:
