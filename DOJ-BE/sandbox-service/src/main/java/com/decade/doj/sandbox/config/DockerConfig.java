@@ -115,10 +115,12 @@ public class DockerConfig {
                 if (exitValue != 0){
                     return new ExecuteMessage()
                             .setExitValue(exitValue)
+                            .setStatus(ExecuteMessage.getStatus(exitValue))
                             .setMessage(message);
                 }
                 return new ExecuteMessage()
                         .setExitValue(exitValue)
+                        .setStatus(ExecuteMessage.getStatus(exitValue))
                         .setTime(Double.parseDouble(status.get(1).strip()))
                         .setMemory(Long.valueOf(status.get(2).strip()))
                         .setMessage(message);

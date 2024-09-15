@@ -47,13 +47,17 @@
                     </div>
                 </div>
             </div>
-            <div class="basic-info">
+            <!-- <div class="basic-info">
                 <div class="item">
                     <h2><i class="fa fa-user" aria-hidden="true" />用户名</h2>
                     <table>
                         <tbody>
                             <tr>
-                                <td>{{ form.username }}</td>
+                                <td>
+                                    <div class="td">
+                                        {{ form.username }}
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -63,7 +67,10 @@
                     <table>
                         <tbody>
                             <tr>
-                                <td>{{ form.school }}</td>
+                                <td>
+                                    <div class="td">{{ form.school == '' ? '暂无' : form.school }}
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -73,7 +80,10 @@
                     <table>
                         <tbody>
                             <tr>
-                                <td>{{ form.email }}</td>
+                                <td>
+                                    <div class="td">{{ form.email == '' ? '暂无' : form.email }}
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -83,7 +93,65 @@
                     <table>
                         <tbody>
                             <tr>
-                                <td>{{ form.url == '' ? '暂无' : form.url }}</td>
+                                <td>
+                                    <div class="td">{{ form.url == '' ? '暂无' : form.url + "1111111111111111111" }}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div> -->
+            <div class="basic-info">
+                <div class="item">
+                    <h2><i class="fa fa-user" aria-hidden="true"></i>用户名</h2>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="td" id="username">{{ form.username }}</div>
+                                    <div class="tooltip" id="tooltip-username">{{ form.username }}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="item">
+                    <h2><i class="fa fa-school" aria-hidden="true"></i>学校</h2>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="td" id="school">{{ form.school == '' ? '暂无' : form.school }}</div>
+                                    <div class="tooltip" id="tooltip-school">{{ form.school }}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="item">
+                    <h2><i class="fa fa-envelope" aria-hidden="true"></i>邮箱</h2>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="td" id="email">{{ form.email == '' ? '暂无' : form.email }}</div>
+                                    <div class="tooltip" id="tooltip-email">{{ form.email }}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="item">
+                    <h2><i class="fa fa-link" aria-hidden="true"></i>个人主页</h2>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="td" id="url">{{ form.url == '' ? '暂无' : form.url + "1111111111111111111" }}
+                                    </div>
+                                    <div class="tooltip" id="tooltip-url">{{ form.url }}</div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -97,19 +165,20 @@
             </div>
         </div>
         <div class="user-submits">
-            
+
         </div>
     </div>
 </template>
   
 <script lang="ts" setup>
 import { Ref, ref, onMounted } from 'vue';
-import { ElForm } from 'element-plus';
+import { ElForm, ElTable } from 'element-plus';
 import { Star, CircleCheck, Male, Female } from '@element-plus/icons-vue';
-import { userInfoResponseData } from '@/api/user/type';
+import { userInfoResponseData, userType } from '@/api/user/type';
 import { reqUserInfo } from '@/api/user';
 import { useUserStore } from '@/stores/userStore';
 import * as echarts from "echarts";
+import { nextTick } from 'vue';
 
 const userStore = useUserStore();
 const avatarImage = ref<HTMLImageElement>();
@@ -137,6 +206,37 @@ let form: Ref<userInfoResponseData['data']> = ref({
     ban: false,
 });
 
+function truncateText(): void {
+    const selectedKeys: (keyof userType)[] = ['username', 'school', 'email', 'url'];
+
+    selectedKeys.forEach((key) => {
+        const element = document.getElementById(key);
+        const tooltip = document.getElementById(`tooltip-${key}`);
+        if (element && tooltip) {
+            const originalText = element.innerText.trim();
+            if (originalText.length > 24) {
+                element.innerText = originalText.slice(0, 24) + '...';
+
+                // 设置 tooltip 的内容
+                tooltip.innerText = originalText;
+
+                // 鼠标悬停时显示 tooltip
+                element.addEventListener('mouseenter', () => {
+                    tooltip.style.display = 'block'; // 显示 tooltip
+                });
+
+                // 鼠标移出时隐藏 tooltip
+                element.addEventListener('mouseleave', () => {
+                    tooltip.style.display = 'none'; // 隐藏 tooltip
+                });
+            } else {
+                // 如果文本不需要截断，隐藏 tooltip
+                tooltip.style.display = 'none';
+            }
+        }
+    });
+};
+
 onMounted(async () => {
     const userInfoResponseData = await reqUserInfo(userStore.userInfo!.userId);
     form.value = userInfoResponseData.data.data;
@@ -144,7 +244,10 @@ onMounted(async () => {
         avatarImage.value!.src = import.meta.env.VITE_APP_URL + form.value.avatar;
     };
 
-    generatePieChart();
+    nextTick(() => {
+        truncateText();
+        generatePieChart();
+    });
 });
 
 const generatePieChart = () => {
@@ -301,6 +404,8 @@ const generatePieChart = () => {
         justify-content: start;
         align-items: start;
         gap: 20px;
+        height: 100%;
+        width: 100%;
 
         .avatar-card {
             display: flex;
@@ -309,7 +414,8 @@ const generatePieChart = () => {
             border-radius: 10px;
             background-color: #FFFFFF;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            width: 440px;
+            width: 30%;
+            height: 100%;
 
             .avatar-img {
                 border-top-left-radius: 10px;
@@ -383,16 +489,19 @@ const generatePieChart = () => {
             display: flex;
             flex-direction: column;
             gap: 28px;
+            width: 21%;
+            height: 100%;
 
             .item {
                 background-color: #f9f9f9;
                 border-radius: 8px;
                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                width: 100%;
 
                 h2 {
                     font-size: 18px;
                     margin: 0;
-                    border-bottom: 2px solid #ccc;
+                    border-bottom: 1px solid #ccc;
                     padding: 15px;
                     display: flex;
                     align-items: center;
@@ -411,17 +520,51 @@ const generatePieChart = () => {
                     border-collapse: collapse;
 
                     td {
-                        padding: 15px;
-                        font-size: 16px;
-                        text-align: left;
+                        position: relative; // 使 tooltip 相对于 td 定位
+
+                        .td {
+                            cursor: pointer;
+                            padding: 15px;
+                            font-size: 16px;
+                            text-align: left;
+                            position: relative; // 使 tooltip 相对于 .td 定位
+                        }
+
+                        .tooltip {
+                            display: none;
+                            position: absolute;
+                            top: -80%;
+                            left: 5%;
+                            background-color: #333;
+                            color: #fff;
+                            padding: 8px;
+                            border-radius: 4px;
+                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                            z-index: 1000;
+                            font-size: 14px;
+
+                            &::before {
+                                content: '';
+                                position: absolute;
+                                bottom: -15px; 
+                                left: 10%;
+                                border-width: 8px;
+                                border-style: solid;
+                                border-color: #333 transparent transparent transparent;
+                            }
+                        }
+
+                        &:hover .tooltip {
+                            display: block; // 显示 tooltip
+                        }
                     }
                 }
             }
         }
 
         .pie-status {
-
-            flex: 1;
+            width: 45%;
+            height: 100%;
 
             .item {
                 background-color: #f9f9f9;

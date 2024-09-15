@@ -5,8 +5,9 @@ export type submitForm = {
     language: string,
 };
 
-type executeMessage = {
+export type executeMessage = {
     exitValue: number,
+    status: string,
     message: string,
     time: number,
     memory: number,

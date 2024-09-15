@@ -12,9 +12,9 @@
         <div class="divider"></div>
         <div class="footer">
             <div class="buttons">
-                <el-button type="info" text @click="handleUndo">Undo</el-button>
-                <el-button type="info" text @click="handleRedo">Redo</el-button>
-                <el-button type="success" size="large" text @click="handleSubmit">submit</el-button>
+                <!-- <el-button type="info" text @click="handleUndo">Undo</el-button>
+                <el-button type="info" text @click="handleRedo">Redo</el-button> -->
+                <el-button :icon="VideoPlay" round @click="handleSubmit">submit</el-button>
             </div>
             <div class="infos">
                 <span class="item">Spaces: {{ config.tabSize }}</span>
@@ -27,23 +27,55 @@
 
         <!-- 仅在 outputVisible 为 true 时显示 output 区域 -->
         <div class="output" v-if="outputVisible">
-            <codemirror v-model="output" :style="{
-                width: config.width,
-                backgroundColor: '#fff',
-                color: '#333'
-            }" :disabled="true" :indent-with-tab="true" :tab-size="config.tabSize" />
+            <!-- 标题部分 -->
+            <div class="output-header">
+                <span>代码运行状态：</span>
+                <!-- 使用状态 class 来动态改变颜色，判断错误或成功 -->
+                <span :class="output?.exitValue !== 0 ? 'error-text' : 'success-text'">
+                    {{ output?.status }}
+                    <!-- 如果状态是 "Running"，显示加载符号 -->
+                    <el-icon v-if="output?.status === 'Running'" v-loading="loading" :element-loading-svg="svg"
+                        class="custom-loading-svg" element-loading-svg-view-box="-10, -10, 50, 50">
+                    </el-icon>
+                </span>
+                <div class="running-status" v-show="output?.exitValue === 0">
+                    <span>{{ timeInfo }}</span>
+                </div>
+                <div class="running-status" v-show="output?.exitValue === 0">
+                    <span>{{ memoryInfo }}</span>
+                </div>
+                <span class="closeoutput" @click="outputVisible = false">
+                    <el-icon>
+                        <Close />
+                    </el-icon>
+                </span>
+            </div>
+
+            <!-- 输入输出部分 -->
+            <div class="input-output-section">
+                <div class="input-field" v-if="inputModel">
+                    <label>输入</label>
+                    <!-- <div class="input-content">{{ input }}</div> -->
+                </div>
+                <div class="output-field">
+                    <label>输出</label>
+                    <pre class="output-content">{{ output?.message }}</pre>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, shallowRef, computed, watch, onMounted } from 'vue'
+import { reactive, shallowRef, computed, watch, onMounted, ref } from 'vue'
 import { EditorView, ViewUpdate } from '@codemirror/view'
 import { redo, undo } from '@codemirror/commands'
 import { Codemirror } from 'vue-codemirror'
 import { ElButton, ElMessage } from 'element-plus'
+import { Close, VideoPlay } from '@element-plus/icons-vue'
 import { configType } from './index.vue'
 import { reqSubmit } from '@/api/submit'
+import { executeMessage } from '@/api/submit/type'
 
 const props = defineProps<{
     config: configType,
@@ -60,8 +92,28 @@ defineExpose({
 // 响应式状态
 const code = shallowRef(props.code);
 const cmView = shallowRef<EditorView>();
-const output = shallowRef('');  // 保存输出结果
+const inputModel = shallowRef(false);  // 控制输入区域显示与否
+const output = shallowRef<executeMessage>();  // 保存输出结果
 const outputVisible = shallowRef(false);  // 控制 output 区域显示与否
+
+const timeInfo = computed(() => {
+    return output.value?.time ? `${(output.value.time * 1000).toFixed(2)} ms` : '0.00 ms';
+});
+const memoryInfo = computed(() => {
+    return output.value?.memory ? `${(output.value.memory / 1024).toFixed(2)} KB` : '0.00 KB';
+});
+
+const loading = ref(true);
+const svg = `
+        <path class="path" d="
+          M 30 15
+          L 28 17
+          M 25.61 25.61
+          A 15 15, 0, 0, 1, 15 30
+          A 15 15, 0, 1, 1, 27.99 7.5
+          L 15 15
+        " style="stroke-width: 4px; fill: #F9F9F9"/>
+      `
 
 // 计算属性
 const extensions = computed(() => {
@@ -109,39 +161,43 @@ const handleStateUpdate = (viewUpdate: ViewUpdate) => {
 };
 
 const handleSubmit = async () => {
-    try {
-        // 将代码字符串转换为 Blob 文件
-        const codeBlob = new Blob([code.value], { type: 'text/plain' });
 
-        // 获取语言扩展名
-        const languageExtension = getLanguageExtension(props.language);
+    output.value = {
+        exitValue: -1, // 设置为 null 表示还没有结果
+        status: 'Running',
+        message: '',
+        time: 0,
+        memory: 0,
+    };
+    outputVisible.value = true;
 
-        // 创建 FormData
-        const formData = new FormData();
-        formData.append('file', codeBlob, `Main.${languageExtension}`);
-        formData.append('language', props.language.name);
+    // 将代码字符串转换为 Blob 文件
+    const codeBlob = new Blob([code.value], { type: 'text/plain' });
 
-        // 发送请求
-        const response = (await reqSubmit(formData)).data;
+    // 获取语言扩展名
+    const languageExtension = getLanguageExtension(props.language);
 
-        // 成功时处理
-        if (response.code === 200) {
-            const data = response.data;
-            if (data.exitValue === 0) {
-                ElMessage.success('提交成功');
-                output.value = `运行时间: ${data.time}ms\n运行内存: ${data.memory}KB\n输出信息: ${data.message}`;
-            } else {
-                ElMessage.error('提交失败');
-                output.value = `错误信息: ${data.exitValue}\n${data.message}`;
-            }
+    // 创建 FormData
+    const formData = new FormData();
+    formData.append('file', codeBlob, `Main.${languageExtension}`);
+    formData.append('language', props.language.name);
 
-            // 显示 output 区域
-            outputVisible.value = true;
+    // 发送请求
+    const response = (await reqSubmit(formData)).data;
+
+    // 成功时处理
+    if (response.code === 200) {
+        const data = response.data;
+        if (data.exitValue === 0) {
+            ElMessage.success('提交成功');
+            output.value = data;
+        } else {
+            ElMessage.error('提交失败');
+            output.value = data;
         }
-    } catch (error) {
-        ElMessage.error('提交失败，请重试');
-        console.error(error);
     }
+    // 显示 output 区域
+    outputVisible.value = true;
 };
 
 // 获取语言扩展名的辅助函数
@@ -239,7 +295,103 @@ const log = console.log
     }
 
     .output {
-        margin-top: 1em;
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+        .output-header {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+
+            .closeoutput {
+                margin-left: auto;
+                cursor: pointer;
+            }
+
+            .running-status {
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                margin-left: 10px;
+                padding: 0 10px;
+
+                span {
+                    color: #e74c3c;
+                    font-size: 16px;
+                }
+            }
+
+            .custom-loading-svg {
+                background-color: transparent;
+                /* 设置背景为透明 */
+                border: none;
+                /* 清除边框 */
+                padding: 0;
+                /* 去掉内边距 */
+            }
+
+            span {
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            /* 根据状态动态改变颜色 */
+            .error-text {
+                color: #e74c3c;
+                /* 红色表示错误 */
+            }
+
+            .success-text {
+                color: #2ecc71;
+                /* 绿色表示成功 */
+            }
+        }
+
+        .input-output-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            .input-field,
+            .output-field {
+                display: flex;
+                flex-direction: column;
+            }
+
+            label {
+                font-size: 14px;
+                margin-bottom: 5px;
+                font-weight: bold;
+                color: #555;
+            }
+
+            .input-content {
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 10px;
+                font-size: 14px;
+                color: #333;
+                line-height: 1.5;
+            }
+
+            .output-content {
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 10px;
+                font-size: 14px;
+                color: #333;
+                line-height: 1.5;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+        }
     }
+
 }
 </style>

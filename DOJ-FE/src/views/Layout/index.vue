@@ -78,5 +78,4 @@ provide('triggerRefresh', triggerRefresh);
     margin-top: 70px;
 }
 
-
 </style>
