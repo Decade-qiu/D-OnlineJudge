@@ -17,6 +17,14 @@
             </select>
         </div>
         <div class="item">
+            <label for="fontSize">tabSize:</label>
+            <select name="fontSize" id="fontSize" v-model.number="config.fontSize">
+                <option :value="option" :key="option" v-for="option in [16, 18, 20, 22, 24, 26]">
+                    {{ option }}
+                </option>
+            </select>
+        </div>
+        <div class="item">
             <label for="tabSize">tabSize:</label>
             <select name="tabSize" id="tabSize" v-model.number="config.tabSize">
                 <option :value="option" :key="option" v-for="option in [2, 4, 6, 8]">

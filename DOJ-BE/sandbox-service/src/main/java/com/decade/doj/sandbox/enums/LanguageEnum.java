@@ -24,9 +24,9 @@ public class LanguageEnum {
         this.timeLimit = timeLimit;
     }
 
-    public static final LanguageEnum JAVA = new LanguageEnum("java", "openjdk:11-slim", "java11", ".java", 256, 2);
-    public static final LanguageEnum PYTHON = new LanguageEnum("python", "python:3.8-slim", "python3", ".py", 256, 10);
-    public static final LanguageEnum CPP = new LanguageEnum("cpp", "gcc:13", "gcc13", ".cpp", 256, 1);
+    public static final LanguageEnum JAVA = new LanguageEnum("java", "openjdk:11-slim", "java11", ".java", 128, 4);
+    public static final LanguageEnum PYTHON = new LanguageEnum("python", "python:3.8-slim", "python3", ".py", 128, 10);
+    public static final LanguageEnum CPP = new LanguageEnum("cpp", "gcc:13", "gcc13", ".cpp", 128, 2);
 
     public static final List<LanguageEnum> values = Arrays.asList(JAVA, PYTHON, CPP);
 

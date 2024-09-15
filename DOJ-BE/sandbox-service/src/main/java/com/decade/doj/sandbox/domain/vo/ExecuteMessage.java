@@ -27,6 +27,10 @@ public class ExecuteMessage {
             return "Compile Error";
         }else if (exitValue == 1) {
             return "Runtime Error";
+        }else if (exitValue == 3) {
+            return "Time Limit Exceeded";
+        }else if (exitValue == 4) {
+            return "Memory Limit Exceeded";
         }
         return "Unknown exitValue";
     }

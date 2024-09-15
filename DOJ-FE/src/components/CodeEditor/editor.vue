@@ -5,15 +5,14 @@
                 width: config.width,
                 height: config.height,
                 backgroundColor: '#fff',
-                color: '#333'
+                color: '#333',
+                fontSize: fontSizeStr,
             }" placeholder="Please enter the code." :extensions="extensions" :disabled="config.disabled"
                 :indent-with-tab="true" :tab-size="config.tabSize" @update="handleStateUpdate" @ready="handleReady" />
         </div>
         <div class="divider"></div>
         <div class="footer">
             <div class="buttons">
-                <!-- <el-button type="info" text @click="handleUndo">Undo</el-button>
-                <el-button type="info" text @click="handleRedo">Redo</el-button> -->
                 <el-button :icon="VideoPlay" round @click="handleSubmit">submit</el-button>
             </div>
             <div class="infos">
@@ -27,13 +26,10 @@
 
         <!-- 仅在 outputVisible 为 true 时显示 output 区域 -->
         <div class="output" v-if="outputVisible">
-            <!-- 标题部分 -->
             <div class="output-header">
                 <span>代码运行状态：</span>
-                <!-- 使用状态 class 来动态改变颜色，判断错误或成功 -->
                 <span :class="output?.exitValue !== 0 ? 'error-text' : 'success-text'">
                     {{ output?.status }}
-                    <!-- 如果状态是 "Running"，显示加载符号 -->
                     <el-icon v-if="output?.status === 'Running'" v-loading="loading" :element-loading-svg="svg"
                         class="custom-loading-svg" element-loading-svg-view-box="-10, -10, 50, 50">
                     </el-icon>
@@ -69,7 +65,6 @@
 <script lang="ts" setup>
 import { reactive, shallowRef, computed, watch, onMounted, ref } from 'vue'
 import { EditorView, ViewUpdate } from '@codemirror/view'
-import { redo, undo } from '@codemirror/commands'
 import { Codemirror } from 'vue-codemirror'
 import { ElButton, ElMessage } from 'element-plus'
 import { Close, VideoPlay } from '@element-plus/icons-vue'
@@ -96,11 +91,12 @@ const inputModel = shallowRef(false);  // 控制输入区域显示与否
 const output = shallowRef<executeMessage>();  // 保存输出结果
 const outputVisible = shallowRef(false);  // 控制 output 区域显示与否
 
+const fontSizeStr = computed(() => `${props.config.fontSize}px`);
 const timeInfo = computed(() => {
     return output.value?.time ? `${(output.value.time * 1000).toFixed(2)} ms` : '0.00 ms';
 });
 const memoryInfo = computed(() => {
-    return output.value?.memory ? `${(output.value.memory / 1024).toFixed(2)} KB` : '0.00 KB';
+    return output.value?.memory ? `${(output.value.memory).toFixed(2)} KB` : '0.00 KB';
 });
 
 const loading = ref(true);
@@ -129,20 +125,6 @@ const extensions = computed(() => {
 
 const handleReady = ({ view }: any) => {
     cmView.value = view;
-};
-
-const handleUndo = () => {
-    undo({
-        state: cmView.value!.state,
-        dispatch: cmView.value!.dispatch
-    });
-}
-
-const handleRedo = () => {
-    redo({
-        state: cmView.value!.state,
-        dispatch: cmView.value!.dispatch
-    });
 };
 
 const state = reactive({
@@ -184,6 +166,8 @@ const handleSubmit = async () => {
 
     // 发送请求
     const response = (await reqSubmit(formData)).data;
+    
+    console.log(response);
 
     // 成功时处理
     if (response.code === 200) {

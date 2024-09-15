@@ -20,6 +20,7 @@ import Editor from './editor.vue';
 
 export type configType = {
     tabSize: number;
+    fontSize: number;
     disabled: boolean;
     height: string;
     width: string;

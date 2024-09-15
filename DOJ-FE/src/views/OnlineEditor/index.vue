@@ -11,7 +11,8 @@ const config = ref({
     height: '62vh',
     width: '100%',
     language: 'cpp',
-    theme: 'oneDark'
+    theme: 'oneDark',
+    fontSize: 16,
 })
 </script>
 

@@ -48,6 +48,8 @@ public class DockerConfig {
     }
 
     public void createDockerContainer(LanguageEnum language) {
+        Integer maxTimeLimit = 15*60;
+
         String cmd = "docker ps -a --format {{.Names}} | grep " + language.getDockerName();
         log.info("check docker container cmd: {}", cmd);
         String res = SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
@@ -68,19 +70,19 @@ public class DockerConfig {
                 + language.getDockerImage()
                 + " tail -f /dev/null";
         log.info("create docker container cmd: {}", cmd);
-        SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
+        SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd, maxTimeLimit);
 
         cmd = "docker exec "
                 + language.getDockerName()
                 + " apt-get update";
         log.info("update apt-get cmd: {}", cmd);
-        SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
+        SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd, maxTimeLimit);
 
         cmd = "docker exec "
                 + language.getDockerName()
                 + " apt-get install time";
         log.info("install time cmd: {}", cmd);
-        SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
+        SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd, maxTimeLimit);
     }
 
     public void upload(String local, String remote) {
@@ -105,28 +107,27 @@ public class DockerConfig {
             String cmd = getCmd(remoteProperty, language, source);
             log.info(cmd);
             // execute command
-            String origin = SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd);
+            String origin = SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd, language.getTimeLimit());
             log.info(origin);
-            if (origin != null) {
-                List<String> res = List.of(origin.split("\n"));
-                List<String> status = List.of(res.get(0).split(" "));
-                Integer exitValue = Integer.parseInt(status.get(0).strip());
-                String message = res.subList(1, res.size()).stream().reduce((a, b) -> a + "\n" + b).orElse("");
-                if (exitValue != 0){
-                    return new ExecuteMessage()
-                            .setExitValue(exitValue)
-                            .setStatus(ExecuteMessage.getStatus(exitValue))
-                            .setMessage(message);
-                }
+            List<String> res = List.of(origin.split("\n"));
+            List<String> status = List.of(res.get(0).split(" "));
+            Integer exitValue = Integer.parseInt(status.get(0).strip());
+            String message = "";
+            if (exitValue <= 2){
+                message = res.subList(1, res.size()).stream().reduce((a, b) -> a + "\n" + b).orElse("");
+            }
+            if (exitValue != 0){
                 return new ExecuteMessage()
                         .setExitValue(exitValue)
                         .setStatus(ExecuteMessage.getStatus(exitValue))
-                        .setTime(Double.parseDouble(status.get(1).strip()))
-                        .setMemory(Long.valueOf(status.get(2).strip()))
                         .setMessage(message);
             }
             return new ExecuteMessage()
-                    .setMessage("执行失败!");
+                    .setExitValue(exitValue)
+                    .setStatus(ExecuteMessage.getStatus(exitValue))
+                    .setTime(Double.parseDouble(status.get(1).strip()))
+                    .setMemory(Long.valueOf(status.get(2).strip()))
+                    .setMessage(message);
         };
     }
 

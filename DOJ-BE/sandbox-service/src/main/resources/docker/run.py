@@ -10,6 +10,8 @@ def process_time_log(time_log):
     with open(time_log, 'r') as f:
         lines = f.readlines()
         for line in lines:
+            if "Command terminated by signal 9" in line:
+                return 4, 0, 0
             if "User time" in line:
                 user_time = float(line.split(":")[1].strip().split(" ")[0])
             if "System time" in line:
