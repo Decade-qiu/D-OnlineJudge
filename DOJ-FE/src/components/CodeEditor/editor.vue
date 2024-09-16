@@ -208,7 +208,16 @@ onMounted(() => {
         (_code) => {
             code.value = _code
         }
-    )
+    );
+    const handleKeyDown = (event: KeyboardEvent) => {
+        // 判断是否是 Ctrl+S 组合键
+        if (event.ctrlKey && event.key === 's') {
+            event.preventDefault(); // 阻止默认保存行为
+            console.log('Ctrl+S is disabled in the editor.'); // 可选：可以在这里执行其他逻辑
+        }
+    };
+    // 监听 keydown 事件
+    window.addEventListener('keydown', handleKeyDown);
 })
 
 // log 方法直接使用 console
