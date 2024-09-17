@@ -1,0 +1,62 @@
+spring:
+    application:
+        name: problem-service
+    profiles:
+        active: dev, common
+    cloud:
+        nacos:
+            server-addr: 192.168.74.131:8848
+            config:
+                file-extension: yaml
+                shared-configs:
+                    - dataId: shared-jdbc.yaml
+                    - dataId: shared-swagger.yaml
+
+# shared-jdbc.yaml
+#spring:
+#    datasource:
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#        url: jdbc:mysql://${doj.db.host:192.168.74.131}:3306/${doj.db.name}
+#        username: ${doj.db.user:root}
+#        password: ${doj.db.pwd:123}
+#        hikari:
+#            auto-commit: true
+#            maximum-pool-size: 10
+#            minimum-idle: 10
+#            connection-test-query: select 1
+#            connection-timeout: 20000
+#mybatis-plus:
+#    global-config:
+#        db-config:
+#            update-strategy: not_null
+#            id-type: auto
+
+# shared-swagger.yaml
+#logging:
+#    level:
+#        com.decade: debug
+#    pattern:
+#        dateformat: HH:mm:ss:SSS
+#knife4j:
+#    enable: true
+#    openapi:
+#        title: ${doj.swagger.title}
+#        description: "Duck Online Judge API"
+#        email: "decade-qzj@foxmail.com"
+#        version: v1.0.0
+#        group:
+#            default:
+#                group-name: default
+#                api-rule: package
+#                api-rule-resources:
+#                    - ${doj.swagger.scan}
+
+# shared-jwt.yaml
+#doj:
+#    jwt:
+#        location: classpath:doj.jks
+#        alias: decade
+#        password: doj123
+#        tokenTTL: 30m
+#        authorization: "authorization"
+#        secret-key: "uid"

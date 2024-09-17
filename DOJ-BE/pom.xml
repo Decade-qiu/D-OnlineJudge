@@ -13,6 +13,7 @@
         <module>gateway-service</module>
         <module>common</module>
         <module>sandbox-service</module>
+        <module>problem-service</module>
     </modules>
 
     <parent>
