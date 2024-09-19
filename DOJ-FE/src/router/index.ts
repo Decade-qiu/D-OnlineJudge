@@ -13,7 +13,7 @@ import Register from '@/views/User/register/index.vue'
 import Info from '@/views/User/info/index.vue'
 import UserHome from '@/views/User/home/index.vue'
 import OnlineEditor from '@/views/OnlineEditor/index.vue'
-
+import Problem from '@/views/Problem/index.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +41,9 @@ const router = createRouter({
                 },{
                     path: '/online',
                     component: OnlineEditor
+                },{
+                    path: '/problem',
+                    component: Problem
                 }
             ]
         }

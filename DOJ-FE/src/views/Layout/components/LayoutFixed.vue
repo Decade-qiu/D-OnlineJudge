@@ -18,6 +18,18 @@ const logout = () => {
     userStore.clearUserInfo();
     window.location.href = '/login';
 };
+
+const navItems = [
+    { path: '/', icon: 'fas fa-home', text: '主页' },
+    { path: '/problem', icon: 'fas fa-book', text: '题库' },
+    { path: '/online', icon: 'fas fa-code', text: '编码' },
+    { path: '/competitions', icon: 'fas fa-trophy', text: '竞赛' },
+    { path: '/status', icon: 'fas fa-tasks', text: '状态' },
+    { path: '/rankings', icon: 'fas fa-chart-bar', text: '排名' },
+    { path: '/about', icon: 'fas fa-info-circle', text: '关于' }
+];
+
+const isActive = (path: string) => router.currentRoute.value.path === path;
 </script>
 
 <template>
@@ -30,20 +42,15 @@ const logout = () => {
                 </a>
                 <!-- Navigation items -->
                 <div class="nav-items">
-                    <router-link class="nav-item" :to="{ path: '/' }" exact-active-class="active"><i
-                            class="fas fa-home"></i>
-                        主页</router-link>
-                    <router-link class="nav-item" :to="{ path: '/problems' }"><i class="fas fa-book"></i>
-                        题库</router-link>
-                    <router-link class="nav-item" :to="{ path: '/online' }"><i class="fas fa-code"></i>
-                        编码</router-link>
-                    <router-link class="nav-item" :to="{ path: '/competitions' }"><i class="fas fa-trophy"></i>
-                        竞赛</router-link>
-                    <router-link class="nav-item" :to="{ path: '/status' }"><i class="fas fa-tasks"></i> 状态</router-link>
-                    <router-link class="nav-item" :to="{ path: '/rankings' }"><i class="fas fa-chart-bar"></i>
-                        排名</router-link>
-                    <router-link class="nav-item" :to="{ path: '/about' }"><i class="fas fa-info-circle"></i>
-                        关于</router-link>
+                    <router-link
+                        v-for="item in navItems"
+                        :key="item.path"
+                        class="nav-item"
+                        :to="{ path: item.path }"
+                        :class="{ active: isActive(item.path) }"
+                    >
+                        <i :class="item.icon"></i> {{ item.text }}
+                    </router-link>
                 </div>
             </div>
             <div class="var">
