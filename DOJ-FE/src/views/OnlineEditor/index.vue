@@ -1,5 +1,7 @@
 <template>
-    <CodeEditor :config="config" />
+    <div class="editor-box">
+        <CodeEditor :config="config" />
+    </div>
 </template>
 
 <script setup lang='ts'>
@@ -17,5 +19,7 @@ const config = ref({
 </script>
 
 <style scoped lang="scss">
-
+    .editor-box {
+        margin-top: 10px;
+    }
 </style>
