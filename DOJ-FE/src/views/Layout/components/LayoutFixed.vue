@@ -220,7 +220,7 @@ const isActive = (path: string) => router.currentRoute.value.path === path;
             /* Active text color */
             border-bottom: 5px solid #2d8cf0;
             /* Underline effect */
-            padding-bottom: 13px;
+            padding-bottom: 15px;
             /* Padding to position underline */
         }
 
