@@ -19,13 +19,33 @@
             <el-input placeholder="请输入题目名称" v-model="searchName" clearable />
         </div>
         <el-table :data="tableData" :default-sort="{ prop: 'id', order: 'ascending' }">
-            <el-table-column prop="status" label="状态" />
-            <el-table-column prop="id" label="编号" sortable />
-            <el-table-column prop="name" label="题目" />
-            <el-table-column prop="difficulty" label="难度" />
-            <el-table-column prop="totalAttempt" label="提交数" />
-            <el-table-column prop="passRate" label="通过率" :formatter="formatPassRate" sortable />
+            <el-table-column prop="status" label="状态" align="center" width="120">
+                <template v-slot="scope">
+                    <span v-if="scope.row.status === 0">
+                    </span>
+                    <span v-else-if="scope.row.status === 1">
+                        <el-icon color="#49CE78"><CircleCheck /></el-icon>
+                    </span>
+                    <span v-else-if="scope.row.status === 2">
+                        <el-icon color="#FF2D55"><circle-close /></el-icon>
+                    </span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="id" label="编号" sortable align="center" width="100" />
+            <el-table-column prop="name" label="题目" align="center" min-width="100">
+                <template v-slot="scope">
+                    <span class="problem_name">{{ scope.row.name }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="difficulty" label="难度" align="center" width="100">
+                <template v-slot="scope">
+                    <span :class="{'easy': scope.row.difficulty==='简单', 'medium': scope.row.difficulty==='中等', 'hard': scope.row.difficulty==='困难'}" class="problem_difficulty">{{ scope.row.difficulty }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="totalAttempt" label="提交数" align="center" width="150" />
+            <el-table-column prop="passRate" label="通过率" :formatter="formatPassRate" sortable width="150" />
         </el-table>
+
         <div class="page_list">
             <el-pagination background layout="prev, pager, next" :total="1000" />
         </div>
@@ -33,90 +53,79 @@
 </template>
 
 <script setup lang='ts'>
-import { ElTable, ElTableColumn, ElSelect, ElInput, ElPagination } from 'element-plus';
+import { ElTable, ElTableColumn, ElSelect, ElInput, ElPagination, ElIcon } from 'element-plus';
+import { CircleCheck, Close, CircleClose } from '@element-plus/icons-vue';
+import { ref } from 'vue';
+import { reqProblemList } from '@/api/problem';
+import type { ProblemType } from '@/api/problem/type';
+import { onMounted } from 'vue';
+
+const searchDifficulty = ref('');
+const searchStatus = ref('');
+const searchTag = ref('');
+const searchName = ref('');
 
 const formatPassRate = (row: any) => {
     return `${(row.totalPass / row.totalAttempt * 100).toFixed(2)}%`
 };
 
-const tableData = [
-    {
-        status: '已通过',
-        id: '1',
-        name: '两数之和',
-        difficulty: '简单',
-        totalAttempt: 100,
-        totalPass: 80
-    },
-    {
-        status: '未通过',
-        id: '2',
-        name: '三数之和',
-        difficulty: '中等',
-        totalAttempt: 100,
-        totalPass: 60
-    },
-    {
-        status: '未通过',
-        id: '3',
-        name: '四数之和',
-        difficulty: '困难',
-        totalAttempt: 100,
-        totalPass: 40
+type TableData = ProblemType & { status: number };
+const tableData = ref<TableData[]>([]);
+
+const getProblemList = async () => {
+    const res = await reqProblemList();
+    const problems = res.data.data;
+    for (const problem of problems) {
+        tableData.value.push({
+            ...problem,
+            status: Math.floor(Math.random() * 3)
+        });
     }
-];
+};
+
+onMounted(() => {
+    getProblemList();
+});
 </script>
 
 <style scoped lang="scss">
 .problem_list {
 
+    font-weight: 700;
+
     .search_setting {
         display: flex;
         align-items: center;
-        /* 垂直居中对齐 */
         gap: 10px;
-        /* 添加间隔以分开选择框和输入框 */
         margin-bottom: 20px;
-        padding: 10px;
-        /* 添加底部间距以分隔搜索设置和表格 */
-        // background-color: #fff;
-        /* 设置背景色为白色 */
-        // border-radius: 8px;
-        // box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        /* 添加阴影 */
-
-        el-select,
-        el-input {
-            background-color: #f5f5f5;
-            /* 设置深灰色背景 */
-            border-radius: 4px;
-            /* 添加圆角 */
-            border: 1px solid #ddd;
-            /* 添加边框 */
-        }
-
-        el-select {
-            min-width: 100px;
-            /* 设置最小宽度以确保显示完整 */
-        }
-
-        el-input {
-            flex: 1;
-            /* 让输入框填满剩余空间 */
-        }
+        padding-top: 10px;
     }
 
     .el-table {
-        .el-table__header {
-            background-color: #333;
-            /* 设置表头的深色背景 */
-            color: #fff;
-            /* 设置表头文字颜色 */
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+        .problem_name {
+            color: #1E70BF;
+            /* 亮蓝色 */
+            cursor: pointer;
+            /* 鼠标悬停时显示指针 */
         }
 
-        .el-table__body {
-            background-color: #fff;
-            /* 保持表格主体为白色 */
+        .problem_difficulty {
+            &.easy {
+                color: #67C23A;
+                /* 绿色 */
+            }
+            &.medium {
+                color: #E6A23C;
+                /* 橙色 */
+            }
+            &.hard {
+                color: #F56C6C;
+                /* 红色 */
+            }
         }
     }
 
