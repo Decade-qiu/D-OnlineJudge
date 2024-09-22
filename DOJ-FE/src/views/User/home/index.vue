@@ -4,21 +4,25 @@
             <div class="avatar-card">
                 <img ref="avatarImage" src="@/assets/default.png" alt="avatar" class="avatar-img" />
                 <div class="user-details">
-                    <p class="user-name">{{ form.username }}
-                        <span style="display: inline-block;">
-                            <template v-if="form.gender">
-                                <el-icon>
-                                    <Male />
-                                </el-icon>
-                            </template>
-                            <template v-else>
-                                <el-icon>
-                                    <Female />
-                                </el-icon>
-                            </template>
-                        </span>
-                    </p>
-                    <p class="user-sign">{{ form.sign }}</p>
+                    <div class="user-basic">
+                        <p class="user-name">{{ form.username }}
+                            <span style="display: inline-block;">
+                                <template v-if="form.gender">
+                                    <el-icon>
+                                        <Male />
+                                    </el-icon>
+                                </template>
+                                <template v-else>
+                                    <el-icon>
+                                        <Female />
+                                    </el-icon>
+                                </template>
+                            </span>
+                        </p>
+                        <el-tooltip effect="dark" :content="form.sign" placement="top">
+                            <p class="user-sign">{{ form.sign }}</p>
+                        </el-tooltip>
+                    </div>
                     <div class="summary-status">
                         <a><el-icon>
                                 <CircleCheck />
@@ -47,114 +51,30 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="basic-info">
-                <div class="item">
-                    <h2><i class="fa fa-user" aria-hidden="true" />用户名</h2>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="td">
-                                        {{ form.username }}
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="item">
-                    <h2><i class="fa fa-school" aria-hidden="true" />学校</h2>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="td">{{ form.school == '' ? '暂无' : form.school }}
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="item">
-                    <h2><i class="fa fa-envelope" aria-hidden="true" />邮箱</h2>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="td">{{ form.email == '' ? '暂无' : form.email }}
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="item">
-                    <h2><i class="fa fa-link" aria-hidden="true" />个人主页</h2>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="td">{{ form.url == '' ? '暂无' : form.url + "1111111111111111111" }}
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div> -->
             <div class="basic-info">
                 <div class="item">
                     <h2><i class="fa fa-user" aria-hidden="true"></i>用户名</h2>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="td" id="username">{{ form.username }}</div>
-                                    <div class="tooltip" id="tooltip-username">{{ form.username }}</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <el-tooltip effect="dark" :content="form.username" placement="top">
+                        <p class="item-body">{{ form.username == '' ? '暂无' : form.username }}</p>
+                    </el-tooltip>
                 </div>
                 <div class="item">
                     <h2><i class="fa fa-school" aria-hidden="true"></i>学校</h2>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="td" id="school">{{ form.school == '' ? '暂无' : form.school }}</div>
-                                    <div class="tooltip" id="tooltip-school">{{ form.school }}</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <el-tooltip effect="dark" :content="form.school" placement="top">
+                        <p class="item-body">{{ form.school == '' ? '暂无' : form.school }}</p>
+                    </el-tooltip>
                 </div>
                 <div class="item">
                     <h2><i class="fa fa-envelope" aria-hidden="true"></i>邮箱</h2>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="td" id="email">{{ form.email == '' ? '暂无' : form.email }}</div>
-                                    <div class="tooltip" id="tooltip-email">{{ form.email }}</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <el-tooltip effect="dark" :content="form.email" placement="top">
+                        <p class="item-body">{{ form.email == '' ? '暂无' : form.email }}</p>
+                    </el-tooltip>
                 </div>
                 <div class="item">
                     <h2><i class="fa fa-link" aria-hidden="true"></i>个人主页</h2>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="td" id="url">{{ form.url == '' ? '暂无' : form.url + "1111111111111111111" }}
-                                    </div>
-                                    <div class="tooltip" id="tooltip-url">{{ form.url }}</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <el-tooltip effect="dark" :content="form.url" placement="top">
+                        <p class="item-body">{{ form.url == '' ? '暂无' : form.url }}</p>
+                    </el-tooltip>
                 </div>
             </div>
             <div class="pie-status">
@@ -172,7 +92,7 @@
   
 <script lang="ts" setup>
 import { Ref, ref, onMounted } from 'vue';
-import { ElForm, ElTable } from 'element-plus';
+import { ElForm, ElTooltip } from 'element-plus';
 import { Star, CircleCheck, Male, Female } from '@element-plus/icons-vue';
 import { userInfoResponseData, userType } from '@/api/user/type';
 import { reqUserInfo } from '@/api/user';
@@ -214,8 +134,8 @@ function truncateText(): void {
         const tooltip = document.getElementById(`tooltip-${key}`);
         if (element && tooltip) {
             const originalText = element.innerText.trim();
-            if (originalText.length > 24) {
-                element.innerText = originalText.slice(0, 24) + '...';
+            if (originalText.length > 13) {
+                element.innerText = originalText.slice(0, 13) + '...';
 
                 // 设置 tooltip 的内容
                 tooltip.innerText = originalText;
@@ -404,8 +324,6 @@ const generatePieChart = () => {
         justify-content: start;
         align-items: start;
         gap: 20px;
-        height: 100%;
-        width: 100%;
 
         .avatar-card {
             display: flex;
@@ -414,34 +332,56 @@ const generatePieChart = () => {
             border-radius: 10px;
             background-color: #FFFFFF;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            width: 30%;
-            height: 100%;
+            width: 34.5%;
 
             .avatar-img {
                 border-top-left-radius: 10px;
                 border-top-right-radius: 10px;
                 border: 10px solid #3f444d;
                 border-image: linear-gradient(45deg, #ff6b6b, #f8e71c, #50e3c2, #4a90e2) 1;
+                width: 100%;
+                object-fit: contain;
+                /* 保证图片不失真，裁剪超出部分 */
+                aspect-ratio: 1 / 1;
+                /* 确保图片保持1:1的比例 */
             }
 
             .user-details {
                 width: 100%;
 
-                .user-name {
-                    padding: 10px 20px;
-                    font-size: 20px;
-                    font-weight: bold;
-                }
+                .user-basic {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
 
-                .user-sign {
-                    padding: 0px 20px;
-                    font-size: 16px;
-                    color: #666;
+                    .user-name {
+                        padding: 13px 20px;
+                        font-size: 20px;
+                        font-weight: bold;
+                    }
+
+                    .user-sign {
+                        padding: 13px 20px;
+                        font-size: 20px;
+                        color: #666;
+                        white-space: nowrap;
+                        /* 禁止换行 */
+                        overflow: hidden;
+                        /* 隐藏溢出的文本 */
+                        text-overflow: ellipsis;
+                        /* 显示省略号 */
+                        max-width: 180px;
+                        /* 设置最大宽度 */
+                        cursor: pointer;
+                        /* 鼠标指针变为可点击 */
+                    }
+
+
                 }
 
                 .summary-status {
                     border-top: 2px solid #B3B3B3;
-                    margin-top: 10px;
+                    margin-top: 5px;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -489,8 +429,7 @@ const generatePieChart = () => {
             display: flex;
             flex-direction: column;
             gap: 28px;
-            width: 21%;
-            height: 100%;
+            width: 25%;
 
             .item {
                 background-color: #f9f9f9;
@@ -515,56 +454,27 @@ const generatePieChart = () => {
                     }
                 }
 
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-
-                    td {
-                        position: relative; // 使 tooltip 相对于 td 定位
-
-                        .td {
-                            cursor: pointer;
-                            padding: 15px;
-                            font-size: 16px;
-                            text-align: left;
-                            position: relative; // 使 tooltip 相对于 .td 定位
-                        }
-
-                        .tooltip {
-                            display: none;
-                            position: absolute;
-                            top: -80%;
-                            left: 5%;
-                            background-color: #333;
-                            color: #fff;
-                            padding: 8px;
-                            border-radius: 4px;
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-                            z-index: 1000;
-                            font-size: 14px;
-
-                            &::before {
-                                content: '';
-                                position: absolute;
-                                bottom: -15px; 
-                                left: 10%;
-                                border-width: 8px;
-                                border-style: solid;
-                                border-color: #333 transparent transparent transparent;
-                            }
-                        }
-
-                        &:hover .tooltip {
-                            display: block; // 显示 tooltip
-                        }
-                    }
+                .item-body {
+                    width: 100% !important;
+                    padding: 15px;
+                    font-size: 16px;
+                    text-align: left;
+                    white-space: nowrap;
+                    /* 禁止换行 */
+                    overflow: hidden !important;
+                    /* 隐藏溢出的文本 */
+                    text-overflow: ellipsis !important;
+                    /* 显示省略号 */
+                    max-width: 100% !important;
+                    /* 设置最大宽度 */
+                    cursor: pointer;
+                    /* 鼠标指针变为可点击 */
                 }
             }
         }
 
         .pie-status {
             width: 45%;
-            height: 100%;
 
             .item {
                 background-color: #f9f9f9;
@@ -590,7 +500,7 @@ const generatePieChart = () => {
 
                 .pie-body {
                     width: 100%;
-                    height: 465px;
+                    height: 460px;
                 }
             }
         }

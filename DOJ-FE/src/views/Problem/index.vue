@@ -54,7 +54,7 @@
 
 <script setup lang='ts'>
 import { ElTable, ElTableColumn, ElSelect, ElInput, ElPagination, ElIcon } from 'element-plus';
-import { CircleCheck, Close, CircleClose } from '@element-plus/icons-vue';
+import { CircleCheck, CircleClose } from '@element-plus/icons-vue';
 import { ref } from 'vue';
 import { reqProblemList } from '@/api/problem';
 import type { ProblemType } from '@/api/problem/type';
