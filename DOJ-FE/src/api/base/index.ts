@@ -8,3 +8,9 @@ export type BaseResponseData = BaseResponse & {
     data: string
 };
 
+export type BasePageQueryForm = {
+    pageNo: number,
+    pageSize: number,
+    isAsc: boolean,
+    sortBy: string,
+};

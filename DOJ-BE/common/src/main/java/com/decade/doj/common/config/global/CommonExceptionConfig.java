@@ -51,7 +51,7 @@ public class CommonExceptionConfig {
 
     @ExceptionHandler(Exception.class)
     public Object handleRuntimeException(Exception e) {
-        log.error("其他异常 uri : {}", e.getMessage());
+        log.error("其他异常 uri : {} {}", e.getMessage(), e.getStackTrace());
         return processResponse(new CommonException(e.getMessage(), 500));
     }
 

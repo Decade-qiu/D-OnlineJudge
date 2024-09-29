@@ -16,6 +16,10 @@ spring:
                     uri: lb://user-service
                     predicates:
                         - Path=/user/**,/static/**
+                -   id: problem
+                    uri: lb://problem-service
+                    predicates:
+                        - Path=/problem/**
                 -   id: sandbox
                     uri: lb://sandbox-service
                     predicates:

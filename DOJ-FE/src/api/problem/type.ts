@@ -1,4 +1,11 @@
-import { BaseResponse } from '@/api/base'
+import { BaseResponse, BasePageQueryForm } from '@/api/base';
+
+export type ProblemPageQueryForm = BasePageQueryForm & {
+    name: string,
+    difficulty: string,
+    tags: string,
+    status: number,
+};
 
 export type ProblemType = {
     id: number;
@@ -15,6 +22,14 @@ export type ProblemType = {
     totalPass: number;
     totalAttempt: number;
     tag: string;
+};
+
+export type ProblemsPageResponseData = BaseResponse & {
+    data: {
+        total: number,
+        pages: number,
+        list: ProblemType[],
+    },
 };
 
 export type ProblemsResponseData = BaseResponse & {

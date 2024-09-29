@@ -30,8 +30,10 @@ public class MVCConfig implements WebMvcConfigurer {
         registry.addResourceHandler(request).addResourceLocations(location);
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new IdentityInterceptor()).addPathPatterns("/**");
-    }
+    // @Override
+    // public void addInterceptors(InterceptorRegistry registry) {
+    //     registry.addInterceptor(new IdentityInterceptor())
+    //             .addPathPatterns("/**")
+    //             .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/doc.html/**");
+    // }
 }

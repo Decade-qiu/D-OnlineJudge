@@ -1,17 +1,17 @@
 <template>
     <div class="problem_list">
         <div class="search_setting">
-            <el-select v-model="searchDifficulty" placeholder="难度" clearable>
+            <el-select v-model="searchDifficulty" placeholder="难度" @clear="searchDifficulty = null" clearable>
                 <el-option label="简单" value="简单" />
                 <el-option label="中等" value="中等" />
                 <el-option label="困难" value="困难" />
             </el-select>
-            <el-select v-model="searchStatus" placeholder="状态" clearable>
+            <el-select v-model="searchStatus" placeholder="状态" clearable @clear="searchStatus = null">
                 <el-option label="已通过" value="已通过" />
                 <el-option label="未通过" value="未通过" />
                 <el-option label="尝试中" value="尝试中" />
             </el-select>
-            <el-select v-model="searchTag" placeholder="标签" clearable>
+            <el-select v-model="searchTag" placeholder="标签" clearable @clear="searchTag = null">
                 <el-option label="数组" value="数组" />
                 <el-option label="字符串" value="字符串" />
                 <el-option label="链表" value="链表" />
@@ -47,7 +47,13 @@
         </el-table>
 
         <div class="page_list">
-            <el-pagination background layout="prev, pager, next" :total="1000" />
+            <el-pagination background layout="prev, pager, next, jumper, total, sizes"
+            :total="total" 
+            :page-count="pages" 
+            :page-sizes="pageSizes" 
+            v-model:page-size="pageQueryFrom.pageSize" v-model:current-page="pageQueryFrom.pageNo"
+            @change="getProblemList"
+            />
         </div>
     </div>
 </template>
@@ -56,14 +62,19 @@
 import { ElTable, ElTableColumn, ElSelect, ElInput, ElPagination, ElIcon } from 'element-plus';
 import { CircleCheck, CircleClose } from '@element-plus/icons-vue';
 import { ref } from 'vue';
-import { reqProblemList } from '@/api/problem';
+import { reqProblemList, reqProblemPageList } from '@/api/problem';
 import type { ProblemType } from '@/api/problem/type';
+import type { BasePageQueryForm } from '@/api/base';
 import { onMounted } from 'vue';
+import { watch } from 'vue';
 
-const searchDifficulty = ref('');
-const searchStatus = ref('');
-const searchTag = ref('');
-const searchName = ref('');
+const searchDifficulty = ref();
+const searchStatus = ref();
+const searchTag = ref();
+const searchName = ref();
+watch([searchDifficulty, searchStatus, searchTag, searchName], () => {
+    getProblemList();
+});
 
 const formatPassRate = (row: any) => {
     return `${(row.totalPass / row.totalAttempt * 100).toFixed(2)}%`
@@ -71,11 +82,30 @@ const formatPassRate = (row: any) => {
 
 type TableData = ProblemType & { status: number };
 const tableData = ref<TableData[]>([]);
+const pageQueryFrom = ref<BasePageQueryForm>({
+    pageNo: 1,
+    pageSize: 10,
+    isAsc: true,
+    sortBy: ''
+});
+const total = ref(0);
+const pages = ref(0);
+const pageSizes = ref([5, 10, 20, 50]);
 
 const getProblemList = async () => {
-    const res = await reqProblemList();
-    const problems = res.data.data;
-    for (const problem of problems) {
+    // const res = await reqProblemList();
+    const res = await reqProblemPageList({
+        ...pageQueryFrom.value,
+        name: searchName.value,
+        difficulty: searchDifficulty.value,
+        tags: searchTag.value,
+        status: searchStatus.value
+    });
+    const { total:totalV, pages:pagesV, list } = res.data.data;
+    total.value = totalV;
+    pages.value = pagesV;
+    tableData.value =  [];
+    for (const problem of list) {
         tableData.value.push({
             ...problem,
             status: Math.floor(Math.random() * 3)

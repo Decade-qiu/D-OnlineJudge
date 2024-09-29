@@ -1,5 +1,8 @@
 package com.decade.doj.problem.service;
 
+import com.decade.doj.common.domain.PageDTO;
+import com.decade.doj.common.domain.PageQueryDTO;
+import com.decade.doj.problem.domain.dto.ProblemPageQueryDTO;
 import com.decade.doj.problem.domain.po.Problem;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IProblemService extends IService<Problem> {
 
+    PageDTO<Problem> pageQuery(ProblemPageQueryDTO problemPageQueryDTO);
 }
