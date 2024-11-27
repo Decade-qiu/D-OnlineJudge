@@ -58,6 +58,32 @@ public class SandboxController {
         return R.ok(executeMessage);
     }
 
+    @PostMapping("/problem")
+    @ApiOperation("测评")
+    public R<ExecuteMessage> validate(@NotNull String pid, @RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) {
+        if (file.isEmpty()) {
+            return R.error("文件为空!");
+        }
+
+        if (!LanguageEnum.isValidLanguage(lang)) {
+            return R.error("不支持的语言!");
+        }
+
+        String filename = UUID.randomUUID() + file.getOriginalFilename();
+        if (lang.equals("java")) filename = file.getOriginalFilename();
+        Path path = Paths.get(resourceProperties.getProblemCodePath() + filename);
+
+        try {
+            file.transferTo(path);
+        } catch (Exception e) {
+            return R.error("文件上传失败, "+path.toAbsolutePath()+"地址不存在!");
+        }
+
+        ExecuteMessage executeMessage = sandboxService.runProblemCodeInSandbox(path.toUri().getPath(), filename, lang, pid);
+
+        return R.ok(executeMessage);
+    }
+
     // @GetMapping("/{id}")
     // @ApiOperation("查询用户接口")
     // public R<String> getUser(@PathVariable("id") @NotNull String id) {

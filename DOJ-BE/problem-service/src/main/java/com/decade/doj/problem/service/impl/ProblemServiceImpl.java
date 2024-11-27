@@ -32,12 +32,12 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         Page<Problem> problemList = lambdaQuery()
                 .like(problemPageQueryDTO.getName() != null, Problem::getName, problemPageQueryDTO.getName())
                 .eq(problemPageQueryDTO.getDifficulty() != null, Problem::getDifficulty, problemPageQueryDTO.getDifficulty())
-                // .or(problemPageQueryDTO.getTags() != null, wrapper -> {
-                //     List<String> tags = List.of(problemPageQueryDTO.getTags().split(","));
-                //     for (String tag : tags) {
-                //         wrapper.like(Problem::getTag, tag);
-                //     }
-                // })
+                .or(problemPageQueryDTO.getTags() != null, wrapper -> {
+                    List<String> tags = List.of(problemPageQueryDTO.getTags().split(","));
+                    for (String tag : tags) {
+                        wrapper.like(Problem::getTag, tag);
+                    }
+                })
                 .page(problemPageQueryDTO.toMpPage("id", true));
 
 

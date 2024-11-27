@@ -28,7 +28,7 @@
         <div class="output" v-if="outputVisible">
             <div class="output-header">
                 <span>代码运行状态：</span>
-                <span :class="output?.exitValue !== 0 ? 'error-text' : 'success-text'">
+                <span :class="output?.exitValue !== 0 && output?.exitValue !== 10 ? 'error-text' : 'success-text'">
                     {{ output?.status }}
                     <el-icon v-if="output?.status === 'Running'" v-loading="loading" :element-loading-svg="svg"
                         class="custom-loading-svg" element-loading-svg-view-box="-10, -10, 50, 50">
@@ -48,7 +48,7 @@
             </div>
 
             <!-- 输入输出部分 -->
-            <div class="input-output-section">
+            <div class="input-output-section" v-show="outputTextVis">
                 <div class="input-field" v-if="inputModel">
                     <label>输入</label>
                     <!-- <div class="input-content">{{ input }}</div> -->
@@ -69,7 +69,7 @@ import { Codemirror } from 'vue-codemirror'
 import { ElButton, ElMessage } from 'element-plus'
 import { Close, VideoPlay } from '@element-plus/icons-vue'
 import { configType } from './index.vue'
-import { reqSubmit } from '@/api/submit'
+import { reqSubmit, reqProblemSubmit } from '@/api/submit'
 import { executeMessage } from '@/api/submit/type'
 
 const props = defineProps<{
@@ -90,6 +90,7 @@ const cmView = shallowRef<EditorView>();
 const inputModel = shallowRef(false);  // 控制输入区域显示与否
 const output = shallowRef<executeMessage>();  // 保存输出结果
 const outputVisible = shallowRef(false);  // 控制 output 区域显示与否
+const outputTextVis = shallowRef(false);  // 控制输入输出区域显示与否
 
 const fontSizeStr = computed(() => `${props.config.fontSize}px`);
 const timeInfo = computed(() => {
@@ -151,7 +152,6 @@ const handleSubmit = async () => {
         time: 0,
         memory: 0,
     };
-    outputVisible.value = true;
 
     // 将代码字符串转换为 Blob 文件
     const codeBlob = new Blob([code.value], { type: 'text/plain' });
@@ -164,20 +164,28 @@ const handleSubmit = async () => {
     formData.append('file', codeBlob, `Main.${languageExtension}`);
     formData.append('language', props.language.name);
 
+    formData.append('pid', "1");
+
     // 发送请求
-    const response = (await reqSubmit(formData)).data;
+    // const response = (await reqSubmit(formData)).data;
+    const response = (await reqProblemSubmit(formData)).data;
     
     console.log(response);
 
     // 成功时处理
     if (response.code === 200) {
         const data = response.data;
-        if (data.exitValue === 0) {
+        if (data.exitValue === 0 || data.exitValue >= 10) {
             ElMessage.success('提交成功');
             output.value = data;
         } else {
             ElMessage.error('提交失败');
             output.value = data;
+        }
+        if (data.message.trim() !== '') {
+            outputTextVis.value = true;
+        }else{
+            outputTextVis.value = false;
         }
     }
     // 显示 output 区域
@@ -298,7 +306,7 @@ const log = console.log
         .output-header {
             display: flex;
             justify-content: flex-start;
-            margin-bottom: 10px;
+            //margin-bottom: 10px;
 
             .closeoutput {
                 margin-left: auto;
@@ -348,6 +356,7 @@ const log = console.log
             display: flex;
             flex-direction: column;
             gap: 10px;
+            margin-top: 15px;
 
             .input-field,
             .output-field {

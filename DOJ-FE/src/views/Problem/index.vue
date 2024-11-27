@@ -34,7 +34,7 @@
             <el-table-column prop="id" label="编号" sortable align="center" width="100" />
             <el-table-column prop="name" label="题目" align="center" min-width="100">
                 <template v-slot="scope">
-                    <span class="problem_name">{{ scope.row.name }}</span>
+                    <span class="problem_name" @click="toProblem(scope.row.id)">{{ scope.row.name }}</span>
                 </template>
             </el-table-column>
             <el-table-column prop="difficulty" label="难度" align="center" width="100">
@@ -62,11 +62,14 @@
 import { ElTable, ElTableColumn, ElSelect, ElInput, ElPagination, ElIcon } from 'element-plus';
 import { CircleCheck, CircleClose } from '@element-plus/icons-vue';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { reqProblemList, reqProblemPageList } from '@/api/problem';
 import type { ProblemType } from '@/api/problem/type';
 import type { BasePageQueryForm } from '@/api/base';
 import { onMounted } from 'vue';
 import { watch } from 'vue';
+
+const router = useRouter();
 
 const searchDifficulty = ref();
 const searchStatus = ref();
@@ -91,6 +94,10 @@ const pageQueryFrom = ref<BasePageQueryForm>({
 const total = ref(0);
 const pages = ref(0);
 const pageSizes = ref([5, 10, 20, 50]);
+
+const toProblem = (id: number) => {
+    router.push("/problem/"+id);
+};
 
 const getProblemList = async () => {
     // const res = await reqProblemList();

@@ -27,6 +27,7 @@ public class DockerConfig {
     private final RemoteProperty remoteProperty;
 
     private final String WITHOUT_INPUT_FILE = "/run/run.py";
+    private final String WITH_INPUT_FILE = "/problem/run.py";
 
     @PostConstruct
     public void init() {
@@ -100,11 +101,46 @@ public class DockerConfig {
         ExecuteMessage run(LanguageEnum language, String source);
     }
 
+    public interface RunCodeWithInput {
+        ExecuteMessage run(LanguageEnum language, String source, String pid);
+    }
+
     @Bean
     public RunCodeWithoutInput runCode(RemoteProperty remoteProperty) {
         return (language, source) -> {
             // script path
-            String cmd = getCmd(remoteProperty, language, source);
+            String cmd = getCmd(remoteProperty, language, source, -1);
+            log.info(cmd);
+            // execute command
+            String origin = SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd, language.getTimeLimit());
+            log.info(origin);
+            List<String> res = List.of(origin.split("\n"));
+            List<String> status = List.of(res.get(0).split(" "));
+            Integer exitValue = Integer.parseInt(status.get(0).strip());
+            String message = "";
+            if (exitValue <= 2){
+                message = res.subList(1, res.size()).stream().reduce((a, b) -> a + "\n" + b).orElse("");
+            }
+            if (exitValue != 0 && exitValue < 10){
+                return new ExecuteMessage()
+                        .setExitValue(exitValue)
+                        .setStatus(ExecuteMessage.getStatus(exitValue))
+                        .setMessage(message);
+            }
+            return new ExecuteMessage()
+                    .setExitValue(exitValue)
+                    .setStatus(ExecuteMessage.getStatus(exitValue))
+                    .setTime(Double.parseDouble(status.get(1).strip()))
+                    .setMemory(Long.valueOf(status.get(2).strip()))
+                    .setMessage(message);
+        };
+    }
+
+    @Bean
+    public RunCodeWithInput runProblemCode(RemoteProperty remoteProperty) {
+        return (language, source, pid) -> {
+            // script path
+            String cmd = getCmd(remoteProperty, language, source, Integer.parseInt(pid));
             log.info(cmd);
             // execute command
             String origin = SSHUtil.executeRemoteCommand(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), cmd, language.getTimeLimit());
@@ -132,9 +168,9 @@ public class DockerConfig {
     }
 
     @NotNull
-    private String getCmd(RemoteProperty remoteProperty, LanguageEnum language, String source) {
-        String script = remoteProperty.getScriptPath() + WITHOUT_INPUT_FILE;
-        String cmd = "python3 " + script + " ";
+    private String getCmd(RemoteProperty remoteProperty, LanguageEnum language, String source, Integer pid) {
+        String script = remoteProperty.getScriptPath() + (pid == -1 ? WITHOUT_INPUT_FILE : WITH_INPUT_FILE);
+        String cmd = "python3 " + script + (pid == -1 ? " " : " "+pid+" ");
         // specify language
         if (language.equals(LanguageEnum.JAVA)) {
             cmd += language.getLanguage();

@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -46,6 +47,12 @@ public class ProblemController {
     public R<PageDTO<Problem>> page(ProblemPageQueryDTO problemPageQueryDTO) {
         PageDTO<Problem> res = problemService.pageQuery(problemPageQueryDTO);
         return R.ok(res);
+    }
+
+    @GetMapping("/{id}")
+    @ApiOperation("获取题目详情")
+    public R<Problem> getProblemById(@PathVariable Long id) {
+        return R.ok(problemService.getById(id));
     }
 
 }

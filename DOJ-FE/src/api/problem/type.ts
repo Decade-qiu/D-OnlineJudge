@@ -35,3 +35,7 @@ export type ProblemsPageResponseData = BaseResponse & {
 export type ProblemsResponseData = BaseResponse & {
     data: ProblemType[],
 };
+
+export type ProblemsDetailResponseData = BaseResponse & {
+    data: ProblemType,
+};

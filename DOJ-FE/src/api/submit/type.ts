@@ -5,6 +5,12 @@ export type submitForm = {
     language: string,
 };
 
+export type problemSubmitForm = {
+    pid: string,
+    file: File,
+    language: string,
+};
+
 export type executeMessage = {
     exitValue: number,
     status: string,
