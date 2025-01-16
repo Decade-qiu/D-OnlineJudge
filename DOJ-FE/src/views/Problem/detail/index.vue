@@ -4,8 +4,8 @@
         <div class="problem-header">
             <h1>{{ problem?.name }}</h1>
             <div class="limits">
-                <span class="meta">内存限制：{{ problem?.memoryLimit }}</span>
-                <span class="meta">时间限制：{{ problem?.timeLimit }}</span>
+                <span class="meta">内存限制：{{ problem?.memoryLimit }} KB</span>
+                <span class="meta">时间限制：{{ problem?.timeLimit }} s</span>
                 <span class="meta">标准输入输出</span>
             </div>
             <div class="stats">
@@ -65,7 +65,7 @@
 
     </div>
 </template>
-  
+
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -83,8 +83,8 @@ const multiLine = (list: string | undefined) => {
     if (!list) return [];
     list = list.substring(1, list.length - 1);
     let res = list.split(",")
-                .map((item) => item.replaceAll('\"', '').trim())
-                .filter((item) => item !== "");
+        .map((item) => item.replaceAll('\"', '').trim())
+        .filter((item) => item !== "");
     // console.log(res);
     return res
 };
@@ -112,16 +112,17 @@ onMounted(async () => {
 });
 
 </script>
-  
+
 <style scoped lang="scss">
 .problem-container {
     display: flex;
     flex-direction: column;
     margin-top: 10px;
-    padding: 20px;
+    padding: 30px;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
 .problem-header {
@@ -136,13 +137,26 @@ onMounted(async () => {
         margin-top: 10px;
         font-weight: 550;
         color: #666;
+        margin-bottom: 5px;
     }
 
     .meta {
-        margin-right: 10px;
-        padding: 5px;
-        background: #f0f0f0;
+        margin-right: 15px;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
         border-radius: 5px;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: #e9ecef;
+        }
+    }
+
+    h1 {
+        font-size: 2em;
+        color: #2c3e50;
+        margin-bottom: 15px;
     }
 }
 
@@ -150,25 +164,33 @@ onMounted(async () => {
     display: flex;
     flex-direction: row;
     margin: 20px 0;
+    gap: 0;
 
     .btn {
-        padding: 10px 20px;
+        padding: 12px 25px;
         border: none;
         cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
         &.submit-btn {
-            background-color: #007bff;
+            background-color: #4CAF50;
             color: white;
             border-radius: 5px 0 0 5px;
         }
 
         &.record-btn {
-            background-color: #28a745;
+            background-color: #2196F3;
             color: white;
         }
 
         &.stats-btn {
-            background-color: #ff9800;
+            background-color: #FF9800;
             color: white;
             border-radius: 0 5px 5px 0;
         }
@@ -184,6 +206,11 @@ onMounted(async () => {
         background-color: #f9f9f9;
         border-radius: 5px;
         border: 1px solid #ddd;
+        transition: all 0.3s ease;
+
+        &:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
 
         h2 {
             margin: 0;
@@ -191,6 +218,11 @@ onMounted(async () => {
             padding: 15px;
             background-color: #F3F4F5;
             border-radius: 10px 10px 0 0;
+            color: #2c3e50;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .item-body {
@@ -198,6 +230,20 @@ onMounted(async () => {
             background-color: #fff;
             border-radius: 18px;
             font-size: large;
+        }
+
+        .copy-btn {
+            padding: 5px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: #f0f0f0;
+                transform: translateY(-1px);
+            }
         }
     }
 
@@ -214,19 +260,21 @@ onMounted(async () => {
             display: flex;
             flex-direction: column;
             background-color: #fff;
-            border: 2px solid #ddd;
+            border: 1px solid #e9ecef;
             border-radius: 5px;
             box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
             margin: 0;
-            padding: 5px 20px;
+            padding: 15px 25px;
             font-family: monospace;
             white-space: pre-wrap;
             overflow-y: auto;
+            line-height: 1.6;
 
             .line {
                 margin: 5px 0;
                 font-size: large;
                 font-family: monospace;
+                color: #2c3e50;
 
                 &:not(:last-child) {
                     margin-bottom: 5px;
@@ -240,4 +288,3 @@ onMounted(async () => {
     }
 }
 </style>
-  
