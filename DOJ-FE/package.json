@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint src",
     "fix": "eslint src --fix",
-    "dev": "vite --open",
+    "dev": "NODE_OPTIONS='--no-warnings' vite --open",
     "build": "vue-tsc && vite build",
     "build:test": "vue-tsc && vite build --mode test",
     "build:pro": "vue-tsc && vite build --mode production",
@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@codemirror/commands": "^6.6.1",
-    "@codemirror/gutter": "^0.19.9",
     "@codemirror/lang-cpp": "^6.0.2",
     "@codemirror/lang-java": "^6.0.1",
     "@codemirror/lang-javascript": "^6.2.2",
@@ -33,6 +32,7 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "sass": "1.69.7",
     "thememirror": "^2.0.1",
     "vue": "^3.3.11",
     "vue-codemirror": "^6.1.1",
@@ -49,7 +49,6 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-vue": "^9.20.1",
-    "sass": "^1.69.7",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vite-plugin-svg-icons": "^2.0.1",
