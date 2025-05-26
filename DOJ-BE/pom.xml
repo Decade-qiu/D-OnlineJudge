@@ -34,7 +34,7 @@
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mysql.version>8.0.23</mysql.version>
         <knife4j.version>4.5.0</knife4j.version>
-        <hutool.version>5.8.11</hutool.version>
+        <hutool.version>5.8.21</hutool.version>
     </properties>
 
     <dependencyManagement>
