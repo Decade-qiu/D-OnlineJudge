@@ -1,5 +1,0 @@
-OpenJDK 64-Bit Server VM (25.332-b09) for linux-aarch64 JRE (1.8.0_332-b09), built on Apr 20 2022 07:44:33 by "openjdk" with gcc 4.8.5 20150623 (Red Hat 4.8.5-36)
-Memory: 4k page, physical 8025700k(5044120k free), swap 1048572k(1048572k free)
-CommandLine flags: -XX:GCLogFileSize=104857600 -XX:InitialHeapSize=1073741824 -XX:MaxHeapSize=1073741824 -XX:MaxNewSize=536870912 -XX:NewSize=536870912 -XX:NumberOfGCLogFiles=10 -XX:+PrintGC -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseGCLogFileRotation -XX:+UseParallelGC 
-2025-05-23T22:16:06.409+0800: 0.513: [GC (Metadata GC Threshold) [PSYoungGen: 353899K->7034K(458752K)] 353899K->7114K(983040K), 0.0143185 secs] [Times: user=0.06 sys=0.01, real=0.02 secs] 
-2025-05-23T22:16:06.424+0800: 0.527: [Full GC (Metadata GC Threshold) [PSYoungGen: 7034K->0K(458752K)] [ParOldGen: 80K->6838K(524288K)] 7114K->6838K(983040K), [Metaspace: 20660K->20659K(1069056K)], 0.0126320 secs] [Times: user=0.05 sys=0.00, real=0.01 secs] 
