@@ -1,0 +1,13 @@
+doj:
+    port:
+        gateway-service: 8080
+        user-service: 8081
+        sandbox-service: 8082
+        problem-service: 8083
+
+    resource:
+        location: "D:/files/"
+        request: "/static/"
+
+        code-path: "D:/files/code/"
+        problem-code-path: "D:/files/problem-code/"

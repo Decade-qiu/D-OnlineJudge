@@ -1,0 +1,11 @@
+server:
+    port: ${doj.port.problem-service}
+doj:
+    db:
+        host: 192.168.74.131
+        name: doj_problem
+        user: root
+        pwd: 123
+    swagger:
+        title: 用户服务接口文档
+        scan: com.decade.doj.problem.controller

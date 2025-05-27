@@ -1,0 +1,10 @@
+server:
+    port: ${doj.port.gateway-service}
+
+doj:
+    auth:
+        excludePaths:
+            - /
+            - /static/**
+            - /user/login
+            - /user/register

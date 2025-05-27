@@ -1,0 +1,26 @@
+spring:
+    application:
+        name: gateway-service
+    profiles:
+        active: dev, common
+    cloud:
+        nacos:
+            server-addr: 192.168.74.131:8848
+            config:
+                file-extension: yaml
+                shared-configs:
+                    -   dataId: shared-jwt.yaml
+        gateway:
+            routes:
+                -   id: user
+                    uri: lb://user-service
+                    predicates:
+                        - Path=/user/**,/static/**
+                -   id: problem
+                    uri: lb://problem-service
+                    predicates:
+                        - Path=/problem/**
+                -   id: sandbox
+                    uri: lb://sandbox-service
+                    predicates:
+                        - Path=/sandbox/**

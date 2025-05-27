@@ -1,0 +1,11 @@
+server:
+    port: ${doj.port.user-service}
+doj:
+    db:
+        host: 127.0.0.1
+        name: doj_user
+        user: root
+        pwd: 123
+    swagger:
+        title: 用户服务接口文档
+        scan: com.decade.doj.user.controller
