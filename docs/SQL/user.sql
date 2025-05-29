@@ -1,5 +1,5 @@
-CREATE DATABASE doj_user
-USE doj_user
+CREATE DATABASE doj_user;
+USE doj_user;
 
 DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client = @@character_set_client */;
