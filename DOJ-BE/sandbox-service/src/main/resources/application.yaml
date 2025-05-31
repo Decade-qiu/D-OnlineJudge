@@ -2,15 +2,15 @@ server:
     port: ${doj.port.sandbox-service}
 doj:
     db:
-        host: 192.168.74.131
+        host: 127.0.0.1
         name: doj_user
         user: root
         pwd: 123
     swagger:
-        title: 用户服务接口文档
+        title: 沙箱接口文档
         scan: com.decade.doj.sandbox.controller
     remote:
-        host: 192.168.74.131
+        host: 127.0.0.1
         user: root
         password: 1
         script-path: /root/doj/sandbox/code

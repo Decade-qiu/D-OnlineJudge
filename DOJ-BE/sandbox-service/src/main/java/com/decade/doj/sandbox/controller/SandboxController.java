@@ -2,7 +2,6 @@ package com.decade.doj.sandbox.controller;
 
 import com.decade.doj.common.config.properties.ResourceProperties;
 import com.decade.doj.common.domain.R;
-import com.decade.doj.sandbox.config.DockerConfig.RunCodeWithoutInput;
 import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.impl.SandboxService;
@@ -34,7 +33,7 @@ public class SandboxController {
 
     @PostMapping("/code")
     @ApiOperation("运行代码文件")
-    public R<ExecuteMessage> uploadAvatar(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) {
+    public R<ExecuteMessage> runCode(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) {
         if (file.isEmpty()) {
             return R.error("文件为空!");
         }
