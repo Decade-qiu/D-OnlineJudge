@@ -6,8 +6,8 @@ doj:
         problem-service: 8083
 
     resource:
-        location: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/files"
+        location: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/files/"
         request: "/static/"
 
-        code-path: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/codes"
-        problem-code-path: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/problem-codes"
+        code-path: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/codes/"
+        problem-code-path: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/problem-codes/"
