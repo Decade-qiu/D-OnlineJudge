@@ -2,7 +2,7 @@ server:
     port: ${doj.port.problem-service}
 doj:
     db:
-        host: 192.168.74.131
+        host: 127.0.0.1
         name: doj_problem
         user: root
         pwd: 123
