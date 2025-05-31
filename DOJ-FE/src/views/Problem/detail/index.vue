@@ -2,15 +2,15 @@
     <div class="problem-container">
         <!-- 标题部分 -->
         <div class="problem-header">
-            <h1>{{ problem?.name }}</h1>
+            <h1 v-html="renderKatex(problem?.name)"></h1>
             <div class="limits">
-                <span class="meta">内存限制：{{ problem?.memoryLimit }} KB</span>
-                <span class="meta">时间限制：{{ problem?.timeLimit }} s</span>
+                <span class="meta">内存限制：<span v-html="renderKatex(`${problem?.memoryLimit} KB`)" /></span>
+                <span class="meta">时间限制：<span v-html="renderKatex(`${problem?.timeLimit} s`)" /></span>
                 <span class="meta">标准输入输出</span>
             </div>
             <div class="stats">
-                <span class="meta">提交：{{ problem?.totalAttempt }}</span>
-                <span class="meta">通过：{{ problem?.totalPass }}</span>
+                <span class="meta">提交：<span v-html="renderKatex(`${problem?.totalAttempt}`)" /></span>
+                <span class="meta">通过：<span v-html="renderKatex(`${problem?.totalPass}`)" /></span>
             </div>
         </div>
 
@@ -23,17 +23,17 @@
 
         <div class="item description">
             <h2>题目描述</h2>
-            <p class="item-body">{{ problem?.description }}</p>
+            <p class="item-body" v-html="renderKatex(problem?.description)"></p>
         </div>
 
         <div class="item input-format">
             <h2>输入格式</h2>
-            <p class="item-body">{{ problem?.inputStyle }}</p>
+            <p class="item-body" v-html="renderKatex(problem?.inputStyle)"></p>
         </div>
 
         <div class="item input-format">
             <h2>输出格式</h2>
-            <p class="item-body">{{ problem?.outputStyle }}</p>
+            <p class="item-body" v-html="renderKatex(problem?.outputStyle)"></p>
         </div>
 
         <div class="item io-example">
@@ -41,7 +41,7 @@
             <div class="example-container">
                 <div class="example-content" ref="inputSampleRef">
                     <template v-for="input in multiLine(problem?.inputSample)">
-                        <div class="line">{{ input }}</div>
+                        <div class="line" v-html="renderKatex(input)"></div>
                     </template>
                 </div>
             </div>
@@ -52,7 +52,7 @@
             <div class="example-container">
                 <div class="example-content" ref="outputSampleRef">
                     <template v-for="output in multiLine(problem?.outputSample)">
-                        <div class="line">{{ output }}</div>
+                        <div class="line" v-html="renderKatex(output)"></div>
                     </template>
                 </div>
             </div>
@@ -60,9 +60,8 @@
 
         <div class="item input-format">
             <h2>数据范围</h2>
-            <p class="item-body">{{ problem?.dataRange }}</p>
+            <p class="item-body" v-html="renderKatex(problem?.dataRange)"></p>
         </div>
-
     </div>
 </template>
 
@@ -72,6 +71,8 @@ import { useRoute } from 'vue-router';
 import { reqProblemDetail } from '@/api/problem';
 import type { ProblemType } from '@/api/problem/type';
 import router from '@/router';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
 
 const route = useRoute();
 const problem = ref<ProblemType>();
@@ -79,13 +80,64 @@ const problem = ref<ProblemType>();
 const inputSampleRef = ref();
 const outputSampleRef = ref();
 
+// const renderKatex = (text: string | undefined) => {
+//     if (!text) return '';
+//     // 支持 $$...$$ 和 $...$ 公式
+//     return text.replace(/(\$\$.*?\$\$|\$.*?\$)/gs, (match) => {
+//         try {
+//             // 去掉 $ 或 $$
+//             const formula = match.startsWith('$$')
+//                 ? match.slice(2, -2)
+//                 : match.slice(1, -1);
+//             return katex.renderToString(formula, { throwOnError: false, displayMode: match.startsWith('$$') });
+//         } catch {
+//             return match;
+//         }
+//     });
+// };
+const renderKatex = (text: string | undefined) => {
+    if (!text) return '';
+    
+    // 首先处理 $$ 和 $ 包裹的数学公式
+    const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/gs);
+    
+    return parts.map(part => {
+        // 如果是公式部分，保持原样渲染
+        if (part.startsWith('$')) {
+            try {
+                const formula = part.startsWith('$$') 
+                    ? part.slice(2, -2)
+                    : part.slice(1, -1);
+                return katex.renderToString(formula, { 
+                    throwOnError: false, 
+                    displayMode: part.startsWith('$$') 
+                });
+            } catch {
+                return part;
+            }
+        }
+        
+        // 对非公式部分，只渲染英文和数字
+        return part.replace(/([a-zA-Z0-9]+)/g, match => {
+            try {
+                return katex.renderToString(match, {
+                    throwOnError: false,
+                    displayMode: false
+                });
+            } catch {
+                return match;
+            }
+        });
+    }).join('');
+};
+
 const multiLine = (list: string | undefined) => {
     if (!list) return [];
     list = list.substring(1, list.length - 1);
     let res = list.split(",")
-        .map((item) => item.replaceAll('\"', '').trim())
-        .filter((item) => item !== "");
-    // console.log(res);
+        .map((item) => item.replace(/\"/g, '').trim())
+        .filter((item) => item !== "")
+        .map((item) => item.replace(/\\n/g, '\n'));
     return res
 };
 
@@ -96,7 +148,6 @@ const submit = () => {
 };
 
 const paste = (exampleContent: any) => {
-    // console.log(111);
     if (exampleContent) {
         const textToCopy = exampleContent.innerText;
         navigator.clipboard.writeText(textToCopy)
@@ -110,7 +161,6 @@ onMounted(async () => {
     const pid = route.params.id as string;
     problem.value = (await reqProblemDetail(pid)).data.data;
 });
-
 </script>
 
 <style scoped lang="scss">
