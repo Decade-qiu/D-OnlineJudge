@@ -1,10 +1,7 @@
 package com.decade.doj.sandbox;
 
-import com.decade.doj.sandbox.config.DockerConfig;
-import com.decade.doj.sandbox.config.DockerConfig.RunCodeWithoutInput;
-import com.decade.doj.sandbox.enums.LanguageEnum;
-import com.decade.doj.sandbox.utils.SFTPUtil;
-import com.decade.doj.sandbox.utils.SSHUtil;
+import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
+import com.decade.doj.sandbox.service.ISandboxService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,8 +10,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class SandboxTest {
 
     @Autowired
-    private RunCodeWithoutInput runCodeWithoutInput;
+    private ISandboxService sandboxService;
 
+    @Test
+    public void testRunCode() {
+        String filePath = "/Users/qzj/Desktop/Development/D-OnlineJudge/static/docker-sandbox/python/Main.py"; // 替换为实际的文件路径
+        String filename = "Main.py"; // 替换为实际的文件名
+        String lang = "python";
 
+        try {
+            ExecuteMessage res = sandboxService.runCodeInSandbox(filePath, filename, lang);
+            System.out.println(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

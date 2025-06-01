@@ -88,7 +88,7 @@ public class SandboxController {
     // public R<String> getUser(@PathVariable("id") @NotNull String id) {
     //     for (LanguageEnum language : LanguageEnum.values) {
     //         if (language.getLanguage().equals(id)) {
-    //             String res = runCodeWithoutInput.run(language, "main"+language.getSuffix());
+    //             String res = runCodeWithoutInput.run(language, "main"+language.getExtension());
     //             return R.ok(res);
     //         }
     //     }

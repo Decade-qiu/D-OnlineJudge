@@ -5,28 +5,45 @@ import lombok.Data;
 import java.util.Arrays;
 import java.util.List;
 
-@Data
-public class LanguageEnum {
+public enum LanguageEnum {
 
-    private String language;
-    private String dockerImage;
-    private String dockerName;
-    private String suffix;
-    private Integer memoryLimit;
-    private Integer timeLimit;
+    PYTHON("python3", "py", "python", "128m", 10),
+    JAVA("java", "java", "java", "256m", 2),
+    CPP("bash -c \"g++ Main.cpp && timeout 5s ./a.out\"", "cpp", "cpp", "128m", 1);
 
-    public LanguageEnum(String language, String image, String script, String suffix, Integer memoryLimit, Integer timeLimit) {
+    private final String runCmd;
+    private final String extension;
+    private final String memoryLimit;
+    private final int timeLimit;
+    private final String language;
+
+    LanguageEnum(String runCmd, String extension, String language, String memoryLimit, int timeLimit) {
+        this.runCmd = runCmd;
+        this.extension = extension;
         this.language = language;
-        this.dockerImage = image;
-        this.dockerName = script;
-        this.suffix = suffix;
         this.memoryLimit = memoryLimit;
         this.timeLimit = timeLimit;
     }
 
-    public static final LanguageEnum JAVA = new LanguageEnum("java", "openjdk:11-slim", "java11", ".java", 128, 4);
-    public static final LanguageEnum PYTHON = new LanguageEnum("python", "python:3.8-slim", "python3", ".py", 128, 10);
-    public static final LanguageEnum CPP = new LanguageEnum("cpp", "gcc:13", "gcc13", ".cpp", 128, 2);
+    public String getRunCmd() {
+        return runCmd;
+    }
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public String getMemoryLimit() {
+        return memoryLimit;
+    }
+
+    public int getTimeLimit() {
+        return timeLimit;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
 
     public static final List<LanguageEnum> values = Arrays.asList(JAVA, PYTHON, CPP);
 
