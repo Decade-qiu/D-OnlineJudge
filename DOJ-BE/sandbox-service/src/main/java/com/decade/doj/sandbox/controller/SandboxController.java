@@ -38,7 +38,7 @@ public class SandboxController {
             return R.error("文件为空!");
         }
 
-        if (!LanguageEnum.isValidLanguage(lang)) {
+        if (LanguageEnum.isInValidLanguage(lang)) {
             return R.error("不支持的语言!");
         }
 
@@ -64,7 +64,7 @@ public class SandboxController {
             return R.error("文件为空!");
         }
 
-        if (!LanguageEnum.isValidLanguage(lang)) {
+        if (LanguageEnum.isInValidLanguage(lang)) {
             return R.error("不支持的语言!");
         }
 

@@ -1,36 +1,34 @@
 package com.decade.doj.sandbox.enums;
 
-import lombok.Data;
+import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.List;
 
 public enum LanguageEnum {
 
-    PYTHON("python3", "py", "python", "128m", 10),
-    JAVA("java", "java", "java", "256m", 2),
-    CPP("bash -c \"g++ Main.cpp && timeout 5s ./a.out\"", "cpp", "cpp", "128m", 1);
+    PYTHON("python3 %s.py", "python", "128m", 5, "code-runner-python"),
+    JAVA("sh -c 'javac %s.java && java -Xmx1024m %s'", "java", "128m", 2, "code-runner-java"),
+    CPP("sh -c 'g++ -std=c++17 %s.cpp -o %s.out && ./%s.out'", "cpp", "128m", 1, "code-runner-cpp");
 
     private final String runCmd;
-    private final String extension;
-    private final String memoryLimit;
-    private final int timeLimit;
+    @Setter
+    private String memoryLimit;
+    @Setter
+    private int timeLimit;
     private final String language;
+    private final String imageName;
 
-    LanguageEnum(String runCmd, String extension, String language, String memoryLimit, int timeLimit) {
+    LanguageEnum(String runCmd, String language, String memoryLimit, int timeLimit, String imageName) {
         this.runCmd = runCmd;
-        this.extension = extension;
         this.language = language;
         this.memoryLimit = memoryLimit;
         this.timeLimit = timeLimit;
+        this.imageName = imageName;
     }
 
     public String getRunCmd() {
         return runCmd;
-    }
-
-    public String getExtension() {
-        return extension;
     }
 
     public String getMemoryLimit() {
@@ -45,20 +43,24 @@ public enum LanguageEnum {
         return language;
     }
 
+    public String getImageName() {
+        return imageName;
+    }
+
     public static final List<LanguageEnum> values = Arrays.asList(JAVA, PYTHON, CPP);
 
-    public static boolean isValidLanguage(String lang) {
+    public static boolean isInValidLanguage(String lang) {
         for (LanguageEnum language : LanguageEnum.values) {
-            if (language.language.equalsIgnoreCase(lang)) {
-                return true;
+            if (language.getLanguage().equalsIgnoreCase(lang)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public static LanguageEnum getLanguageEnum(String lang) {
         for (LanguageEnum language : LanguageEnum.values) {
-            if (language.language.equalsIgnoreCase(lang)) {
+            if (language.getLanguage().equalsIgnoreCase(lang)) {
                 return language;
             }
         }

@@ -4,6 +4,7 @@ import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.ISandboxService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -16,36 +17,36 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SandboxService implements ISandboxService {
 
-    // private final RunCodeWithoutInput runCodeWithoutInput;
-    //
-    // private final RunCodeWithInput runCodeWithInput;
-    //
-    // private final RemoteProperty remoteProperty;
-
-    private String getImageName(String lang) {
-        return switch (lang.toLowerCase()) {
-            case "python" -> "code-runner-python";
-            case "java" -> "code-runner-java";
-            // 可扩展更多语言
-            default -> throw new IllegalArgumentException("不支持的语言: " + lang);
+    public static String buildRunCommand(String rawCmd, String baseName) {
+        int count = rawCmd.split("%s", -1).length - 1;
+        return switch (count) {
+            case 1 -> String.format(rawCmd, baseName);
+            case 2 -> String.format(rawCmd, baseName, baseName);
+            case 3 -> String.format(rawCmd, baseName, baseName, baseName);
+            default -> throw new IllegalArgumentException("Unsupported placeholder count in runCmd: " + count);
         };
     }
 
     @Override
     public ExecuteMessage runCodeInSandbox(String filePath, String filename, String lang) {
         LanguageEnum languageEnum = LanguageEnum.getLanguageEnum(lang);
-        String imageName = getImageName(lang);
+        String imageName = languageEnum.getImageName();
         String fileDir = new File(filePath).getParent();
         String mountPath = "/app";
 
+        String extension = filename.substring(filename.lastIndexOf(".") + 1);
+        String baseName = filename.replaceFirst("\\." + extension + "$", "");
+
         try {
+            String runCmd = buildRunCommand(languageEnum.getRunCmd(), baseName);
+
             String execCmd = String.format(
-                    "/usr/bin/time -v timeout %ds %s %s",
+                    "/usr/bin/time -v timeout %ds %s",
                     languageEnum.getTimeLimit(),
-                    languageEnum.getRunCmd(),
-                    "Main." + languageEnum.getExtension()
+                    runCmd
             );
 
             List<String> command = Arrays.asList(
@@ -91,12 +92,15 @@ public class SandboxService implements ISandboxService {
                 displayOutput = rawOutput;
             }
 
+            log.info(String.valueOf(exitCode));
+            log.info(rawOutput);
+
             return new ExecuteMessage()
                     .setExitValue(exitCode)
                     .setStatus(ExecuteMessage.getStatus(exitCode))
-                    .setMessage(displayOutput.trim())
+                    .setMessage(ExecuteMessage.show(exitCode) ?  displayOutput.trim() : "")
                     .setTime(Double.parseDouble(timeUsed))
-                    .setMemory(Long.parseLong(memoryUsage.replace(" KB", "")));
+                    .setMemory(Long.parseLong(memoryUsage));
 
         } catch (Exception e) {
             return new ExecuteMessage()

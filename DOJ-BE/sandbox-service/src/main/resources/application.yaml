@@ -9,8 +9,3 @@ doj:
     swagger:
         title: 沙箱接口文档
         scan: com.decade.doj.sandbox.controller
-    remote:
-        host: 127.0.0.1
-        user: root
-        password: 1
-        script-path: /root/doj/sandbox/code
