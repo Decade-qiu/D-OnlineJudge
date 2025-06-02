@@ -145,6 +145,8 @@ const handleStateUpdate = (viewUpdate: ViewUpdate) => {
 
 const handleSubmit = async () => {
 
+    outputTextVis.value = false;
+
     output.value = {
         exitValue: -1, // 设置为 null 表示还没有结果
         status: 'Running',
@@ -164,22 +166,20 @@ const handleSubmit = async () => {
     formData.append('file', codeBlob, `Main.${languageExtension}`);
     formData.append('language', props.language.name);
 
-    formData.append('pid', "1");
+    // formData.append('pid', "1");
 
     // 发送请求
-    // const response = (await reqSubmit(formData)).data;
-    const response = (await reqProblemSubmit(formData)).data;
+    const response = (await reqSubmit(formData)).data;
+    // const response = (await reqProblemSubmit(formData)).data;
     
-    console.log(response);
+    ElMessage.success('提交成功');
 
     // 成功时处理
     if (response.code === 200) {
         const data = response.data;
         if (data.exitValue === 0 || data.exitValue >= 10) {
-            ElMessage.success('提交成功');
             output.value = data;
         } else {
-            ElMessage.error('提交失败');
             output.value = data;
         }
         if (data.message.trim() !== '') {
