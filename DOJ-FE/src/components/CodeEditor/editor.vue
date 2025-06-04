@@ -13,7 +13,7 @@
         <div class="divider"></div>
         <div class="footer">
             <div class="buttons">
-                <el-button :icon="VideoPlay" round @click="handleSubmit">submit</el-button>
+                <el-button :icon="VideoPlay" round @click="handleSubmit">run</el-button>
             </div>
             <div class="infos">
                 <span class="item">Spaces: {{ config.tabSize }}</span>
@@ -166,13 +166,10 @@ const handleSubmit = async () => {
     formData.append('file', codeBlob, `Main.${languageExtension}`);
     formData.append('language', props.language.name);
 
-    // formData.append('pid', "1");
+    ElMessage.success('提交成功');
 
     // 发送请求
     const response = (await reqSubmit(formData)).data;
-    // const response = (await reqProblemSubmit(formData)).data;
-    
-    ElMessage.success('提交成功');
 
     // 成功时处理
     if (response.code === 200) {
@@ -218,15 +215,18 @@ onMounted(() => {
         }
     );
     const handleKeyDown = (event: KeyboardEvent) => {
-        // 判断是否是 Ctrl+S 组合键
-        if (event.ctrlKey && event.key === 's') {
+        const isSaveShortcut = 
+            (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's';
+
+        if (isSaveShortcut) {
             event.preventDefault(); // 阻止默认保存行为
-            console.log('Ctrl+S is disabled in the editor.'); // 可选：可以在这里执行其他逻辑
+            console.log('Save shortcut (Ctrl+S / Cmd+S) is disabled in the editor.');
+            // 可选：在这里执行其他逻辑，比如保存代码等
         }
     };
-    // 监听 keydown 事件
+
     window.addEventListener('keydown', handleKeyDown);
-})
+});
 
 // log 方法直接使用 console
 const log = console.log

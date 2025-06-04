@@ -63,6 +63,13 @@
             <p class="item-body" v-html="renderKatex(problem?.dataRange)"></p>
         </div>
     </div>
+
+    <!-- 分割行 -->
+    <hr />
+
+    <div class="editor-box">
+        <CodeEditor :config="config" />
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -74,49 +81,46 @@ import router from '@/router';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 
+const config = ref({
+    tabSize: 4,
+    disabled: false,
+    height: '62vh',
+    width: '100%',
+    language: 'cpp',
+    theme: 'oneDark',
+    fontSize: 16,
+});
+
 const route = useRoute();
 const problem = ref<ProblemType>();
 
 const inputSampleRef = ref();
 const outputSampleRef = ref();
 
-// const renderKatex = (text: string | undefined) => {
-//     if (!text) return '';
-//     // 支持 $$...$$ 和 $...$ 公式
-//     return text.replace(/(\$\$.*?\$\$|\$.*?\$)/gs, (match) => {
-//         try {
-//             // 去掉 $ 或 $$
-//             const formula = match.startsWith('$$')
-//                 ? match.slice(2, -2)
-//                 : match.slice(1, -1);
-//             return katex.renderToString(formula, { throwOnError: false, displayMode: match.startsWith('$$') });
-//         } catch {
-//             return match;
-//         }
-//     });
-// };
+const editorRef = ref<HTMLElement | null>(null);
+
 const renderKatex = (text: string | undefined) => {
     if (!text) return '';
-    
+
     // 首先处理 $$ 和 $ 包裹的数学公式
     const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/gs);
-    
+
     return parts.map(part => {
         // 如果是公式部分，保持原样渲染
         if (part.startsWith('$')) {
             try {
-                const formula = part.startsWith('$$') 
+                const formula = part.startsWith('$$')
                     ? part.slice(2, -2)
                     : part.slice(1, -1);
-                return katex.renderToString(formula, { 
-                    throwOnError: false, 
-                    displayMode: part.startsWith('$$') 
+                return katex.renderToString(formula, {
+                    throwOnError: false,
+                    displayMode: part.startsWith('$$')
                 });
             } catch {
                 return part;
             }
         }
-        
+
         // 对非公式部分，只渲染英文和数字
         return part.replace(/([a-zA-Z0-9]+)/g, match => {
             try {
@@ -141,10 +145,9 @@ const multiLine = (list: string | undefined) => {
     return res
 };
 
+// 当点击提交时，滚动到编辑器区域
 const submit = () => {
-    const pid = problem.value?.id;
-    const pname = problem.value?.name;
-    router.push({ name: 'submit', params: { pid, pname } });
+    editorRef.value?.scrollIntoView({ behavior: 'smooth' });
 };
 
 const paste = (exampleContent: any) => {
@@ -160,6 +163,7 @@ const paste = (exampleContent: any) => {
 onMounted(async () => {
     const pid = route.params.id as string;
     problem.value = (await reqProblemDetail(pid)).data.data;
+    editorRef.value = document.querySelector('.editor-box');
 });
 </script>
 
@@ -224,7 +228,7 @@ onMounted(async () => {
         transition: all 0.3s ease;
 
         &:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
