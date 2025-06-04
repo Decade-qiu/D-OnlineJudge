@@ -5,6 +5,7 @@ import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.ISandboxService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,35 +22,70 @@ import java.util.regex.Pattern;
 @Slf4j
 public class SandboxService implements ISandboxService {
 
+    /**
+     * 通过占位符数量构造最终执行命令，例如：
+     *   rawCmd = "python3 %s.py"，baseName = "Main" -> "python3 Main.py"
+     *   rawCmd = "g++ %s.cpp -o %s.out && ./%s.out" -> 3 个占位符，将 baseName 填充三次
+     *
+     * @param rawCmd  带有若干 "%s" 占位符的 Shell 命令模板
+     * @param baseName 去掉后缀后的文件名
+     * @return 填充好占位符的最终命令字符串
+     */
     public static String buildRunCommand(String rawCmd, String baseName) {
-        int count = rawCmd.split("%s", -1).length - 1;
-        return switch (count) {
+        // 计算 "%s" 出现的次数
+        int placeholderCount = rawCmd.split("%s", -1).length - 1;
+        return switch (placeholderCount) {
             case 1 -> String.format(rawCmd, baseName);
             case 2 -> String.format(rawCmd, baseName, baseName);
             case 3 -> String.format(rawCmd, baseName, baseName, baseName);
-            default -> throw new IllegalArgumentException("Unsupported placeholder count in runCmd: " + count);
+            default -> throw new IllegalArgumentException("Unsupported placeholder count in runCmd: " + placeholderCount);
         };
     }
 
-    @Override
-    public ExecuteMessage runCodeInSandbox(String filePath, String filename, String lang) {
-        LanguageEnum languageEnum = LanguageEnum.getLanguageEnum(lang);
-        String imageName = languageEnum.getImageName();
-        String fileDir = new File(filePath).getParent();
-        String mountPath = "/app";
+    // 正则编译为静态常量，避免每次重复编译
+    private static final Pattern MEM_PATTERN = Pattern.compile(
+            "Maximum resident set size \\(kbytes\\): (\\d+)"
+    );
+    private static final Pattern TIME_PATTERN = Pattern.compile(
+            "Elapsed \\(wall clock\\) time \\(h:mm:ss or m:ss\\): \\d+:(\\d+\\.\\d+)"
+    );
+    // 构造 /usr/bin/time 与 timeout 的命令模板
+    private static final String TIMEOUT_TEMPLATE = "/usr/bin/time -v timeout %ds %s";
+    // 挂载目录
+    private static final String MOUNT_PATH = "/app";
 
-        String extension = filename.substring(filename.lastIndexOf(".") + 1);
-        String baseName = filename.replaceFirst("\\." + extension + "$", "");
+    @Override
+    @Async("RunCodeThreadPool")
+    public CompletableFuture<ExecuteMessage> runCodeInSandbox(String filePath, String filename, String lang) {
+        ExecuteMessage result = _runCodeInSandbox(filePath, filename, lang);
+        return CompletableFuture.completedFuture(result);
+    }
+
+    private ExecuteMessage _runCodeInSandbox(String filePath, String filename, String lang) {
+
+        LanguageEnum languageEnum = LanguageEnum.getLanguageEnum(lang);
+
+        // 镜像名称
+        String imageName = languageEnum.getImageName();
+        // 运行时挂载目录（宿主与容器）
+        String fileDir = new File(filePath).getParent();
+        String mountPath = MOUNT_PATH;
+
+        int dotIndex = filename.lastIndexOf(".");
+        String baseName = (dotIndex >= 0)
+                ? filename.substring(0, dotIndex)
+                : filename;
 
         try {
+            // 构造真实要执行的命令
             String runCmd = buildRunCommand(languageEnum.getRunCmd(), baseName);
-
             String execCmd = String.format(
-                    "/usr/bin/time -v timeout %ds %s",
+                    TIMEOUT_TEMPLATE,
                     languageEnum.getTimeLimit(),
                     runCmd
             );
 
+            // 准备 Docker 运行命令列表
             List<String> command = Arrays.asList(
                     "docker", "run", "--rm",
                     "-v", fileDir + ":" + mountPath,
@@ -58,51 +95,52 @@ public class SandboxService implements ISandboxService {
             );
 
             ProcessBuilder builder = new ProcessBuilder(command);
+            // 合并标准输出与标准错误
             builder.redirectErrorStream(true);
 
-            long startTime = System.currentTimeMillis();
+            long startTimeMillis = System.currentTimeMillis();
 
             Process process = builder.start();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuilder output = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
+            // 读取进程输出
+            StringBuilder fullOutputBuilder = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    fullOutputBuilder.append(line).append("\n");
+                }
             }
 
             int exitCode = process.waitFor();
-            long endTime = System.currentTimeMillis();
+            long endTimeMillis = System.currentTimeMillis();
 
-            Pattern memPattern = Pattern.compile("Maximum resident set size \\(kbytes\\): (\\d+)");
-            Pattern timePattern = Pattern.compile("Elapsed \\(wall clock\\) time \\(h:mm:ss or m:ss\\): \\d+:(\\d+\\.\\d+)");
+            String fullOutput = fullOutputBuilder.toString().trim();
 
-            Matcher memMatcher = memPattern.matcher(output.toString());
-            Matcher timeMatcher = timePattern.matcher(output.toString());
+            // 匹配内存、耗时信息
+            Matcher memMatcher = MEM_PATTERN.matcher(fullOutput);
+            Matcher timeMatcher = TIME_PATTERN.matcher(fullOutput);
 
             String memoryUsage = memMatcher.find() ? memMatcher.group(1) : "-1";
-            String timeUsed = timeMatcher.find() ? timeMatcher.group(1) : String.valueOf((endTime - startTime));
+            String timeUsed = timeMatcher.find()
+                    ? timeMatcher.group(1)
+                    : String.valueOf((endTimeMillis - startTimeMillis) / 1000.0);
 
-            String rawOutput = output.toString().trim();
-            int statIndex = rawOutput.indexOf("Command being timed:");
-            String displayOutput;
-            if (statIndex != -1) {
-                displayOutput = rawOutput.substring(0, statIndex).trim();
-            } else {
-                displayOutput = rawOutput;
-            }
+            int statIndex = fullOutput.indexOf("Command being timed:");
+            String trimmedOutput = (statIndex != -1)
+                    ? fullOutput.substring(0, statIndex).trim()
+                    : fullOutput;
 
-            log.info(String.valueOf(exitCode));
-            log.info(rawOutput);
+            log.info("Exit code: {}", exitCode);
+            log.info("Raw output:\n{}", fullOutput);
 
             return new ExecuteMessage()
                     .setExitValue(exitCode)
                     .setStatus(ExecuteMessage.getStatus(exitCode))
-                    .setMessage(ExecuteMessage.show(exitCode) ?  displayOutput.trim() : "")
+                    .setMessage(ExecuteMessage.show(exitCode) ? trimmedOutput : "")
                     .setTime(Double.parseDouble(timeUsed))
                     .setMemory(Long.parseLong(memoryUsage));
-
         } catch (Exception e) {
+            log.error("运行沙箱代码出错", e);
             return new ExecuteMessage()
                     .setExitValue(1)
                     .setStatus("Runtime Error")
@@ -112,14 +150,6 @@ public class SandboxService implements ISandboxService {
 
     @Override
     public ExecuteMessage runProblemCodeInSandbox(String localPath, String filename, String lang, String pid) {
-        // SFTPUtil.uploadFile(remoteProperty.getHost(), remoteProperty.getUser(), remoteProperty.getPassword(), localPath, remoteProperty.getScriptPath()+"/problem/"+pid);
-        // LanguageEnum languageEnum = LanguageEnum.getLanguageEnum(lang);
-        // if (languageEnum == null) {
-        //     return new ExecuteMessage()
-        //             .setMessage("不支持的语言!");
-        // }
-        // return runCodeWithInput.run(languageEnum, filename, pid);
         return new ExecuteMessage();
     }
-
 }
