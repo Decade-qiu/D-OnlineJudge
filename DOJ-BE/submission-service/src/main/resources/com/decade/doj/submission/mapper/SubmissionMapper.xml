@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.decade.doj.submission.mapper.SubmissionMapper">
+
+    <resultMap id="BaseResultMap" type="com.decade.doj.submission.domain.po.Submission">
+            <id property="id" column="id" />
+            <result property="userId" column="user_id" />
+            <result property="problemId" column="problem_id" />
+            <result property="language" column="language" />
+            <result property="code" column="code" />
+            <result property="exitValue" column="exit_value" />
+            <result property="status" column="status" />
+            <result property="message" column="message" />
+            <result property="time" column="time" />
+            <result property="memory" column="memory" />
+            <result property="submitTime" column="submit_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,problem_id,language,code,exit_value,
+        status,message,time,memory,submit_time
+    </sql>
+</mapper>

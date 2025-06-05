@@ -1,0 +1,11 @@
+server:
+    port: ${doj.port.submission-service}
+doj:
+    db:
+        host: 127.0.0.1
+        name: doj_submission
+        user: root
+        pwd: 123
+    swagger:
+        title: 沙箱接口文档
+        scan: com.decade.doj.submission.controller

@@ -4,6 +4,7 @@ doj:
         user-service: 8081
         sandbox-service: 8082
         problem-service: 8083
+        submission-service: 8084
 
     resource:
         location: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/files/"
