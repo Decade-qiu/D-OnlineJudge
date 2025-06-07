@@ -1,13 +1,24 @@
 <template>
     <div :class="['online-coding', { 'full-page': isPageFullscreen }]">
-        <toolbar :config="config" :themes="Object.keys(themes)" :languages="Object.keys(languages)"
-            @language="ensureLanguageCode" @fullscreen="togglePageFullscreen" />
+        <toolbar
+            :config="config"
+            :themes="Object.keys(themes)"
+            :languages="Object.keys(languages)"
+            @language="ensureLanguageCode"
+            @fullscreen="togglePageFullscreen"
+        />
         <div class="divider"></div>
         <div class="loading-box" v-if="loading">
             <loading />
         </div>
-        <editor v-else-if="currentLangCode" :config="config" :theme="currentTheme" :language="currentLangCode.language"
-            :code="currentLangCode.code" />
+        <component
+            v-else="currentLangCode"
+            :is="editorComponent"
+            :config="config"
+            :theme="currentTheme"
+            :language="currentLangCode.language"
+            :code="currentLangCode.code"
+        />
     </div>
 </template>
 
@@ -16,7 +27,8 @@ import { reactive, computed, shallowRef, onBeforeMount, PropType, toRefs, ref } 
 import languages from './languages';
 import * as themes from './themes';
 import Toolbar from './toolbar.vue';
-import Editor from './editor.vue';
+import CodeEditor from './codeEditor.vue';
+import ProblemEditor from './problemEditor.vue';
 
 export type configType = {
     tabSize: number;
@@ -26,6 +38,7 @@ export type configType = {
     width: string;
     language: string;
     theme: string;
+    editorType: string; // 'code' | 'problem'
 };
 
 const props = defineProps({
@@ -36,6 +49,10 @@ const props = defineProps({
 });
 
 const { config } = toRefs(props);
+
+const editorComponent = computed(() => {
+    return config.value.editorType === 'problem' ? ProblemEditor : CodeEditor;
+});
 
 const loading = shallowRef(false)
 const langCodeMap = reactive(new Map<string, { code: string; language: () => any }>())

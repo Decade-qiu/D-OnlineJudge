@@ -18,7 +18,7 @@
         <div class="buttons">
             <button class="btn submit-btn" @click="submit">提交</button>
             <button class="btn record-btn">提交记录</button>
-            <button class="btn stats-btn">统计</button>
+            <button class="btn stats-btn">提交统计</button>
         </div>
 
         <div class="item description">
@@ -68,7 +68,7 @@
     <hr />
 
     <div class="editor-box">
-        <CodeEditor :config="config" />
+        <Editor :config="config" />
     </div>
 </template>
 
@@ -77,11 +77,12 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { reqProblemDetail } from '@/api/problem';
 import type { ProblemType } from '@/api/problem/type';
-import router from '@/router';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { configType } from '@/components/CodeEditor/index.vue';
+import Editor from '@/components/CodeEditor/index.vue';
 
-const config = ref({
+const config = ref<configType>({
     tabSize: 4,
     disabled: false,
     height: '62vh',
@@ -89,6 +90,7 @@ const config = ref({
     language: 'cpp',
     theme: 'oneDark',
     fontSize: 16,
+    editorType: 'problem'
 });
 
 const route = useRoute();
@@ -162,6 +164,7 @@ const paste = (exampleContent: any) => {
 
 onMounted(async () => {
     const pid = route.params.id as string;
+    console.log(route.params);
     problem.value = (await reqProblemDetail(pid)).data.data;
     editorRef.value = document.querySelector('.editor-box');
 });

@@ -69,7 +69,7 @@ import { Codemirror } from 'vue-codemirror'
 import { ElButton, ElMessage } from 'element-plus'
 import { Close, VideoPlay } from '@element-plus/icons-vue'
 import { configType } from './index.vue'
-import { reqSubmit, reqProblemSubmit } from '@/api/submit'
+import { reqSubmit } from '@/api/submit'
 import { executeMessage } from '@/api/submit/type'
 
 const props = defineProps<{
