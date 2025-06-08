@@ -5,7 +5,6 @@ import com.decade.doj.common.domain.R;
 import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.ISandboxService;
-import com.decade.doj.sandbox.service.impl.SandboxService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -46,23 +45,39 @@ public class SandboxController {
             return CompletableFuture.completedFuture(R.error("不支持的编程语言: " + lang));
         }
 
-        String path = saveCodeFile(file, resourceProperties.getCodePath());
+        String path = saveFile(file, resourceProperties.getCodePath(), null)[0];
 
         return sandboxService
                 .runCodeInSandbox(path, file.getOriginalFilename(), lang)
                 .thenApply(R::ok);
     }
 
-    // @PostMapping("/problem")
-    // @ApiOperation("测评")
-    // public R<ExecuteMessage> validate(@NotNull String pid, @RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) throws IOException {
-    //     return;
-    // }
+    @PostMapping("/problem")
+    @ApiOperation("运行题目代码")
+    public CompletableFuture<R<ExecuteMessage>> runProblem(@RequestParam("file") MultipartFile file, @RequestParam("input") MultipartFile input, @RequestParam("language") @NotBlank String lang, @RequestParam("pid") Long pid) throws IOException {
+        if (file.isEmpty()) {
+            return CompletableFuture.completedFuture(R.error("上传的文件不能为空!"));
+        }
 
-    private String saveCodeFile(MultipartFile file, String baseCodePath) throws IOException {
-        String folderName = UUID.randomUUID().toString();
+        if (LanguageEnum.isInValidLanguage(lang)) {
+            return CompletableFuture.completedFuture(R.error("不支持的编程语言: " + lang));
+        }
 
-        String subFolderPathStr = baseCodePath + folderName + FileSystems.getDefault().getSeparator();
+        String[] Paths = saveFile(file, resourceProperties.getCodePath(), null);
+        String codePath = Paths[0];
+        saveFile(input, resourceProperties.getCodePath(), Paths[1]);
+
+        return sandboxService
+                .runCodeInSandboxWI(codePath, input.getOriginalFilename(), file.getOriginalFilename(), lang)
+                .thenApply(R::ok);
+    }
+
+    private String[] saveFile(MultipartFile file, String basePath, String folderName) throws IOException {
+        if (folderName == null) {
+            folderName = UUID.randomUUID().toString();
+        }
+
+        String subFolderPathStr = basePath + folderName + FileSystems.getDefault().getSeparator();
 
         Path subFolderPath = Paths.get(subFolderPathStr);
         Files.createDirectories(subFolderPath);
@@ -76,7 +91,7 @@ public class SandboxController {
 
         file.transferTo(destinationFilePath.toFile());
 
-        return destinationFilePath.toUri().getPath();
+        return new String[]{destinationFilePath.toUri().getPath(), folderName};
     }
 
 }

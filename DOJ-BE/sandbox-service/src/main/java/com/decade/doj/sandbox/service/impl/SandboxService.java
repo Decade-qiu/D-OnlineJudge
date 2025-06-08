@@ -149,7 +149,97 @@ public class SandboxService implements ISandboxService {
     }
 
     @Override
-    public ExecuteMessage runProblemCodeInSandbox(String localPath, String filename, String lang, String pid) {
-        return new ExecuteMessage();
+    @Async("RunCodeThreadPool")
+    public CompletableFuture<ExecuteMessage> runCodeInSandboxWI(String localPath, String inputname, String filename, String lang) {
+        ExecuteMessage result = _runCodeInSandboxWI(localPath, inputname, filename, lang);
+        return CompletableFuture.completedFuture(result);
+    }
+
+    private ExecuteMessage _runCodeInSandboxWI(String filePath, String inputname, String filename, String lang) {
+
+        LanguageEnum languageEnum = LanguageEnum.getLanguageEnum(lang);
+
+        // 镜像名称
+        String imageName = languageEnum.getImageName();
+        // 运行时挂载目录（宿主与容器）
+        String fileDir = new File(filePath).getParent();
+        String mountPath = MOUNT_PATH;
+
+        int dotIndex = filename.lastIndexOf(".");
+        String baseName = (dotIndex >= 0)
+                ? filename.substring(0, dotIndex)
+                : filename;
+
+        try {
+            // 构造真实要执行的命令
+            String runCmd = buildRunCommand(languageEnum.getRunCmd(), baseName);
+            runCmd += " < " + inputname; // 添加输入重定向
+            String execCmd = String.format(
+                    TIMEOUT_TEMPLATE,
+                    languageEnum.getTimeLimit(),
+                    runCmd
+            );
+
+            // 准备 Docker 运行命令列表
+            List<String> command = Arrays.asList(
+                    "docker", "run", "--rm",
+                    "-v", fileDir + ":" + mountPath,
+                    "--memory", languageEnum.getMemoryLimit(),
+                    imageName,
+                    execCmd
+            );
+
+            ProcessBuilder builder = new ProcessBuilder(command);
+            // 合并标准输出与标准错误
+            builder.redirectErrorStream(true);
+
+            long startTimeMillis = System.currentTimeMillis();
+
+            Process process = builder.start();
+
+            // 读取进程输出
+            StringBuilder fullOutputBuilder = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    fullOutputBuilder.append(line).append("\n");
+                }
+            }
+
+            int exitCode = process.waitFor();
+            long endTimeMillis = System.currentTimeMillis();
+
+            String fullOutput = fullOutputBuilder.toString().trim();
+
+            // 匹配内存、耗时信息
+            Matcher memMatcher = MEM_PATTERN.matcher(fullOutput);
+            Matcher timeMatcher = TIME_PATTERN.matcher(fullOutput);
+
+            String memoryUsage = memMatcher.find() ? memMatcher.group(1) : "-1";
+            String timeUsed = timeMatcher.find()
+                    ? timeMatcher.group(1)
+                    : String.valueOf((endTimeMillis - startTimeMillis) / 1000.0);
+
+            int statIndex = fullOutput.indexOf("Command being timed:");
+            String trimmedOutput = (statIndex != -1)
+                    ? fullOutput.substring(0, statIndex).trim()
+                    : fullOutput;
+
+            log.info("Exit code: {}", exitCode);
+            log.info("Raw output:\n{}", fullOutput);
+
+            return new ExecuteMessage()
+                    .setExitValue(exitCode)
+                    .setStatus(ExecuteMessage.getStatus(exitCode))
+                    .setMessage(ExecuteMessage.show(exitCode) ? trimmedOutput : "")
+                    .setTime(Double.parseDouble(timeUsed))
+                    .setMemory(Long.parseLong(memoryUsage));
+        } catch (Exception e) {
+            log.error("运行沙箱代码出错", e);
+            return new ExecuteMessage()
+                    .setExitValue(1)
+                    .setStatus("Runtime Error")
+                    .setMessage("执行代码时发生错误: " + e.getMessage());
+        }
     }
 }

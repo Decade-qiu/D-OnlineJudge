@@ -8,5 +8,5 @@ public interface ISandboxService {
 
     CompletableFuture<ExecuteMessage> runCodeInSandbox(String localPath, String filename, String lang);
 
-    ExecuteMessage runProblemCodeInSandbox(String localPath, String filename, String lang, String pid);
+    CompletableFuture<ExecuteMessage> runCodeInSandboxWI(String localPath, String inputname, String filename, String lang);
 }
