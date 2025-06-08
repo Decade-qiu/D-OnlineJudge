@@ -14,6 +14,7 @@
         <div class="footer">
             <div class="buttons">
                 <el-button :icon="VideoPlay" round @click="handleSubmit">run</el-button>
+                <el-button :icon="VideoPlay" type="primary" round @click="handleSubmit1">submit</el-button>
             </div>
             <div class="infos">
                 <span class="item">Spaces: {{ config.tabSize }}</span>
@@ -28,7 +29,7 @@
         <div class="input-section">
             <div class="input-field">
                 <label>输入</label>
-                <el-input v-model="inputContent"/>
+                <el-input v-model="inputContent" :autosize="{ minRows: 1, maxRows: 10 }" type="textarea" />
             </div>
         </div>
         <div class="output" v-if="outputVisible">
@@ -68,11 +69,11 @@
 import { reactive, shallowRef, computed, watch, onMounted, ref } from 'vue'
 import { EditorView, ViewUpdate } from '@codemirror/view'
 import { Codemirror } from 'vue-codemirror'
-import { ElButton, ElMessage } from 'element-plus'
+import { ElButton, ElMessage, ElMessageBox } from 'element-plus'
 import { Close, VideoPlay } from '@element-plus/icons-vue'
 import { configType } from './index.vue'
 import { useRoute } from 'vue-router'
-import { reqSubmit } from '@/api/submit'
+import { reqProblemSubmit, reqProblemValidate } from '@/api/submit'
 import { executeMessage } from '@/api/submit/type'
 
 const props = defineProps<{
@@ -149,6 +150,61 @@ const handleStateUpdate = (viewUpdate: ViewUpdate) => {
     state.lines = viewUpdate.state.doc.lines
 };
 
+const handleSubmit1 = async () => {
+
+    outputTextVis.value = false;
+
+    output.value = {
+        exitValue: -1, // 设置为 null 表示还没有结果
+        status: 'Running',
+        message: '',
+        time: 0,
+        memory: 0,
+    };
+
+    // 将代码字符串转换为 Blob 文件
+    const codeBlob = new Blob([code.value], { type: 'text/plain' });
+
+    // 获取语言扩展名
+    const languageExtension = getLanguageExtension(props.language);
+
+    // 创建 FormData
+    const formData = new FormData();
+    const pid = route.params.id as string;
+    formData.append('pid', pid);
+    formData.append('file', codeBlob, `Main.${languageExtension}`);
+    formData.append('language', props.language.name);
+
+    ElMessage.success('提交成功');
+
+    // 发送请求
+    const response = (await reqProblemValidate(formData)).data;
+
+    // 成功时处理
+    if (response.code === 200) {
+        const data = response.data;
+        output.value = data
+        if (data.message.trim() !== '') {
+            outputTextVis.value = true;
+        } else {
+            outputTextVis.value = false;
+        }
+        if (data.status === "Accepted") {
+            ElMessageBox.alert(
+                'Accepted!',
+                '提示',
+            );
+        } else if (data.status === "Wrong Answer") {
+            ElMessageBox.alert(
+                "Wrong Answer!",
+                '提示',
+            );
+        }
+    }
+    // 显示 output 区域
+    outputVisible.value = true;
+};
+
 const handleSubmit = async () => {
 
     outputTextVis.value = false;
@@ -179,7 +235,7 @@ const handleSubmit = async () => {
     ElMessage.success('提交成功');
 
     // 发送请求
-    const response = (await reqSubmit(formData)).data;
+    const response = (await reqProblemSubmit(formData)).data;
 
     // 成功时处理
     if (response.code === 200) {
@@ -191,7 +247,7 @@ const handleSubmit = async () => {
         }
         if (data.message.trim() !== '') {
             outputTextVis.value = true;
-        }else{
+        } else {
             outputTextVis.value = false;
         }
     }
@@ -225,7 +281,7 @@ onMounted(() => {
         }
     );
     const handleKeyDown = (event: KeyboardEvent) => {
-        const isSaveShortcut = 
+        const isSaveShortcut =
             (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's';
 
         if (isSaveShortcut) {
@@ -440,7 +496,7 @@ const log = console.log
 
             &:focus {
                 border-color: #409EFF;
-                box-shadow: 0 0 0 2px rgba(64,158,255,0.2);
+                box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
             }
         }
     }

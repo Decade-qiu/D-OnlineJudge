@@ -72,6 +72,46 @@ public class SandboxController {
                 .thenApply(R::ok);
     }
 
+    @PostMapping("/validate")
+    @ApiOperation("验证题目代码")
+    public CompletableFuture<R<ExecuteMessage>> runProblemValidate(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang, @RequestParam("pid") Long pid) throws IOException {
+        if (file.isEmpty()) {
+            return CompletableFuture.completedFuture(R.error("上传的文件不能为空!"));
+        }
+
+        if (LanguageEnum.isInValidLanguage(lang)) {
+            return CompletableFuture.completedFuture(R.error("不支持的编程语言: " + lang));
+        }
+
+        String[] Paths = saveFile(file, resourceProperties.getCodePath(), null);
+        String codePath = Paths[0];
+        String[] data = saveText2File(pid, resourceProperties.getCodePath(), Paths[1]);
+
+        return sandboxService
+                .runCodeInSandboxWIV(codePath, data[0], data[1], file.getOriginalFilename(), lang)
+                .thenApply(R::ok);
+    }
+
+    private String[] saveText2File(Long pid, String basePath, String folderName) throws IOException {
+        if (folderName == null) {
+            folderName = UUID.randomUUID().toString();
+        }
+
+        String subFolderPathStr = basePath + folderName + FileSystems.getDefault().getSeparator();
+
+        Path subFolderPath = Paths.get(subFolderPathStr);
+        Files.createDirectories(subFolderPath);
+
+        String inputFileName = pid + "_p_input.txt";
+        // 模拟从其他微服务读取input和output数据
+        String inputdata = "1 987";
+        String outputdata = "988";
+        Path inputFilePath = subFolderPath.resolve(inputFileName);
+        Files.writeString(inputFilePath, inputdata);
+
+        return new String[]{inputFileName, outputdata};
+    }
+
     private String[] saveFile(MultipartFile file, String basePath, String folderName) throws IOException {
         if (folderName == null) {
             folderName = UUID.randomUUID().toString();

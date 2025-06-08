@@ -22,5 +22,18 @@ public class ThreadPoolConfig {
                 executor.getCorePoolSize(), executor.getMaxPoolSize(), executor.getQueueCapacity());
         return executor;
     }
+
+    @Bean("ValidateThreadPool")
+    public ThreadPoolTaskExecutor validateThreadPoolTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(20);
+        executor.setThreadNamePrefix("ValidateThread-");
+        executor.initialize();
+        log.error("ValidateThreadPool initialized with core pool size: {}, max pool size: {}, queue capacity: {}",
+                executor.getCorePoolSize(), executor.getMaxPoolSize(), executor.getQueueCapacity());
+        return executor;
+    }
 }
 

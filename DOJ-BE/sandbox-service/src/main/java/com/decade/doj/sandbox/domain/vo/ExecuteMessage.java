@@ -33,6 +33,8 @@ public class ExecuteMessage {
         InfoStatus.add(0);
         InfoStatus.add(1);
         InfoStatus.add(2);
+        InfoStatus.add(10);
+        InfoStatus.add(11);
     }
 
     public static String getStatus(Integer exitValue) {

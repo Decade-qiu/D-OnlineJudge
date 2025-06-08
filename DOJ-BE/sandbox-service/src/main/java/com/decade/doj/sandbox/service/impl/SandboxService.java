@@ -151,11 +151,18 @@ public class SandboxService implements ISandboxService {
     @Override
     @Async("RunCodeThreadPool")
     public CompletableFuture<ExecuteMessage> runCodeInSandboxWI(String localPath, String inputname, String filename, String lang) {
-        ExecuteMessage result = _runCodeInSandboxWI(localPath, inputname, filename, lang);
+        ExecuteMessage result = _runCodeInSandboxWI(localPath, inputname, filename, lang, null);
         return CompletableFuture.completedFuture(result);
     }
 
-    private ExecuteMessage _runCodeInSandboxWI(String filePath, String inputname, String filename, String lang) {
+    @Override
+    @Async("ValidateThreadPool")
+    public CompletableFuture<ExecuteMessage> runCodeInSandboxWIV(String localPath, String inputname, String output, String filename, String lang) {
+        ExecuteMessage result = _runCodeInSandboxWI(localPath, inputname, filename, lang, output);
+        return CompletableFuture.completedFuture(result);
+    }
+
+    private ExecuteMessage _runCodeInSandboxWI(String filePath, String inputname, String filename, String lang, String answer) {
 
         LanguageEnum languageEnum = LanguageEnum.getLanguageEnum(lang);
 
@@ -228,9 +235,23 @@ public class SandboxService implements ISandboxService {
             log.info("Exit code: {}", exitCode);
             log.info("Raw output:\n{}", fullOutput);
 
+            String status = ExecuteMessage.getStatus(exitCode);
+            if (answer != null && ExecuteMessage.getStatus(exitCode).equals("Finished")) {
+                // 比较输出与答案
+                boolean isCorrect = trimmedOutput.equals(answer.trim());
+                if (isCorrect) {
+                    status = "Accepted";
+                    exitCode = 10;
+                } else {
+                    status = "Wrong Answer";
+                    exitCode = 11;
+                    trimmedOutput += "\n```\nExpected: " + answer.trim();
+                }
+            }
+
             return new ExecuteMessage()
                     .setExitValue(exitCode)
-                    .setStatus(ExecuteMessage.getStatus(exitCode))
+                    .setStatus(status)
                     .setMessage(ExecuteMessage.show(exitCode) ? trimmedOutput : "")
                     .setTime(Double.parseDouble(timeUsed))
                     .setMemory(Long.parseLong(memoryUsage));
