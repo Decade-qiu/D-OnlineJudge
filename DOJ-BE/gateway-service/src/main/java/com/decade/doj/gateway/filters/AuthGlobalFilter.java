@@ -26,7 +26,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-@EnableConfigurationProperties(AuthProperties.class)
+@EnableConfigurationProperties({AuthProperties.class, JwtProperties.class})
 @Slf4j
 public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
@@ -38,6 +38,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        log.info(jwtProperties.getSecretKey());
         String path = exchange.getRequest().getURI().getPath();
         if (isExcludedPath(path)) {
             ServerWebExchange build = exchange.mutate()

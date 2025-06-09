@@ -11,3 +11,4 @@ spring:
                 shared-configs:
                     - dataId: shared-jdbc.yaml
                     - dataId: shared-swagger.yaml
+                    - dataId: shared-jwt.yaml

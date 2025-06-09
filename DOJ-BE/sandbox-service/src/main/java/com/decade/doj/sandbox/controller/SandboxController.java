@@ -1,7 +1,9 @@
 package com.decade.doj.sandbox.controller;
 
+import com.decade.doj.common.client.ProblemClient;
 import com.decade.doj.common.config.properties.ResourceProperties;
 import com.decade.doj.common.domain.R;
+import com.decade.doj.common.domain.po.Problem;
 import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.ISandboxService;
@@ -33,6 +35,8 @@ public class SandboxController {
     private final ResourceProperties resourceProperties;
 
     private final ISandboxService sandboxService;
+
+    private final ProblemClient problemClient;
 
     @PostMapping("/code")
     @ApiOperation("运行代码文件")
@@ -103,9 +107,11 @@ public class SandboxController {
         Files.createDirectories(subFolderPath);
 
         String inputFileName = pid + "_p_input.txt";
-        // 模拟从其他微服务读取input和output数据
-        String inputdata = "1 987";
-        String outputdata = "988";
+        // 从其他微服务读取input和output数据
+        Problem problem = problemClient.getProblemById(pid).getData();
+        String inputdata = problem.getTestData();
+        String outputdata = problem.getTestAns();
+
         Path inputFilePath = subFolderPath.resolve(inputFileName);
         Files.writeString(inputFilePath, inputdata);
 
