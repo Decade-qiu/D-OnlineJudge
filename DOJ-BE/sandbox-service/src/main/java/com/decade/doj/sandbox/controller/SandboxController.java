@@ -4,6 +4,7 @@ import com.decade.doj.common.client.ProblemClient;
 import com.decade.doj.common.config.properties.ResourceProperties;
 import com.decade.doj.common.domain.R;
 import com.decade.doj.common.domain.po.Problem;
+import com.decade.doj.common.utils.UserContext;
 import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.ISandboxService;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -92,7 +94,7 @@ public class SandboxController {
         String[] data = saveText2File(pid, resourceProperties.getCodePath(), Paths[1]);
 
         return sandboxService
-                .runCodeInSandboxWIV(codePath, data[0], data[1], file.getOriginalFilename(), lang)
+                .runCodeInSandboxWIV(codePath, data[0], data[1], file.getOriginalFilename(), lang, pid, Paths[2], UserContext.getCurrentUser())
                 .thenApply(R::ok);
     }
 
@@ -135,9 +137,12 @@ public class SandboxController {
 
         Path destinationFilePath = subFolderPath.resolve(origFilename);
 
-        file.transferTo(destinationFilePath.toFile());
+        byte[] bytes = file.getBytes();
+        String content = new String(bytes, StandardCharsets.UTF_8);
+        Files.write(destinationFilePath, bytes);
+        // file.transferTo(destinationFilePath.toFile());
 
-        return new String[]{destinationFilePath.toUri().getPath(), folderName};
+        return new String[]{destinationFilePath.toUri().getPath(), folderName, content};
     }
 
 }

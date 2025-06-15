@@ -1,5 +1,6 @@
 package com.decade.doj.submission;
 
+import com.decade.doj.common.config.custom.JwtTool;
 import com.decade.doj.common.config.custom.MVCConfig;
 import com.decade.doj.common.config.custom.MybatisConfig;
 import com.decade.doj.common.interceptor.IdentityInterceptor;
@@ -10,7 +11,7 @@ import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
 @MapperScan("com.decade.doj.submission.mapper")
-@Import({MVCConfig.class, MybatisConfig.class, IdentityInterceptor.class})
+@Import({JwtTool.class, MVCConfig.class, MybatisConfig.class, IdentityInterceptor.class})
 public class SubmissionApplication {
     public static void main(String[] args) {
         SpringApplication.run(SubmissionApplication.class, args);

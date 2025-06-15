@@ -1,5 +1,11 @@
 package com.decade.doj.sandbox.service.impl;
 
+import cn.hutool.core.date.DateTime;
+import com.decade.doj.common.client.ProblemClient;
+import com.decade.doj.common.client.SubmissionClient;
+import com.decade.doj.common.domain.po.Problem;
+import com.decade.doj.common.domain.po.Submission;
+import com.decade.doj.common.utils.UserContext;
 import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.ISandboxService;
@@ -53,6 +59,9 @@ public class SandboxService implements ISandboxService {
     private static final String TIMEOUT_TEMPLATE = "/usr/bin/time -v timeout %ds %s";
     // 挂载目录
     private static final String MOUNT_PATH = "/app";
+
+    private final SubmissionClient submissionClient;
+    private final ProblemClient problemClient;
 
     @Override
     @Async("RunCodeThreadPool")
@@ -155,10 +164,26 @@ public class SandboxService implements ISandboxService {
         return CompletableFuture.completedFuture(result);
     }
 
-    @Override
     @Async("ValidateThreadPool")
-    public CompletableFuture<ExecuteMessage> runCodeInSandboxWIV(String localPath, String inputname, String output, String filename, String lang) {
+    @Override
+    public CompletableFuture<ExecuteMessage> runCodeInSandboxWIV(String localPath, String inputname, String output, String filename, String lang, Long pid, String code, Long uid) {
         ExecuteMessage result = _runCodeInSandboxWI(localPath, inputname, filename, lang, output);
+        // 保存当前用户
+        UserContext.setCurrentUser(uid);
+        Problem problem = problemClient.getProblemById(pid).getData();
+        submissionClient.submit(
+                new Submission()
+                        .setUserId(UserContext.getCurrentUser())
+                        .setProblemId(problem.getId())
+                        .setLanguage(lang)
+                        .setCode(code)
+                        .setExitValue(result.getExitValue())
+                        .setStatus(result.getStatus())
+                        .setMessage(result.getMessage())
+                        .setTime(result.getTime())
+                        .setMemory(result.getMemory())
+                        .setSubmitTime(new DateTime())
+        );
         return CompletableFuture.completedFuture(result);
     }
 
