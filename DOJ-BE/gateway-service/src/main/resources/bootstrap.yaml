@@ -24,3 +24,7 @@ spring:
                     uri: lb://sandbox-service
                     predicates:
                         - Path=/sandbox/**
+                -   id: submission
+                    uri: lb://submission-service
+                    predicates:
+                        - Path=/submission/**
