@@ -30,6 +30,10 @@ public class Submission {
      */
     private Long problemId;
 
+    private String userName;
+
+    private String problemName;
+
     /**
      * 编程语言
      */

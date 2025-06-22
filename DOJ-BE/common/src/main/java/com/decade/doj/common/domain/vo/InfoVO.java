@@ -1,6 +1,6 @@
-package com.decade.doj.user.domain.vo;
+package com.decade.doj.common.domain.vo;
 
-import com.decade.doj.user.domain.po.User;
+import com.decade.doj.common.domain.po.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;

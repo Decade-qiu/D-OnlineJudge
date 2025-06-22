@@ -3,8 +3,10 @@ package com.decade.doj.sandbox.service.impl;
 import cn.hutool.core.date.DateTime;
 import com.decade.doj.common.client.ProblemClient;
 import com.decade.doj.common.client.SubmissionClient;
+import com.decade.doj.common.client.UserClient;
 import com.decade.doj.common.domain.po.Problem;
 import com.decade.doj.common.domain.po.Submission;
+import com.decade.doj.common.domain.po.User;
 import com.decade.doj.common.utils.UserContext;
 import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.enums.LanguageEnum;
@@ -61,6 +63,7 @@ public class SandboxService implements ISandboxService {
     private static final String MOUNT_PATH = "/app";
 
     private final SubmissionClient submissionClient;
+    private final UserClient userClient;
     private final ProblemClient problemClient;
 
     @Override
@@ -171,11 +174,14 @@ public class SandboxService implements ISandboxService {
         // 保存当前用户
         UserContext.setCurrentUser(uid);
         Problem problem = problemClient.getProblemById(pid).getData();
+        User user = userClient.getUser(uid).getData();
         submissionClient.submit(
                 new Submission()
-                        .setUserId(UserContext.getCurrentUser())
+                        .setUserId(user.getId())
+                        .setUserName(user.getUsername())
                         .setProblemId(problem.getId())
-                        .setLanguage(lang)
+                        .setProblemName(problem.getName())
+                        .setLanguage(lang.toLowerCase())
                         .setCode(code)
                         .setExitValue(result.getExitValue())
                         .setStatus(result.getStatus())

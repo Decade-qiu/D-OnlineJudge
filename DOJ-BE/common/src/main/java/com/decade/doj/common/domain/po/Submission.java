@@ -16,7 +16,9 @@ import java.util.Date;
 public class Submission {
     private Long id;
     private Long userId;
+    private String userName;
     private Long problemId;
+    private String problemName;
     private String language;
     private String code;
     private Integer exitValue;
