@@ -7,9 +7,9 @@
                 <el-option label="困难" value="困难" />
             </el-select>
             <el-select v-model="searchStatus" placeholder="状态" clearable @clear="searchStatus = null">
-                <el-option label="已通过" value="已通过" />
-                <el-option label="未通过" value="未通过" />
-                <el-option label="尝试中" value="尝试中" />
+                <el-option label="已通过" value="0" />
+                <el-option label="未开始" value="1" />
+                <el-option label="尝试中" value="2" />
             </el-select>
             <el-select v-model="searchTag" placeholder="标签" clearable @clear="searchTag = null">
                 <el-option label="数组" value="数组" />
@@ -64,6 +64,7 @@ import { CircleCheck, CircleClose } from '@element-plus/icons-vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { reqProblemList, reqProblemPageList } from '@/api/problem';
+import { reqSubmissionUserProblem } from '@/api/submission';
 import type { ProblemType } from '@/api/problem/type';
 import type { BasePageQueryForm } from '@/api/base';
 import { onMounted } from 'vue';
@@ -113,9 +114,23 @@ const getProblemList = async () => {
     pages.value = pagesV;
     tableData.value =  [];
     for (const problem of list) {
+        const ss = (await reqSubmissionUserProblem(problem.id)).data.data;
+        if (searchStatus.value == 0) {
+            if (ss !== 1) {
+                continue; // 如果状态是已通过，且查询条件是已通过，则跳过
+            }
+        } else if (searchStatus.value == 1) {
+            if (ss !== 0) {
+                continue; // 如果状态是未开始，且查询条件是未开始，则跳过
+            }
+        } else if (searchStatus.value == 2) {
+            if (ss !== 2) {
+                continue; // 如果状态是尝试中，且查询条件是尝试中，则跳过
+            }
+        }
         tableData.value.push({
             ...problem,
-            status: Math.floor(Math.random() * 3)
+            status: ss
         });
     }
 };

@@ -28,3 +28,7 @@ export type SubmissionsPageResponseData = BaseResponse & {
         list: Submission[];
     },
 };
+
+export type SubmissionUserMatch = BaseResponse & {
+    data: number;
+};

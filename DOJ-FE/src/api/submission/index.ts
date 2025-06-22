@@ -1,6 +1,6 @@
 // 统一管理项目接口
 import request from '@/utils/request';
-import type { Submission, SubmissionPageQueryForm, SubmissionsPageResponseData } from './type';
+import type { Submission, SubmissionPageQueryForm, SubmissionsPageResponseData, SubmissionUserMatch } from './type';
 import type { BaseResponseData } from '@/api/base';
 import { AxiosResponse } from 'axios';
 
@@ -8,6 +8,7 @@ enum API {
     SUBMISSIONS_LIST = '/submission/list',
     SUBMISSIONS_PAGE = '/submission/page',
     SUBMISSION_DETAIL = '/submission/',
+    SUBMISSION_USER_PROBLEM = '/submission/match/',
 };
 
 // 请求提交列表（非分页）
@@ -20,6 +21,6 @@ export const reqSubmissionPageList = (data: SubmissionPageQueryForm) =>
         params: data
     });
 
-// 请求提交详情
-export const reqSubmissionDetail = (id: string) =>
-    request.get<Submission, AxiosResponse<Submission>>(API.SUBMISSION_DETAIL + id);
+// 请求用户提交的题目
+export const reqSubmissionUserProblem = (id: number) =>
+    request.get<SubmissionUserMatch, AxiosResponse<SubmissionUserMatch>>(API.SUBMISSION_USER_PROBLEM + id);
