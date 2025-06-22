@@ -1,6 +1,6 @@
 <template>
     <div :class="['online-coding', { 'full-page': isPageFullscreen }]">
-        <toolbar
+        <toolbar v-if="config.editorType !== 'show'"
             :config="config"
             :themes="Object.keys(themes)"
             :languages="Object.keys(languages)"
@@ -29,6 +29,7 @@ import * as themes from './themes';
 import Toolbar from './toolbar.vue';
 import CodeEditor from './codeEditor.vue';
 import ProblemEditor from './problemEditor.vue';
+import ShowEditor from './showEditor.vue';
 
 export type configType = {
     tabSize: number;
@@ -39,6 +40,7 @@ export type configType = {
     language: string;
     theme: string;
     editorType: string; // 'code' | 'problem'
+    code?: string; // 可选属性，适用于 'show' 编辑器
 };
 
 const props = defineProps({
@@ -51,7 +53,12 @@ const props = defineProps({
 const { config } = toRefs(props);
 
 const editorComponent = computed(() => {
-    return config.value.editorType === 'problem' ? ProblemEditor : CodeEditor;
+    if (config.value.editorType === 'problem') {
+        return ProblemEditor;
+    } else if (config.value.editorType === 'show') {
+        return ShowEditor;
+    }
+    return CodeEditor;
 });
 
 const loading = shallowRef(false)
@@ -63,13 +70,16 @@ const currentTheme = computed(() => {
 
 // 定义异步函数，用于确保加载语言代码
 const ensureLanguageCode = async (targetLanguage: string) => {
-    config.value.language = targetLanguage
+    config.value.language = targetLanguage;
     loading.value = true;
     const delayPromise = () => new Promise((resolve) => window.setTimeout(resolve, 260));
     if (langCodeMap.has(targetLanguage)) {
         await delayPromise();
     } else {
         const [result] = await Promise.all([languages[targetLanguage](), delayPromise()]);
+        if (config.value.code) {
+            result.default.code = config.value.code;
+        }
         langCodeMap.set(targetLanguage, result.default);
     }
     loading.value = false;

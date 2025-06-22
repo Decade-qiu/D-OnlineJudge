@@ -2,42 +2,64 @@
     <div class="status_list">
         <div class="search_setting">
             <el-input v-model="searchProblemName" placeholder="请输入题目名称" clearable />
-            <el-input v-model="searchUserId" placeholder="请输入用户ID" clearable />
+            <el-input v-model="searchUserId" placeholder="请输入用户名称" clearable />
             <el-select v-model="searchLanguage" placeholder="语言" clearable>
-                <el-option label="cpp" value="C/C++" />
-                <el-option label="Java" value="Java" />
-                <el-option label="Python" value="Python" />
-                <el-option label="JavaScript" value="JavaScript" />
+                <el-option label="cpp" value="cpp" />
+                <el-option label="Java" value="java" />
+                <el-option label="Python" value="python" />
             </el-select>
             <el-select v-model="searchStatus" placeholder="状态" clearable>
                 <el-option label="Accepted" value="Accepted" />
                 <el-option label="Wrong Answer" value="Wrong Answer" />
                 <el-option label="Runtime Error" value="Runtime Error" />
+                <el-option label="Compile Error" value="Compile Error" />
                 <el-option label="Time Limit Exceeded" value="Time Limit Exceeded" />
+                <el-option label="Memory Limit Exceeded" value="Memory Limit Exceeded" />
             </el-select>
         </div>
         <el-table :data="tableData" style="width: 100%" :default-sort="{ prop: 'id', order: 'descending' }">
             <!-- 展开行用于展示代码 -->
-            <el-table-column type="expand">
+            <el-table-column type="expand" width="20">
                 <template v-slot="props">
-                    <div class="code_container">
-                        <pre>{{ props.row.code }}</pre>
-                    </div>
+                    <Editor :config="{
+                        tabSize: 4,
+                        disabled: false,
+                        height: '62vh',
+                        width: '100%',
+                        language: props.row.language,
+                        theme: 'oneDark',
+                        fontSize: 16,
+                        editorType: 'show',
+                        code: props.row.code
+                    }" />
                 </template>
             </el-table-column>
-            <el-table-column prop="submitTime" label="提交时间" sortable align="center" width="180" />
-            <el-table-column prop="id" label="提交ID" sortable align="center" width="120" />
-            <el-table-column prop="problemName" label="题目名称" align="center" min-width="120">
-                <template v-slot="scope">
-                    <span class="problem_name" @click="toProblem(scope.row.problemId)">{{ scope.row.problemName
-                        }}</span>
-                </template>
+            <el-table-column prop="submitTime" label="提交时间" sortable align="center" width="160" />
+            <el-table-column prop="id" label="提交ID" sortable align="center" width="100" />
+            <el-table-column prop="problemName" label="题目名称" align="center" min-width="100">
+            <template v-slot="scope">
+                <span class="problem_name" @click="toProblem(scope.row.problemId)">{{ scope.row.problemName }}</span>
+            </template>
             </el-table-column>
-            <el-table-column prop="userName" label="用户" align="center" width="100" />
-            <el-table-column prop="language" label="语言" align="center" width="130" />
-            <el-table-column prop="status" label="状态" align="center" width="150" />
-            <el-table-column prop="time" label="执行时间" align="center" width="120" />
-            <el-table-column prop="memory" label="内存消耗" align="center" width="120" />
+            <el-table-column prop="userName" label="用户" align="center" />
+            <el-table-column prop="language" label="语言" align="center" />
+            <el-table-column prop="status" label="状态" align="center" min-width="100">
+            <template v-slot="scope">
+                <el-tag
+                :type="scope.row.status === 'Accepted' ? 'success'
+                    : scope.row.status === 'Wrong Answer' ? 'danger'
+                    : scope.row.status === 'Runtime Error' ? 'danger'
+                    : scope.row.status === 'Compile Error' ? 'danger'
+                    : scope.row.status === 'Time Limit Exceeded' ? 'warning'
+                    : scope.row.status === 'Memory Limit Exceeded' ? 'warning'
+                    : 'info'"
+                >
+                {{ scope.row.status }}
+                </el-tag>
+            </template>
+            </el-table-column>
+            <el-table-column prop="time" label="执行时间" align="center" />
+            <el-table-column prop="memory" label="内存消耗" align="center" />
         </el-table>
 
         <div class="page_list">
@@ -59,6 +81,8 @@ import { reqProblemDetail } from '@/api/problem'; // 如果需要题目相关接
 import type { BasePageQueryForm } from '@/api/base';
 import { Submission } from '@/api/submission/type';
 import languages from '@/components/CodeEditor/languages';
+import { configType } from '@/components/CodeEditor/index.vue';
+import Editor from '@/components/CodeEditor/index.vue';
 
 interface StatusItem {
     id: number;             // 提交ID
@@ -104,7 +128,7 @@ const toProblem = (id: number) => {
 const getStatusList = async () => {
     const params = {
         ...pageQueryForm.value,
-        problemName: searchProblemName.value,
+        problemId: searchProblemName.value,
         userId: searchUserId.value,
         language: searchLanguage.value,
         status: searchStatus.value
