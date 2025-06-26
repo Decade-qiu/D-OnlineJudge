@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ElTable, ElTableColumn, ElSelect, ElOption, ElInput, ElPagination } from 'element-plus';
 // 假设后端接口已经实现，接口方法可根据实际情况调整
 import { reqSubmissionPageList } from '@/api/submission';
@@ -99,6 +99,7 @@ interface StatusItem {
 }
 
 const router = useRouter();
+const route = useRoute();
 
 // 搜索条件
 const searchProblemName = ref();
@@ -133,7 +134,6 @@ const getStatusList = async () => {
         language: searchLanguage.value,
         status: searchStatus.value
     };
-    console.log('查询参数:', params);
     const res = await reqSubmissionPageList(params);
     const { total: totalV, pages: pagesV, list } = res.data.data;
     total.value = totalV;
@@ -161,6 +161,10 @@ const getStatusList = async () => {
 };
 
 onMounted(() => {
+    // 从 URL 查询参数获取
+    const { problemName, userName } = route.query;
+    if (problemName) searchProblemName.value = problemName as string;
+    if (userName) searchUserId.value = userName as string;
     getStatusList();
 });
 </script>

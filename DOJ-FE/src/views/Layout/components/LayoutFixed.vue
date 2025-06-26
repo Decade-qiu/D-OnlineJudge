@@ -23,7 +23,7 @@ const navItems = [
     { path: '/', icon: 'fas fa-home', text: '主页' },
     { path: '/problem', icon: 'fas fa-book', text: '题库' },
     { path: '/online', icon: 'fas fa-code', text: '编码' },
-    { path: '/competitions', icon: 'fas fa-trophy', text: '竞赛' },
+    // { path: '/competitions', icon: 'fas fa-trophy', text: '竞赛' },
     { path: '/status', icon: 'fas fa-tasks', text: '状态' },
     { path: '/rankings', icon: 'fas fa-chart-bar', text: '排名' },
     { path: '/about', icon: 'fas fa-info-circle', text: '关于' }

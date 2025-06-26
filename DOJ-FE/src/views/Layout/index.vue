@@ -15,7 +15,7 @@ provide('triggerRefresh', triggerRefresh);
         <LayoutFixed />
         <main class="content">
             <!-- <RouterView /> -->
-            <router-view v-slot="{ Component }" :key="refresh">
+            <router-view v-slot="{ Component }" :key="$route.fullPath">
                 <transition name="fade" mode="out-in">
                     <!-- <keep-alive> -->
                         <component :is="Component" />

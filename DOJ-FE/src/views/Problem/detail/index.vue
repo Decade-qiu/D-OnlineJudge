@@ -17,8 +17,8 @@
         <!-- 功能按钮 -->
         <div class="buttons">
             <button class="btn submit-btn" @click="submit">提交</button>
-            <button class="btn record-btn">提交记录</button>
-            <button class="btn stats-btn">提交统计</button>
+            <button class="btn record-btn" @click="personSubmission">提交记录</button>
+            <button class="btn stats-btn" @click="problemSubmission">提交统计</button>
         </div>
 
         <div class="item description">
@@ -74,13 +74,14 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { reqProblemDetail } from '@/api/problem';
 import type { ProblemType } from '@/api/problem/type';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { configType } from '@/components/CodeEditor/index.vue';
 import Editor from '@/components/CodeEditor/index.vue';
+import { useUserStore } from '@/stores/userStore';
 
 const config = ref<configType>({
     tabSize: 4,
@@ -94,7 +95,10 @@ const config = ref<configType>({
 });
 
 const route = useRoute();
+const router = useRouter();
 const problem = ref<ProblemType>();
+
+const userStore = useUserStore();
 
 const inputSampleRef = ref();
 const outputSampleRef = ref();
@@ -160,6 +164,30 @@ const paste = (exampleContent: any) => {
                 console.error("复制失败：", err);
             });
     }
+};
+
+const personSubmission = () => {
+    // 获取当前题目名称和当前用户名
+    const problemName = problem.value?.name || '';
+    const userName = userStore.userInfo?.username || '';
+    router.push({
+        path: '/status',
+        query: {
+            problemName: problemName,
+            userName: userName
+        }
+    });
+};
+
+const problemSubmission = () => {
+    // 跳转到题目提交统计页面
+    const problemName = problem.value?.name || '';
+    router.push({
+        path: '/status',
+        query: {
+            problemName: problemName,
+        }
+    });
 };
 
 onMounted(async () => {
