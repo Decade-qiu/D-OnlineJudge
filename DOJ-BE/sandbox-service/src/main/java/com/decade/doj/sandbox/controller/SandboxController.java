@@ -1,11 +1,13 @@
 package com.decade.doj.sandbox.controller;
 
+import com.decade.doj.common.client.ProblemClient;
 import com.decade.doj.common.config.properties.ResourceProperties;
 import com.decade.doj.common.domain.R;
-import com.decade.doj.sandbox.config.DockerConfig.RunCodeWithoutInput;
+import com.decade.doj.common.domain.po.Problem;
+import com.decade.doj.common.utils.UserContext;
 import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.enums.LanguageEnum;
-import com.decade.doj.sandbox.service.impl.SandboxService;
+import com.decade.doj.sandbox.service.ISandboxService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +17,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/sandbox")
@@ -30,70 +36,113 @@ public class SandboxController {
 
     private final ResourceProperties resourceProperties;
 
-    private final SandboxService sandboxService;
+    private final ISandboxService sandboxService;
+
+    private final ProblemClient problemClient;
 
     @PostMapping("/code")
     @ApiOperation("运行代码文件")
-    public R<ExecuteMessage> uploadAvatar(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) {
+    public CompletableFuture<R<ExecuteMessage>> runCode(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) throws IOException {
         if (file.isEmpty()) {
-            return R.error("文件为空!");
+            return CompletableFuture.completedFuture(R.error("上传的文件不能为空!"));
         }
 
-        if (!LanguageEnum.isValidLanguage(lang)) {
-            return R.error("不支持的语言!");
+        if (LanguageEnum.isInValidLanguage(lang)) {
+            return CompletableFuture.completedFuture(R.error("不支持的编程语言: " + lang));
         }
 
-        String filename = UUID.randomUUID() + file.getOriginalFilename();
-        if (lang.equals("java")) filename = file.getOriginalFilename();
-        Path path = Paths.get(resourceProperties.getCodePath() + filename);
+        String path = saveFile(file, resourceProperties.getCodePath(), null)[0];
 
-        try {
-            file.transferTo(path);
-        } catch (Exception e) {
-            return R.error("文件上传失败, "+path.toAbsolutePath()+"地址不存在!");
-        }
-
-        ExecuteMessage executeMessage = sandboxService.runCodeInSandbox(path.toUri().getPath(), filename, lang);
-
-        return R.ok(executeMessage);
+        return sandboxService
+                .runCodeInSandbox(path, file.getOriginalFilename(), lang)
+                .thenApply(R::ok);
     }
 
     @PostMapping("/problem")
-    @ApiOperation("测评")
-    public R<ExecuteMessage> validate(@NotNull String pid, @RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) {
+    @ApiOperation("运行题目代码")
+    public CompletableFuture<R<ExecuteMessage>> runProblem(@RequestParam("file") MultipartFile file, @RequestParam("input") MultipartFile input, @RequestParam("language") @NotBlank String lang, @RequestParam("pid") Long pid) throws IOException {
         if (file.isEmpty()) {
-            return R.error("文件为空!");
+            return CompletableFuture.completedFuture(R.error("上传的文件不能为空!"));
         }
 
-        if (!LanguageEnum.isValidLanguage(lang)) {
-            return R.error("不支持的语言!");
+        if (LanguageEnum.isInValidLanguage(lang)) {
+            return CompletableFuture.completedFuture(R.error("不支持的编程语言: " + lang));
         }
 
-        String filename = UUID.randomUUID() + file.getOriginalFilename();
-        if (lang.equals("java")) filename = file.getOriginalFilename();
-        Path path = Paths.get(resourceProperties.getProblemCodePath() + filename);
+        String[] Paths = saveFile(file, resourceProperties.getCodePath(), null);
+        String codePath = Paths[0];
+        saveFile(input, resourceProperties.getCodePath(), Paths[1]);
 
-        try {
-            file.transferTo(path);
-        } catch (Exception e) {
-            return R.error("文件上传失败, "+path.toAbsolutePath()+"地址不存在!");
-        }
-
-        ExecuteMessage executeMessage = sandboxService.runProblemCodeInSandbox(path.toUri().getPath(), filename, lang, pid);
-
-        return R.ok(executeMessage);
+        return sandboxService
+                .runCodeInSandboxWI(codePath, input.getOriginalFilename(), file.getOriginalFilename(), lang)
+                .thenApply(R::ok);
     }
 
-    // @GetMapping("/{id}")
-    // @ApiOperation("查询用户接口")
-    // public R<String> getUser(@PathVariable("id") @NotNull String id) {
-    //     for (LanguageEnum language : LanguageEnum.values) {
-    //         if (language.getLanguage().equals(id)) {
-    //             String res = runCodeWithoutInput.run(language, "main"+language.getSuffix());
-    //             return R.ok(res);
-    //         }
-    //     }
-    //     return R.error("未找到对应语言");
-    // }
+    @PostMapping("/validate")
+    @ApiOperation("验证题目代码")
+    public CompletableFuture<R<ExecuteMessage>> runProblemValidate(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang, @RequestParam("pid") Long pid) throws IOException {
+        if (file.isEmpty()) {
+            return CompletableFuture.completedFuture(R.error("上传的文件不能为空!"));
+        }
+
+        if (LanguageEnum.isInValidLanguage(lang)) {
+            return CompletableFuture.completedFuture(R.error("不支持的编程语言: " + lang));
+        }
+
+        String[] Paths = saveFile(file, resourceProperties.getCodePath(), null);
+        String codePath = Paths[0];
+        String[] data = saveText2File(pid, resourceProperties.getCodePath(), Paths[1]);
+
+        return sandboxService
+                .runCodeInSandboxWIV(codePath, data[0], data[1], file.getOriginalFilename(), lang, pid, Paths[2], UserContext.getCurrentUser())
+                .thenApply(R::ok);
+    }
+
+    private String[] saveText2File(Long pid, String basePath, String folderName) throws IOException {
+        if (folderName == null) {
+            folderName = UUID.randomUUID().toString();
+        }
+
+        String subFolderPathStr = basePath + folderName + FileSystems.getDefault().getSeparator();
+
+        Path subFolderPath = Paths.get(subFolderPathStr);
+        Files.createDirectories(subFolderPath);
+
+        String inputFileName = pid + "_p_input.txt";
+        // 从其他微服务读取input和output数据
+        Problem problem = problemClient.getProblemById(pid).getData();
+        String inputdata = problem.getTestData();
+        String outputdata = problem.getTestAns();
+
+        Path inputFilePath = subFolderPath.resolve(inputFileName);
+        Files.writeString(inputFilePath, inputdata);
+
+        return new String[]{inputFileName, outputdata};
+    }
+
+    private String[] saveFile(MultipartFile file, String basePath, String folderName) throws IOException {
+        if (folderName == null) {
+            folderName = UUID.randomUUID().toString();
+        }
+
+        String subFolderPathStr = basePath + folderName + FileSystems.getDefault().getSeparator();
+
+        Path subFolderPath = Paths.get(subFolderPathStr);
+        Files.createDirectories(subFolderPath);
+
+        String origFilename = file.getOriginalFilename();
+        if (origFilename == null || origFilename.isBlank()) {
+            throw new IOException("上传文件原始文件名为空，无法保存");
+        }
+
+        Path destinationFilePath = subFolderPath.resolve(origFilename);
+
+        byte[] bytes = file.getBytes();
+        String content = new String(bytes, StandardCharsets.UTF_8);
+        Files.write(destinationFilePath, bytes);
+        // file.transferTo(destinationFilePath.toFile());
+
+        return new String[]{destinationFilePath.toUri().getPath(), folderName, content};
+    }
 
 }
