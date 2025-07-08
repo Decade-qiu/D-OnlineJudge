@@ -1,6 +1,6 @@
 spring:
     application:
-        name: sandbox-service
+        name: submission-service
     profiles:
         active: dev, common
     cloud:

@@ -29,6 +29,7 @@
     "cropperjs": "^1.6.2",
     "echarts": "^5.5.1",
     "element-plus": "^2.5.1",
+    "katex": "^0.16.22",
     "nprogress": "^0.2.0",
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^3.2.1",

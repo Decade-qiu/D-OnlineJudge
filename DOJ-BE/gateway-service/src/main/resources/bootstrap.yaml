@@ -5,7 +5,7 @@ spring:
         active: dev, common
     cloud:
         nacos:
-            server-addr: 192.168.74.131:8848
+            server-addr: 127.0.0.1:8848
             config:
                 file-extension: yaml
                 shared-configs:
@@ -24,3 +24,7 @@ spring:
                     uri: lb://sandbox-service
                     predicates:
                         - Path=/sandbox/**
+                -   id: submission
+                    uri: lb://submission-service
+                    predicates:
+                        - Path=/submission/**
