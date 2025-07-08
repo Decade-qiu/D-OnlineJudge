@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Data
-@Component
 @ConfigurationProperties(prefix = "doj.auth")
 public class AuthProperties {
     private List<String> includePaths;
