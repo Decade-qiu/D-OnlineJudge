@@ -4,7 +4,7 @@
 
 **D-OnlineJudge** is a full-stack online coding platform featuring a Spring Cloud-based microservices architecture and Vue 3 frontend. It provides secure code execution environments through Docker containerization and robust inter-service communication via OpenFeign. The system supports programming competitions, code submission evaluation, and real-time progress tracking.
 
-> Attention: This project is not yet fully completed; the problem list page, as well as the comparison of answers and user program output, are still under development, and due to the author's poor time management, no updates are expected in the near future.
+> ~~Attention: This project is not yet fully completed; the problem list page, as well as the comparison of answers and user program output, are still under development, and due to the author's poor time management, no updates are expected in the near future.~~
 
 ---
 
@@ -15,3 +15,17 @@ The project is organized into the following directories:
 - **`DOJ-BE`**: Contains the backend code, consisting of multiple microservices.
 - **`DOJ-FE`**: Contains the frontend code, built with Vue 3.
 - **`docs`**: Contains additional project documentation.
+
+---
+
+✅ **Update:** The project is now completed!
+
+🚀 **Future Plans:**  
+We plan to integrate AI capabilities into the platform to enhance the coding and learning experience. Planned features include:
+
+- 🤖 **AI-assisted Code Hints** — Provide intelligent suggestions and help users debug their submissions.
+- 🧠 **Submission Feedback** — Automatically analyze user code for potential improvements in complexity, style, and performance.
+- 🔍 **Natural Language Problem Search** — Let users find problems or solutions by asking in plain language.
+- 📈 **Personalized Learning Paths** — Recommend problems based on user history and progress.
+
+Stay tuned for future AI-powered enhancements!
