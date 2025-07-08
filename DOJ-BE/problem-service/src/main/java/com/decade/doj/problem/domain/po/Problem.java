@@ -70,5 +70,9 @@ public class Problem implements Serializable {
     @TableField("tag")
     private String tag;
 
+    @TableField("test_data")
+    private String testData;
 
+    @TableField("test_ans")
+    private String testAns;
 }
