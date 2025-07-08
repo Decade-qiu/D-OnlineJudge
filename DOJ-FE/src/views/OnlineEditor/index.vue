@@ -1,13 +1,15 @@
 <template>
     <div class="editor-box">
-        <CodeEditor :config="config" />
+        <Editor :config="config" />
     </div>
 </template>
 
 <script setup lang='ts'>
 import { ref } from 'vue';
+import { configType } from '@/components/CodeEditor/index.vue';
+import Editor from '@/components/CodeEditor/index.vue';
 
-const config = ref({
+const config = ref<configType>({
     tabSize: 4,
     disabled: false,
     height: '62vh',
@@ -15,6 +17,7 @@ const config = ref({
     language: 'cpp',
     theme: 'oneDark',
     fontSize: 16,
+    editorType: 'code'
 })
 </script>
 
