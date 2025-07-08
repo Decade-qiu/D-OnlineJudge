@@ -15,6 +15,7 @@ import UserHome from '@/views/User/home/index.vue'
 import OnlineEditor from '@/views/OnlineEditor/index.vue'
 import Problem from '@/views/Problem/index.vue'
 import ProblemDetail from '@/views/Problem/detail/index.vue'
+import Status from '@/views/Status/index.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,6 +49,9 @@ const router = createRouter({
                 },{
                     path: '/problem/:id',
                     component: ProblemDetail
+                },{
+                    path: '/status',
+                    component: Status
                 }
             ]
         }
