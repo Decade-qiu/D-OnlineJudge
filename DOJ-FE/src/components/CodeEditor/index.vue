@@ -1,13 +1,24 @@
 <template>
     <div :class="['online-coding', { 'full-page': isPageFullscreen }]">
-        <toolbar :config="config" :themes="Object.keys(themes)" :languages="Object.keys(languages)"
-            @language="ensureLanguageCode" @fullscreen="togglePageFullscreen" />
+        <toolbar v-if="config.editorType !== 'show'"
+            :config="config"
+            :themes="Object.keys(themes)"
+            :languages="Object.keys(languages)"
+            @language="ensureLanguageCode"
+            @fullscreen="togglePageFullscreen"
+        />
         <div class="divider"></div>
         <div class="loading-box" v-if="loading">
             <loading />
         </div>
-        <editor v-else-if="currentLangCode" :config="config" :theme="currentTheme" :language="currentLangCode.language"
-            :code="currentLangCode.code" />
+        <component
+            v-else="currentLangCode"
+            :is="editorComponent"
+            :config="config"
+            :theme="currentTheme"
+            :language="currentLangCode.language"
+            :code="currentLangCode.code"
+        />
     </div>
 </template>
 
@@ -16,7 +27,9 @@ import { reactive, computed, shallowRef, onBeforeMount, PropType, toRefs, ref } 
 import languages from './languages';
 import * as themes from './themes';
 import Toolbar from './toolbar.vue';
-import Editor from './editor.vue';
+import CodeEditor from './codeEditor.vue';
+import ProblemEditor from './problemEditor.vue';
+import ShowEditor from './showEditor.vue';
 
 export type configType = {
     tabSize: number;
@@ -26,6 +39,8 @@ export type configType = {
     width: string;
     language: string;
     theme: string;
+    editorType: string; // 'code' | 'problem'
+    code?: string; // 可选属性，适用于 'show' 编辑器
 };
 
 const props = defineProps({
@@ -37,6 +52,15 @@ const props = defineProps({
 
 const { config } = toRefs(props);
 
+const editorComponent = computed(() => {
+    if (config.value.editorType === 'problem') {
+        return ProblemEditor;
+    } else if (config.value.editorType === 'show') {
+        return ShowEditor;
+    }
+    return CodeEditor;
+});
+
 const loading = shallowRef(false)
 const langCodeMap = reactive(new Map<string, { code: string; language: () => any }>())
 const currentLangCode = computed(() => langCodeMap.get(config.value.language)!)
@@ -46,13 +70,16 @@ const currentTheme = computed(() => {
 
 // 定义异步函数，用于确保加载语言代码
 const ensureLanguageCode = async (targetLanguage: string) => {
-    config.value.language = targetLanguage
+    config.value.language = targetLanguage;
     loading.value = true;
     const delayPromise = () => new Promise((resolve) => window.setTimeout(resolve, 260));
     if (langCodeMap.has(targetLanguage)) {
         await delayPromise();
     } else {
         const [result] = await Promise.all([languages[targetLanguage](), delayPromise()]);
+        if (config.value.code) {
+            result.default.code = config.value.code;
+        }
         langCodeMap.set(targetLanguage, result.default);
     }
     loading.value = false;

@@ -17,9 +17,9 @@ interface ImportMetaEnv{
 
 
 // 自定义组件类型
-import CodeEditor from '@/components/CodeEditor/index.vue';
+import Editor from '@/components/CodeEditor/index.vue';
 declare module 'vue' {
   export interface GlobalComponents {
-    CodeEditor: typeof CodeEditor
+    Editor: typeof Editor
   }
 }

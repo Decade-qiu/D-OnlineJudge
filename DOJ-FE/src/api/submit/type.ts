@@ -8,6 +8,7 @@ export type submitForm = {
 export type problemSubmitForm = {
     pid: string,
     file: File,
+    input: File,
     language: string,
 };
 
