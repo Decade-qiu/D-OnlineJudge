@@ -3,7 +3,6 @@ package com.decade.doj.user.service.impl;
 import com.decade.doj.common.config.properties.JwtProperties;
 import com.decade.doj.common.domain.R;
 import com.decade.doj.common.exception.BadRequestException;
-import com.decade.doj.common.exception.CommonException;
 import com.decade.doj.common.exception.ForbiddenException;
 import com.decade.doj.common.config.custom.JwtTool;
 import com.decade.doj.common.utils.UserContext;
