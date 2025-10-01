@@ -1,6 +1,9 @@
 .DS_Store
 **/.DS_Store
 
+.vscode/
+GEMINI.md
+
 nacos/
 mysql/
 static/

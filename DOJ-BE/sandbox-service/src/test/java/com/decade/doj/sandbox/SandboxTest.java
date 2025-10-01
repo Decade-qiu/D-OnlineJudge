@@ -18,12 +18,12 @@ public class SandboxTest {
         String filename = "Main.py"; // 替换为实际的文件名
         String lang = "python";
 
-        try {
-            ExecuteMessage res = sandboxService.runCodeInSandbox(filePath, filename, lang);
-            System.out.println(res);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // try {
+        //     ExecuteMessage res = sandboxService.runCodeInSandbox(filePath, filename, lang);
+        //     System.out.println(res);
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
     }
 
 }
