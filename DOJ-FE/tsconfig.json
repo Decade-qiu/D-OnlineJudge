@@ -18,7 +18,7 @@
     "strict": true,
 
     // 全局组件声明
-    "types": ["element-plus/global"],
+    // "types": ["element-plus/global"],
 
     // 路径别名
     "baseUrl": "./", 
