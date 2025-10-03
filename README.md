@@ -25,7 +25,7 @@ This guide provides the essential steps to get the D-OnlineJudge application run
 - **Start Dependencies**: Run `MySQL` and `Nacos` using Docker. For detailed instructions, see `docs/1.docker部署.md`.
 - **Configure Nacos**: Add the shared configurations (`shared-jdbc.yaml`, etc.) to the Nacos dashboard.
 - **Build**: Navigate to the `DOJ-BE/` directory and run `mvn clean install`.
-- **Run Services**: Start each microservice by running its corresponding JAR file from the `target` directory (e.g., `java -jar user-service/target/user-service-1.0-SNAPSHOT.jar`).
+- **Run Services**: Start each microservice by running its corresponding JAR file from the `target` directory (e.g., `java -jar user-service/target/user-service-1.0-SNAPSHOT.jar`). If you have a system proxy enabled, you may need to disable it for the JVM by adding `-Dhttp.proxySet=false -Dhttps.proxySet=false` to the command.
 
 ### 2. Frontend Setup (`DOJ-FE`)
 

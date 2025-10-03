@@ -3,6 +3,8 @@
 # 脚本执行时，如果任何命令失败，则立即退出
 set -e
 
+pnpm build
+
 # 定义镜像和容器的名称
 IMAGE_NAME="doj-fe"
 CONTAINER_NAME="doj-fe-container"
