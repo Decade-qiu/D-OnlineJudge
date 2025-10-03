@@ -27,7 +27,7 @@ CREATE TABLE `user` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `user` (`username`, `avatar`, `email`, `password`, `score`, `rank`, `school`, `gender`, `easy_solve`, `middle_solve`, `hard_solve`, `role`, `url`, `sign`, `fans`, `subscribe`, `ban`) VALUES
+INSERT INTO `user` (`username`, `avatar`, `email`, `password`, `score`, `ranks`, `school`, `gender`, `easy_solve`, `middle_solve`, `hard_solve`, `role`, `url`, `sign`, `fans`, `subscribe`, `ban`) VALUES
 ('decade', '', 'decade@example.com', '123', 100, 20, 'Some School', 1, 5, 3, 1, 1, 'http://example.com/decade', '普通用户', 50, 10, 0),
 ('root', '', 'root@example.com', '123', 200, 10, 'Some University', 0, 10, 8, 5, 0, 'http://example.com/root', '管理员', 200, 50, 0);
 

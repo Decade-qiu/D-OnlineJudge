@@ -13,3 +13,34 @@ The project is organized into the following directories:
 - **`DOJ-BE`**: Contains the backend code, consisting of multiple microservices.
 - **`DOJ-FE`**: Contains the frontend code, built with Vue 3.
 - **`docs`**: Contains additional project documentation.
+
+---
+
+## Quick Start
+
+This guide provides the essential steps to get the D-OnlineJudge application running locally.
+
+### 1. Backend Setup (`DOJ-BE`)
+
+- **Start Dependencies**: Run `MySQL` and `Nacos` using Docker. For detailed instructions, see `docs/1.docker部署.md`.
+- **Configure Nacos**: Add the shared configurations (`shared-jdbc.yaml`, etc.) to the Nacos dashboard.
+- **Build**: Navigate to the `DOJ-BE/` directory and run `mvn clean install`.
+- **Run Services**: Start each microservice by running its corresponding JAR file from the `target` directory (e.g., `java -jar user-service/target/user-service-1.0-SNAPSHOT.jar`).
+
+### 2. Frontend Setup (`DOJ-FE`)
+
+- **Install Dependencies**: Navigate to the `DOJ-FE/` directory and run `pnpm install`.
+- **Deploy**: Use the provided script to build and deploy the frontend in a Docker container.
+  ```sh
+  # (Run once) Add execute permission to the script
+  chmod +x run-docker.sh
+
+  # Run the deployment script
+  ./run-docker.sh
+  ```
+
+### 3. Access the Application
+
+Once all services are running, you can access the application at `http://localhost:8088`.
+
+For more detailed build and deployment instructions, please refer to `docs/0.build.md`.
