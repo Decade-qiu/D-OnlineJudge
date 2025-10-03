@@ -25,6 +25,7 @@ public class CrossFilter {
         // 允许跨域的请求来源
         configuration.addAllowedOrigin("http://localhost:5174");
         configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.addAllowedOrigin("http://localhost:8088");
         // 预检请求的有效期，单位为秒
         configuration.setMaxAge(3600L);
         // 是否允许携带cookie跨域
