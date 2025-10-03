@@ -17,6 +17,7 @@
             :config="config"
             :theme="currentTheme"
             :language="currentLangCode.language"
+            :language-name="currentLangCode.languageName"
             :code="currentLangCode.code"
         />
     </div>
@@ -62,7 +63,7 @@ const editorComponent = computed(() => {
 });
 
 const loading = shallowRef(false)
-const langCodeMap = reactive(new Map<string, { code: string; language: () => any }>())
+const langCodeMap = reactive(new Map<string, { code: string; language: () => any; languageName: string; }>())
 const currentLangCode = computed(() => langCodeMap.get(config.value.language)!)
 const currentTheme = computed(() => {
     return config.value.theme !== 'default' ? (themes as any)[config.value.theme] : void 0
@@ -80,6 +81,7 @@ const ensureLanguageCode = async (targetLanguage: string) => {
         if (config.value.code) {
             result.default.code = config.value.code;
         }
+        result.default.languageName = targetLanguage;
         langCodeMap.set(targetLanguage, result.default);
     }
     loading.value = false;

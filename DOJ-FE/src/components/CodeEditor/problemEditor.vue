@@ -80,7 +80,8 @@ const props = defineProps<{
     config: configType,
     code: string,
     theme: Object | Array<string>,
-    language: Function
+    language: Function,
+    languageName: string
 }>();
 
 const route = useRoute();
@@ -166,14 +167,14 @@ const handleSubmit1 = async () => {
     const codeBlob = new Blob([code.value], { type: 'text/plain' });
 
     // 获取语言扩展名
-    const languageExtension = getLanguageExtension(props.language);
+    const languageExtension = getLanguageExtension(props.languageName);
 
     // 创建 FormData
     const formData = new FormData();
     const pid = route.params.id as string;
     formData.append('pid', pid);
     formData.append('file', codeBlob, `Main.${languageExtension}`);
-    formData.append('language', props.language.name);
+    formData.append('language', props.languageName);
 
     ElMessage.success('提交成功');
 
@@ -222,15 +223,13 @@ const handleSubmit = async () => {
     const inputBlob = new Blob([inputContent.value], { type: 'text/plain' });
 
     // 获取语言扩展名
-    const languageExtension = getLanguageExtension(props.language);
-
-    // 创建 FormData
+    const languageExtension = getLanguageExtension(props.languageName);
     const formData = new FormData();
     const pid = route.params.id as string;
     formData.append('pid', pid);
     formData.append('file', codeBlob, `Main.${languageExtension}`);
     formData.append('input', inputBlob, `${pid}_input.txt`);
-    formData.append('language', props.language.name);
+    formData.append('language', props.languageName);
 
     ElMessage.success('提交成功');
 
@@ -256,11 +255,11 @@ const handleSubmit = async () => {
 };
 
 // 获取语言扩展名的辅助函数
-const getLanguageExtension = (languageFunc: Function) => {
-    if (!languageFunc) return 'txt'; // 默认 txt 后缀
+const getLanguageExtension = (languageName: string) => {
+    if (!languageName) return 'txt'; // 默认 txt 后缀
 
     // 你可以根据不同语言函数推断其扩展名
-    const language = languageFunc.name.toLowerCase();
+    const language = languageName.toLowerCase();
 
     switch (language) {
         case 'javascript': return 'js';
