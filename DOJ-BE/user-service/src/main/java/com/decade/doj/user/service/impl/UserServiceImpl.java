@@ -5,6 +5,7 @@ import com.decade.doj.common.domain.R;
 import com.decade.doj.common.exception.BadRequestException;
 import com.decade.doj.common.exception.ForbiddenException;
 import com.decade.doj.common.config.custom.JwtTool;
+import com.decade.doj.common.exception.UnauthorizedException;
 import com.decade.doj.common.utils.UserContext;
 import com.decade.doj.user.domain.dto.LoginDTO;
 import com.decade.doj.user.domain.dto.RegisterDTO;
@@ -14,9 +15,15 @@ import com.decade.doj.user.mapper.UserMapper;
 import com.decade.doj.user.domain.po.User;
 import com.decade.doj.user.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.decade.doj.common.config.properties.AppNameProperties;
 import com.decade.doj.user.utils.AESTool;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -33,6 +40,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private final AESTool aesTool;
     private final JwtTool jwtTool;
     private final JwtProperties jwtProperties;
+    private final StringRedisTemplate redisTemplate;
+    private final AppNameProperties appNameProperties;
+
+    private String getRedisKeyPrefix() {
+        return appNameProperties.getName() + ":refresh_token:";
+    }
 
     @Override
     public R<LoginVO> login(LoginDTO loginDTO) {
@@ -48,14 +61,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (user.getBan()) {
             throw new ForbiddenException("用户被冻结");
         }
-        // token
-        String token = jwtTool.createToken(user.getId(), jwtProperties.getTokenTTL());
+        // 1. 生成访问令牌 (Access Token)
+        String accessToken = jwtTool.createToken(user.getId(), jwtProperties.getTokenTTL());
 
+        // 2. 生成刷新令牌 (Refresh Token)
+        String refreshToken = UUID.randomUUID().toString();
+
+        // 3. 将 Refresh Token 存入 Redis
+        String redisKey = getRedisKeyPrefix() + refreshToken;
+        redisTemplate.opsForValue().set(redisKey, user.getId().toString(), jwtProperties.getRefreshTokenTTL());
+
+        // 4. 封装并返回双令牌
         LoginVO loginVO = new LoginVO()
-                .setToken(token)
+                .setAccessToken(accessToken)
+                .setRefreshToken(refreshToken)
                 .setUserId(user.getId())
                 .setUsername(user.getUsername());
         return R.ok(loginVO);
+    }
+
+    @Override
+    public R<String> refreshToken(String refreshToken) {
+        String redisKey = getRedisKeyPrefix() + refreshToken;
+        String userIdStr = redisTemplate.opsForValue().get(redisKey);
+
+        if (userIdStr == null) {
+            throw new UnauthorizedException("无效的刷新令牌");
+        }
+
+        Long userId = Long.valueOf(userIdStr);
+        String accessToken = jwtTool.createToken(userId, jwtProperties.getTokenTTL());
+        return R.ok(accessToken);
     }
 
     @Override

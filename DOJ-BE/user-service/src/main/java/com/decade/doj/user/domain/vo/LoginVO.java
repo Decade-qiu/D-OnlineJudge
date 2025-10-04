@@ -7,7 +7,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class LoginVO {
 
-    private String token;
+    private String accessToken;
+    private String refreshToken;
     private Long userId;
     private String username;
 

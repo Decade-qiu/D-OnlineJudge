@@ -79,6 +79,12 @@ public class UserController {
         return userService.login(loginDTO);
     }
 
+    @PostMapping("/refresh")
+    @ApiOperation("刷新令牌接口")
+    public R<String> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+        return userService.refreshToken(refreshToken);
+    }
+
     @GetMapping("/{id}")
     @ApiOperation("查询用户接口")
     public R<InfoVO> getUser(@PathVariable("id") @NotNull Long id) {

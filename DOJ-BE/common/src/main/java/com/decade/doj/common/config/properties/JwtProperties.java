@@ -13,6 +13,7 @@ public class JwtProperties {
     private String password;
     private String alias;
     private Duration tokenTTL = Duration.ofMinutes(10);
+    private Duration refreshTokenTTL = Duration.ofDays(7);
 
     private String authorization;
     private String secretKey;

@@ -132,7 +132,7 @@ let form: Ref<userInfoResponseData['data']> = ref({
 
 // 上传头像
 const uploadHeaders = {
-    Authorization: userStore.userInfo?.token
+    Authorization: userStore.userInfo?.accessToken
 };
 const beforeUpload = (file: File) => {
     const isJPG = file.type === 'image/jpeg';

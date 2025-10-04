@@ -8,7 +8,8 @@ export type loginForm = {
 
 // 登陆接口返回数据类型
 type dataType = {
-    token: string,
+    accessToken: string,
+    refreshToken: string,
     userId: number,
     username: string
 };

@@ -20,6 +20,8 @@ public interface IUserService extends IService<User> {
 
     R<LoginVO> login(LoginDTO loginDTO);
 
+    R<String> refreshToken(String refreshToken);
+
     R register(RegisterDTO registerDTO);
 
     R updateUser(User user);
