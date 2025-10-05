@@ -17,4 +17,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface IProblemService extends IService<Problem> {
 
     PageDTO<Problem> pageQuery(ProblemPageQueryDTO problemPageQueryDTO);
+
+    void updateProblemStats(Long problemId, boolean isAccepted);
 }

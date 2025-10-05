@@ -12,6 +12,7 @@ spring:
                     - dataId: shared-jdbc.yaml
                     - dataId: shared-swagger.yaml
                     - dataId: shared-jwt.yaml
+                    - dataId: shared-rabbitmq.yaml
 
 # shared-jdbc.yaml
 #spring:

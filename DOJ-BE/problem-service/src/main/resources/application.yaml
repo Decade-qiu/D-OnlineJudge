@@ -6,6 +6,8 @@ doj:
         name: doj_problem
         user: root
         pwd: 123
+    mq:
+        host: 127.0.0.1
     swagger:
         title: 用户服务接口文档
         scan: com.decade.doj.problem.controller

@@ -2,22 +2,17 @@ package com.decade.doj.submission.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.decade.doj.common.client.ProblemClient;
-import com.decade.doj.common.client.SubmissionClient;
-import com.decade.doj.common.client.UserClient;
 import com.decade.doj.common.domain.PageDTO;
-import com.decade.doj.common.domain.po.Problem;
-import com.decade.doj.common.domain.po.User;
 import com.decade.doj.submission.domain.dto.SubmissionPageQueryDTO;
 import com.decade.doj.submission.domain.po.Submission;
 import com.decade.doj.submission.service.ISubmissionService;
 import com.decade.doj.submission.mapper.SubmissionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.jdbc.Null;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Map;
 
 /**
 * @author qzj
@@ -29,6 +24,48 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ISubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submission>
     implements ISubmissionService {
+
+    private final RabbitTemplate rabbitTemplate;
+
+    @Override
+    public boolean save(Submission submission) {
+        boolean saved = super.save(submission);
+        if (!saved) {
+            return false;
+        }
+
+        // 无论提交是否成功，都发送一个“提交创建”事件，用于更新题目的总尝试次数
+        Map<String, Object> submissionMessage = Map.of(
+            "problemId", submission.getProblemId(),
+            "isAccepted", "Accepted".equals(submission.getStatus())
+        );
+        rabbitTemplate.convertAndSend("doj.topic", "submission.created", submissionMessage);
+
+        // 如果不是AC，则直接返回
+        if (!"Accepted".equals(submission.getStatus())) {
+            return true;
+        }
+
+        // 查询在这条记录之前，是否已经有过 AC 记录
+        long previousAcCount = this.lambdaQuery()
+                .eq(Submission::getUserId, submission.getUserId())
+                .eq(Submission::getProblemId, submission.getProblemId())
+                .eq(Submission::getStatus, "Accepted")
+                .count();
+
+        // 如果之前的 AC 记录数等于 1 (也就是刚刚插入的这条)，说明是首次 AC
+        if (previousAcCount == 1) {
+            log.info("用户 {} 首次 AC 题目 {}，发送消息到MQ", submission.getUserId(), submission.getProblemId());
+            // 发送消息到 MQ
+            Map<String, Long> message = Map.of(
+                "userId", submission.getUserId(),
+                "problemId", submission.getProblemId()
+            );
+            rabbitTemplate.convertAndSend("doj.topic", "problem.solved", message);
+        }
+
+        return true;
+    }
 
     @Override
     public PageDTO<Submission> pageQuery(SubmissionPageQueryDTO submissionPageQueryDTO) {

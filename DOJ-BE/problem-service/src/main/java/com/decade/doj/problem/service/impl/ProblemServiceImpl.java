@@ -45,4 +45,13 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     }
 
+    @Override
+    public void updateProblemStats(Long problemId, boolean isAccepted) {
+        lambdaUpdate()
+            .eq(Problem::getId, problemId)
+            .setSql("total_attempt = total_attempt + 1")
+            .setSql(isAccepted, "total_pass = total_pass + 1")
+            .update();
+    }
+
 }
