@@ -1,5 +1,8 @@
 .idea/
 *.iml
+.DS_Store
+**/.DS_Store
+.vscode/
 /target/
 /DOJ-BE/target/
 /DOJ-BE/.idea/
@@ -8,4 +11,7 @@
 
 # Ignore local data and static files
 redis/
+nacos/
+mysql/
 static/
+GEMINI.md
