@@ -1,9 +1,0 @@
-FROM python:3.10-slim
-
-# 安装必要工具用于统计资源
-RUN apt-get update && apt-get install -y time && apt-get clean
-
-WORKDIR /app
-
-# 默认 ENTRYPOINT，用于执行你传进来的命令（语言、超时都交给外部决定）
-ENTRYPOINT ["/bin/bash", "-c"]

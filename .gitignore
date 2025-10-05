@@ -1,9 +1,11 @@
-.DS_Store
-**/.DS_Store
+.idea/
+*.iml
+/target/
+/DOJ-BE/target/
+/DOJ-BE/.idea/
+/DOJ-FE/node_modules/
+/DOJ-FE/dist/
 
-.vscode/
-GEMINI.md
-
-nacos/
-mysql/
+# Ignore local data and static files
+redis/
 static/
