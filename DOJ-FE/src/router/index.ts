@@ -52,6 +52,9 @@ const router = createRouter({
                 },{
                     path: '/status',
                     component: Status
+                },{
+                    path: '/rankings',
+                    component: () => import('@/views/Rankings/index.vue')
                 }
             ]
         }
