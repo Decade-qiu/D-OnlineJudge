@@ -8,6 +8,8 @@ doj:
         pwd: 123
     redis:
         host: 127.0.0.1
+    mq:
+        host: 127.0.0.1
     swagger:
         title: 用户服务接口文档
         scan: com.decade.doj.user.controller

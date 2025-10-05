@@ -1,5 +1,7 @@
 package com.decade.doj.user.service;
 
+import com.decade.doj.common.domain.PageDTO;
+import com.decade.doj.common.domain.PageQueryDTO;
 import com.decade.doj.common.domain.R;
 import com.decade.doj.user.domain.dto.LoginDTO;
 import com.decade.doj.user.domain.dto.RegisterDTO;
@@ -7,6 +9,7 @@ import com.decade.doj.user.domain.dto.UpdPwdDTO;
 import com.decade.doj.user.domain.po.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.decade.doj.user.domain.vo.LoginVO;
+import com.decade.doj.user.domain.vo.RankVO;
 
 /**
  * <p>
@@ -27,4 +30,8 @@ public interface IUserService extends IService<User> {
     R updateUser(User user);
 
     R updatePwd(UpdPwdDTO updPwdDTO);
+
+    R<PageDTO<RankVO>> getRankings(PageQueryDTO pageQueryDTO);
+
+    void handleProblemSolved(Long userId, Long problemId);
 }

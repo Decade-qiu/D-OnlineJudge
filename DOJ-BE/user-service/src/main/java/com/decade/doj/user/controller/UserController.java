@@ -3,6 +3,8 @@ package com.decade.doj.user.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.decade.doj.common.config.properties.ResourceProperties;
+import com.decade.doj.common.domain.PageQueryDTO;
+import com.decade.doj.common.domain.PageDTO;
 import com.decade.doj.common.domain.R;
 import com.decade.doj.user.domain.dto.LoginDTO;
 import com.decade.doj.user.domain.dto.RegisterDTO;
@@ -10,6 +12,7 @@ import com.decade.doj.user.domain.dto.UpdPwdDTO;
 import com.decade.doj.user.domain.po.User;
 import com.decade.doj.user.domain.vo.InfoVO;
 import com.decade.doj.user.domain.vo.LoginVO;
+import com.decade.doj.user.domain.vo.RankVO;
 import com.decade.doj.user.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -83,6 +86,12 @@ public class UserController {
     @ApiOperation("刷新令牌接口")
     public R<String> refreshToken(@RequestHeader("Authorization") String refreshToken) {
         return userService.refreshToken(refreshToken);
+    }
+
+    @GetMapping("/rankings")
+    @ApiOperation("获取排行榜")
+    public R<PageDTO<RankVO>> getRankings(PageQueryDTO pageQueryDTO) {
+        return userService.getRankings(pageQueryDTO);
     }
 
     @GetMapping("/{id}")
