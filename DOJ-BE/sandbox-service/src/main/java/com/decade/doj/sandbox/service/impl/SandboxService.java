@@ -9,10 +9,12 @@ import com.decade.doj.common.domain.po.Submission;
 import com.decade.doj.common.domain.po.User;
 import com.decade.doj.common.utils.UserContext;
 import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
+import com.decade.doj.sandbox.domain.vo.JudgingTask;
 import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.ISandboxService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,9 +65,7 @@ public class SandboxService implements ISandboxService {
     // 挂载目录
     private static final String MOUNT_PATH = "/app";
 
-    private final SubmissionClient submissionClient;
-    private final UserClient userClient;
-    private final ProblemClient problemClient;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     @Async("RunCodeThreadPool")
@@ -167,30 +168,17 @@ public class SandboxService implements ISandboxService {
         return CompletableFuture.completedFuture(result);
     }
 
-    @Async("ValidateThreadPool")
     @Override
-    public CompletableFuture<ExecuteMessage> runCodeInSandboxWIV(String localPath, String inputname, String output, String filename, String lang, Long pid, String code, Long uid) {
-        ExecuteMessage result = _runCodeInSandboxWI(localPath, inputname, filename, lang, output);
-        // 保存当前用户
-        UserContext.setCurrentUser(uid);
-        Problem problem = problemClient.getProblemById(pid).getData();
-        User user = userClient.getUser(uid).getData();
-        submissionClient.submit(
-                new Submission()
-                        .setUserId(user.getId())
-                        .setUserName(user.getUsername())
-                        .setProblemId(problem.getId())
-                        .setProblemName(problem.getName())
-                        .setLanguage(lang.toLowerCase())
-                        .setCode(code)
-                        .setExitValue(result.getExitValue())
-                        .setStatus(result.getStatus())
-                        .setMessage(result.getMessage())
-                        .setTime(result.getTime())
-                        .setMemory(result.getMemory())
-                        .setSubmitTime(new DateTime())
+    public void execute(JudgingTask task) {
+        ExecuteMessage result = _runCodeInSandboxWI(task.getLocalPath(), task.getInput(), task.getFilename(), task.getLang(), task.getOutput());
+        log.info("User: {}, Problem: {}, 判题结果: {}", task.getUid(), task.getProblemId(), result);
+
+        Map<String, Object> resultMessage = Map.of(
+                "submissionId", task.getSubmissionId(),
+                "executeMessage", result
         );
-        return CompletableFuture.completedFuture(result);
+        rabbitTemplate.convertAndSend("doj.topic", "judging.result", resultMessage);
+        log.info("判题结果已发布到MQ, submissionId: {}", task.getSubmissionId());
     }
 
     private ExecuteMessage _runCodeInSandboxWI(String filePath, String inputname, String filename, String lang, String answer) {
