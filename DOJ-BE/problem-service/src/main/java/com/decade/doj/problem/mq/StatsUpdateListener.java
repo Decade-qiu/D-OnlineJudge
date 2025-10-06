@@ -20,7 +20,13 @@ public class StatsUpdateListener {
         if (message == null) {
             return;
         }
-        Long problemId = (Long) message.get("problemId");
+        Object problemIdObj = message.get("problemId");
+        Long problemId = null;
+        if (problemIdObj instanceof Integer) {
+            problemId = ((Integer) problemIdObj).longValue();
+        } else if (problemIdObj instanceof Long) {
+            problemId = (Long) problemIdObj;
+        }
         Boolean isAccepted = (Boolean) message.get("isAccepted");
 
         if (problemId == null || isAccepted == null) {
