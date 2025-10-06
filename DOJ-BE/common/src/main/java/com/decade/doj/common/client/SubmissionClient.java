@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface SubmissionClient {
 
     @PostMapping("/submission/submit")
-    R<String> submit(@RequestBody Submission submission);
+    R<Long> submit(@RequestBody Submission submission);
 
 }

@@ -26,9 +26,9 @@ public class SubmissionController {
 
     @PostMapping("/submit")
     @ApiOperation("提交记录")
-    public R<String> submit(@RequestBody Submission submission) {
+    public R<Long> submit(@RequestBody Submission submission) {
         submissionService.save(submission);
-        return R.ok("提交成功");
+        return R.ok(submission.getId());
     }
 
     @GetMapping("/page")

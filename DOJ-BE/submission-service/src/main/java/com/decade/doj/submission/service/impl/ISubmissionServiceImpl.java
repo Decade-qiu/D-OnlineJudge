@@ -25,48 +25,6 @@ import java.util.Map;
 public class ISubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submission>
     implements ISubmissionService {
 
-    private final RabbitTemplate rabbitTemplate;
-
-    @Override
-    public boolean save(Submission submission) {
-        boolean saved = super.save(submission);
-        if (!saved) {
-            return false;
-        }
-
-        // 无论提交是否成功，都发送一个“提交创建”事件，用于更新题目的总尝试次数
-        Map<String, Object> submissionMessage = Map.of(
-            "problemId", submission.getProblemId(),
-            "isAccepted", "Accepted".equals(submission.getStatus())
-        );
-        rabbitTemplate.convertAndSend("doj.topic", "submission.created", submissionMessage);
-
-        // 如果不是AC，则直接返回
-        if (!"Accepted".equals(submission.getStatus())) {
-            return true;
-        }
-
-        // 查询在这条记录之前，是否已经有过 AC 记录
-        long previousAcCount = this.lambdaQuery()
-                .eq(Submission::getUserId, submission.getUserId())
-                .eq(Submission::getProblemId, submission.getProblemId())
-                .eq(Submission::getStatus, "Accepted")
-                .count();
-
-        // 如果之前的 AC 记录数等于 1 (也就是刚刚插入的这条)，说明是首次 AC
-        if (previousAcCount == 1) {
-            log.info("用户 {} 首次 AC 题目 {}，发送消息到MQ", submission.getUserId(), submission.getProblemId());
-            // 发送消息到 MQ
-            Map<String, Long> message = Map.of(
-                "userId", submission.getUserId(),
-                "problemId", submission.getProblemId()
-            );
-            rabbitTemplate.convertAndSend("doj.topic", "problem.solved", message);
-        }
-
-        return true;
-    }
-
     @Override
     public PageDTO<Submission> pageQuery(SubmissionPageQueryDTO submissionPageQueryDTO) {
         log.info("分页查询提交列表: {}", submissionPageQueryDTO);
