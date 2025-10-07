@@ -32,36 +32,6 @@
                 <el-input v-model="inputContent" :autosize="{ minRows: 1, maxRows: 10 }" type="textarea" />
             </div>
         </div>
-        <div class="output" v-if="outputVisible">
-            <div class="output-header">
-                <span>代码运行状态：</span>
-                <span :class="output?.exitValue !== 0 && output?.exitValue !== 10 ? 'error-text' : 'success-text'">
-                    {{ output?.status }}
-                    <el-icon v-if="output?.status === 'Running'" v-loading="loading" :element-loading-svg="svg"
-                        class="custom-loading-svg" element-loading-svg-view-box="-10, -10, 50, 50">
-                    </el-icon>
-                </span>
-                <div class="running-status" v-show="output?.exitValue === 0">
-                    <span>{{ timeInfo }}</span>
-                </div>
-                <div class="running-status" v-show="output?.exitValue === 0">
-                    <span>{{ memoryInfo }}</span>
-                </div>
-                <span class="closeoutput" @click="outputVisible = false">
-                    <el-icon>
-                        <Close />
-                    </el-icon>
-                </span>
-            </div>
-
-            <!-- 输入输出部分 -->
-            <div class="input-output-section" v-show="outputTextVis">
-                <div class="output-field">
-                    <label>输出</label>
-                    <pre class="output-content">{{ output?.message }}</pre>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -75,6 +45,7 @@ import { configType } from './index.vue'
 import { useRoute } from 'vue-router'
 import { reqProblemSubmit, reqProblemValidate } from '@/api/submit'
 import { executeMessage } from '@/api/submit/type'
+import { useWebSocket } from '@/utils/websocket'
 
 const props = defineProps<{
     config: configType,
@@ -153,16 +124,6 @@ const handleStateUpdate = (viewUpdate: ViewUpdate) => {
 
 const handleSubmit1 = async () => {
 
-    outputTextVis.value = false;
-
-    output.value = {
-        exitValue: -1, // 设置为 null 表示还没有结果
-        status: 'Running',
-        message: '',
-        time: 0,
-        memory: 0,
-    };
-
     // 将代码字符串转换为 Blob 文件
     const codeBlob = new Blob([code.value], { type: 'text/plain' });
 
@@ -176,34 +137,21 @@ const handleSubmit1 = async () => {
     formData.append('file', codeBlob, `Main.${languageExtension}`);
     formData.append('language', props.languageName);
 
-    ElMessage.success('提交成功');
-
-    // 发送请求
-    const response = (await reqProblemValidate(formData)).data;
-
-    // 成功时处理
-    if (response.code === 200) {
-        const data = response.data;
-        output.value = data
-        if (data.message.trim() !== '') {
-            outputTextVis.value = true;
+    try {
+        // 发送异步验证请求
+        const response = (await reqProblemValidate(formData)).data;
+        if (response.code === 200) {
+            ElMessage.info('提交成功，判题中...');
+            const submissionId = response.data;
+            // 订阅 WebSocket 结果
+            console.log(submissionId);
+            useWebSocket().subscribeToSubmission(submissionId);
         } else {
-            outputTextVis.value = false;
+            ElMessage.error(`提交失败: ${response.message}`);
         }
-        if (data.status === "Accepted") {
-            ElMessageBox.alert(
-                'Accepted!',
-                '提示',
-            );
-        } else if (data.status === "Wrong Answer") {
-            ElMessageBox.alert(
-                "Wrong Answer!",
-                '提示',
-            );
-        }
+    } catch (err) {
+        ElMessage.error('提交请求失败');
     }
-    // 显示 output 区域
-    outputVisible.value = true;
 };
 
 const handleSubmit = async () => {

@@ -23,3 +23,7 @@ export type executeMessage = {
 export type executeResponseData = BaseResponse & {
     data: executeMessage,
 };
+
+export type sidResponseData = BaseResponse & {
+    data: number,
+};
