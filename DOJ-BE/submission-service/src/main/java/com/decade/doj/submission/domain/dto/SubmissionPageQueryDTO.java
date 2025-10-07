@@ -10,6 +10,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class SubmissionPageQueryDTO extends PageQueryDTO {
 
+    private Long submissionId;
+
     private String userId;
 
     private String problemId;

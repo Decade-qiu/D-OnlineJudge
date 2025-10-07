@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,8 +26,16 @@ import java.util.Map;
 public class ISubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submission>
     implements ISubmissionService {
 
-    @Override
     public PageDTO<Submission> pageQuery(SubmissionPageQueryDTO submissionPageQueryDTO) {
+        // 如果 submissionId 存在，则执行精确查询
+        if (submissionPageQueryDTO.getSubmissionId() != null) {
+            Submission submission = this.getById(submissionPageQueryDTO.getSubmissionId());
+            if (submission == null) {
+                return PageDTO.empty(0L, 0L);
+            }
+            return PageDTO.fullPage(1L, 1L, List.of(submission));
+        }
+
         log.info("分页查询提交列表: {}", submissionPageQueryDTO);
         log.info("userId={}, problemId={}, status={}, language={}",
                 submissionPageQueryDTO.getUserId(),
@@ -42,7 +51,7 @@ public class ISubmissionServiceImpl extends ServiceImpl<SubmissionMapper, Submis
                 .like(problem != null && !problem.isBlank(), Submission::getProblemName, submissionPageQueryDTO.getProblemId())
                 .eq(submissionPageQueryDTO.getStatus() != null, Submission::getStatus, submissionPageQueryDTO.getStatus())
                 .eq(submissionPageQueryDTO.getLanguage() != null, Submission::getLanguage, submissionPageQueryDTO.getLanguage())
-                .page(submissionPageQueryDTO.toMpPage("id", true));
+                .page(submissionPageQueryDTO.toMpPage("submit_time", false));
 
         return PageDTO.fullPage(submissionList.getTotal(), submissionList.getPages(), submissionList.getRecords());
     }
