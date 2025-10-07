@@ -1,5 +1,11 @@
-<script lang="ts" setup>
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import { useWebSocket } from '@/utils/websocket';
 
+onMounted(() => {
+  // 在应用根组件挂载时，初始化 WebSocket 连接
+  useWebSocket();
+});
 </script>
 
 <template>
