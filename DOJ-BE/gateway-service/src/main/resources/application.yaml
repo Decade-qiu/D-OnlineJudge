@@ -1,6 +1,27 @@
 server:
     port: ${doj.port.gateway-service}
 
+spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8858
+      datasource:
+        ds1:
+          nacos:
+            server-addr: ${spring.cloud.nacos.server-addr}
+            data-id: gateway-sentinel-rules
+            group-id: DEFAULT_GROUP
+            data-type: json
+            rule-type: flow
+        degrade:
+          nacos:
+            server-addr: ${spring.cloud.nacos.server-addr}
+            data-id: gateway-sentinel-degrade-rules
+            group-id: DEFAULT_GROUP
+            data-type: json
+            rule-type: degrade
+
 doj:
     auth:
         excludePaths:
