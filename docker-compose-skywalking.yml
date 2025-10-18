@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  elasticsearch:
+    image: elasticsearch:7.17.18
+    container_name: skywalking-es
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  oap:
+    image: apache/skywalking-oap-server:9.5.0
+    container_name: skywalking-oap
+    ports:
+      - "11800:11800"
+      - "12800:12800"
+    environment:
+      - SW_STORAGE=elasticsearch
+      - SW_STORAGE_ES_CLUSTER_NODES=elasticsearch:9200
+      - SW_STORAGE_ES_HTTP_PROTOCOL=http
+      - SW_HEALTH_CHECKER=default
+      - SW_TELEMETRY=prometheus
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+
+  ui:
+    image: apache/skywalking-ui:9.5.0
+    container_name: skywalking-ui
+    links:
+      - oap
+    ports:
+      - "9999:8080"
+    environment:
+      - SW_OAP_ADDRESS=http://oap:12800
