@@ -1,5 +1,12 @@
 server:
     port: ${doj.port.submission-service}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
 doj:
     db:
         host: 127.0.0.1

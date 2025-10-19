@@ -1,6 +1,12 @@
 server:
     port: ${doj.port.gateway-service}
 
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,prometheus
+
 spring:
   cloud:
     sentinel:

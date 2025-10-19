@@ -1,5 +1,16 @@
 server:
     port: ${doj.port.problem-service}
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,prometheus
+    metrics:
+        export:
+            prometheus:
+                enabled: true
+
 doj:
     db:
         host: 127.0.0.1

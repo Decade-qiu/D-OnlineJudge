@@ -15,3 +15,5 @@ nacos/
 mysql/
 static/
 GEMINI.md
+
+skywalking-agent/
