@@ -1,7 +1,8 @@
 version: '3.8'
+
 services:
   elasticsearch:
-    image: elasticsearch:7.17.18
+    image: elasticsearch:7.10.1
     container_name: skywalking-es
     ports:
       - "9200:9200"
@@ -13,10 +14,20 @@ services:
       memlock:
         soft: -1
         hard: -1
+    networks:
+      - doj
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s --fail http://localhost:9200/_cluster/health?wait_for_status=yellow"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   oap:
     image: apache/skywalking-oap-server:9.5.0
     container_name: skywalking-oap
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     ports:
       - "11800:11800"
       - "12800:12800"
@@ -27,13 +38,19 @@ services:
       - SW_HEALTH_CHECKER=default
       - SW_TELEMETRY=prometheus
       - JAVA_OPTS=-Xms512m -Xmx1024m
+    networks:
+      - doj
 
   ui:
     image: apache/skywalking-ui:9.5.0
     container_name: skywalking-ui
-    links:
-      - oap
     ports:
       - "9999:8080"
     environment:
       - SW_OAP_ADDRESS=http://oap:12800
+    networks:
+      - doj
+
+networks:
+  doj:
+    external: true
