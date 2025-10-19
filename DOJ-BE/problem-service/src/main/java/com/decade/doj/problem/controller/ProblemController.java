@@ -7,8 +7,8 @@ import com.decade.doj.common.domain.R;
 import com.decade.doj.problem.domain.dto.ProblemPageQueryDTO;
 import com.decade.doj.problem.domain.po.Problem;
 import com.decade.doj.problem.service.impl.ProblemServiceImpl;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/problem")
-@Api(tags = "题目相关接口")
+@Tag(name = "题目相关接口")
 @Slf4j
 @RequiredArgsConstructor
 public class ProblemController {
@@ -37,20 +37,20 @@ public class ProblemController {
     private final ProblemServiceImpl problemService;
 
     @GetMapping("/list")
-    @ApiOperation("获取题目列表")
+    @Operation(summary = "获取题目列表")
     public R<List<Problem>> list() {
         return R.ok(problemService.list());
     }
 
     @GetMapping("/page")
-    @ApiOperation("分页获取题目列表")
+    @Operation(summary = "分页获取题目列表")
     public R<PageDTO<Problem>> page(ProblemPageQueryDTO problemPageQueryDTO) {
         PageDTO<Problem> res = problemService.pageQuery(problemPageQueryDTO);
         return R.ok(res);
     }
 
     @GetMapping("/{id}")
-    @ApiOperation("获取题目详情")
+    @Operation(summary = "获取题目详情")
     public R<Problem> getProblemById(@PathVariable Long id) {
         return R.ok(problemService.getById(id));
     }

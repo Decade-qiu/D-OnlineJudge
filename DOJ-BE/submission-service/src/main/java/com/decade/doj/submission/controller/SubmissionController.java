@@ -7,8 +7,8 @@ import com.decade.doj.common.utils.UserContext;
 import com.decade.doj.submission.domain.dto.SubmissionPageQueryDTO;
 import com.decade.doj.submission.domain.po.Submission;
 import com.decade.doj.submission.service.ISubmissionService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/submission")
-@Api(tags = "提交相关接口")
+@Tag(name = "提交相关接口")
 @Slf4j
 @RequiredArgsConstructor
 public class SubmissionController {
@@ -25,21 +25,21 @@ public class SubmissionController {
     private final ISubmissionService submissionService;
 
     @PostMapping("/submit")
-    @ApiOperation("提交记录")
+    @Operation(summary = "提交记录")
     public R<Long> submit(@RequestBody Submission submission) {
         submissionService.save(submission);
         return R.ok(submission.getId());
     }
 
     @GetMapping("/page")
-    @ApiOperation("分页获取提交列表")
+    @Operation(summary = "分页获取提交列表")
     public R<PageDTO<Submission>> page(SubmissionPageQueryDTO problemPageQueryDTO) {
         PageDTO<Submission> res = submissionService.pageQuery(problemPageQueryDTO);
         return R.ok(res);
     }
 
     @GetMapping("/match/{id}")
-    @ApiOperation("获取当前用户指定问题的提交详情")
+    @Operation(summary = "获取当前用户指定问题的提交详情")
     public R<Integer> getById(@PathVariable String id) {
         List<Submission> submissions = submissionService.lambdaQuery()
                 .eq(Submission::getProblemId, id)

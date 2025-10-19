@@ -12,8 +12,8 @@ import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.domain.vo.JudgingTask;
 import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.ISandboxService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -33,7 +33,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/sandbox")
-@Api(tags = "沙箱相关接口")
+@Tag(name = "沙箱相关接口")
 @Slf4j
 @RequiredArgsConstructor
 @EnableConfigurationProperties(ResourceProperties.class)
@@ -47,7 +47,7 @@ public class SandboxController {
     private final StringRedisTemplate redisTemplate;
 
     @PostMapping("/code")
-    @ApiOperation("运行代码文件")
+    @Operation(summary = "运行代码文件(同步执行)")
     public CompletableFuture<R<ExecuteMessage>> runCode(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) throws IOException {
         if (file.isEmpty()) {
             return CompletableFuture.completedFuture(R.error("上传的文件不能为空!"));
@@ -65,7 +65,7 @@ public class SandboxController {
     }
 
     @PostMapping("/problem")
-    @ApiOperation("运行题目代码")
+    @Operation(summary = "运行题目代码(同步执行)")
     public CompletableFuture<R<ExecuteMessage>> runProblem(@RequestParam("file") MultipartFile file, @RequestParam("input") MultipartFile input, @RequestParam("language") @NotBlank String lang, @RequestParam("pid") Long pid) throws IOException {
         if (file.isEmpty()) {
             return CompletableFuture.completedFuture(R.error("上传的文件不能为空!"));
@@ -85,7 +85,7 @@ public class SandboxController {
     }
 
     @PostMapping("/validate")
-    @ApiOperation("验证题目代码")
+    @Operation(summary = "验证题目代码(异步提交)")
     public R<Long> runProblemValidate(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang, @RequestParam("pid") Long pid) throws IOException {
         if (file.isEmpty()) {
             return R.error(400, "上传的文件不能为空!");

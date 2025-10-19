@@ -14,8 +14,8 @@ import com.decade.doj.user.domain.vo.InfoVO;
 import com.decade.doj.user.domain.vo.LoginVO;
 import com.decade.doj.user.domain.vo.RankVO;
 import com.decade.doj.user.service.IUserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +37,7 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/user")
-@Api(tags = "用户相关接口")
+@Tag(name = "用户相关接口")
 @Slf4j
 @RequiredArgsConstructor
 public class UserController {
@@ -47,13 +47,13 @@ public class UserController {
     private final ResourceProperties resourceProperties;
 
     @PutMapping("/pwd")
-    @ApiOperation("修改密码接口")
+    @Operation(summary = "修改密码接口")
     public R updatePwd(@RequestBody @Validated UpdPwdDTO updPwdDTO) {
         return userService.updatePwd(updPwdDTO);
     }
 
     @PostMapping("/avatar")
-    @ApiOperation("上传头像接口")
+    @Operation(summary = "上传头像接口")
     public R<String> uploadAvatar(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return R.error("文件为空!");
@@ -71,31 +71,31 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    @ApiOperation("用户注册接口")
+    @Operation(summary = "用户注册接口")
     public R register(@RequestBody @Validated RegisterDTO registerDTO) {
         return userService.register(registerDTO);
     }
 
     @PostMapping("/login")
-    @ApiOperation("用户登录接口")
+    @Operation(summary = "用户登录接口")
     public R<LoginVO> login(@RequestBody @Validated LoginDTO loginDTO) {
         return userService.login(loginDTO);
     }
 
     @PostMapping("/refresh")
-    @ApiOperation("刷新令牌接口")
+    @Operation(summary = "刷新令牌接口")
     public R<String> refreshToken(@RequestHeader("Authorization") String refreshToken) {
         return userService.refreshToken(refreshToken);
     }
 
     @GetMapping("/rankings")
-    @ApiOperation("获取排行榜")
+    @Operation(summary = "获取排行榜")
     public R<PageDTO<RankVO>> getRankings(PageQueryDTO pageQueryDTO) {
         return userService.getRankings(pageQueryDTO);
     }
 
     @GetMapping("/{id}")
-    @ApiOperation("查询用户接口")
+    @Operation(summary = "查询用户接口")
     public R<InfoVO> getUser(@PathVariable("id") @NotNull Long id) {
         User user = userService.getById(id);
         if (user == null) {
@@ -106,7 +106,7 @@ public class UserController {
     }
 
     @PutMapping()
-    @ApiOperation("修改用户接口")
+    @Operation(summary = "修改用户接口")
     public R updateUser(@RequestBody User user) {
         return userService.updateUser(user);
     }
