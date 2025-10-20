@@ -1,8 +1,8 @@
 package com.decade.doj.problem.controller;
 
 
+import com.decade.doj.common.annotation.AdminRequired;
 import com.decade.doj.common.domain.PageDTO;
-import com.decade.doj.common.domain.PageQueryDTO;
 import com.decade.doj.common.domain.R;
 import com.decade.doj.problem.domain.dto.ProblemPageQueryDTO;
 import com.decade.doj.problem.domain.po.Problem;
@@ -11,11 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,6 +31,30 @@ import java.util.List;
 public class ProblemController {
 
     private final ProblemServiceImpl problemService;
+
+    @PostMapping
+    @AdminRequired
+    @Operation(summary = "新增题目")
+    public R<Void> createProblem(@RequestBody Problem problem) {
+        problemService.save(problem);
+        return R.ok();
+    }
+
+    @PutMapping
+    @AdminRequired
+    @Operation(summary = "修改题目")
+    public R<Void> updateProblem(@RequestBody Problem problem) {
+        problemService.updateById(problem);
+        return R.ok();
+    }
+
+    @DeleteMapping("/{id}")
+    @AdminRequired
+    @Operation(summary = "删除题目")
+    public R<Void> deleteProblem(@PathVariable Long id) {
+        problemService.removeById(id);
+        return R.ok();
+    }
 
     @GetMapping("/list")
     @Operation(summary = "获取题目列表")
