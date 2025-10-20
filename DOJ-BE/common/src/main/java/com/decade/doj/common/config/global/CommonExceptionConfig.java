@@ -1,15 +1,14 @@
 package com.decade.doj.common.config.global;
 
 import com.decade.doj.common.domain.R;
-import com.decade.doj.common.exception.BadRequestException;
-import com.decade.doj.common.exception.CommonException;
-import com.decade.doj.common.exception.DbException;
-import com.decade.doj.common.exception.UnauthorizedException;
+import com.decade.doj.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.util.NestedServletException;
 
@@ -56,9 +55,17 @@ public class CommonExceptionConfig {
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public Object handleUnauthorizedException(UnauthorizedException e) {
-        log.error("未授权异常 -> {}", e.getMessage());
-        return processResponse(e);
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public R<Void> handleUnauthorizedException(UnauthorizedException e) {
+        log.error("<UNK> uri : {} {}", e.getMessage(), e.getStackTrace());
+        return R.error(401, e.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public R<Void> handleForbiddenException(ForbiddenException e) {
+        log.error("403 uri : {} {}", e.getMessage(), e.getStackTrace());
+        return R.error(403, e.getMessage());
     }
 
     private ResponseEntity<R<Void>> processResponse(CommonException e){

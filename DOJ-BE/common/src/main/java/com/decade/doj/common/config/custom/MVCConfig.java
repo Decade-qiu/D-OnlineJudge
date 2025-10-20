@@ -1,7 +1,7 @@
 package com.decade.doj.common.config.custom;
 
 import com.decade.doj.common.config.properties.ResourceProperties;
-// import com.decade.doj.common.interceptor.IdentityInterceptor;
+import com.decade.doj.common.interceptor.AdminCheckInterceptor;
 import com.decade.doj.common.interceptor.IdentityInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +22,7 @@ public class MVCConfig implements WebMvcConfigurer {
 
     private final ResourceProperties resourceProperties;
     private final IdentityInterceptor identityInterceptor;
+    private final AdminCheckInterceptor adminCheckInterceptor;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -33,8 +34,13 @@ public class MVCConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 身份识别拦截器，必须先执行
         registry.addInterceptor(identityInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/doc.html/**", "/actuator/**");
+        
+        // 管理员权限拦截器，后执行
+        registry.addInterceptor(adminCheckInterceptor)
                 .addPathPatterns("/**");
-                // .excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/doc.html/**", "/actuator/**", "/metrics/**", "/error");
     }
 }
