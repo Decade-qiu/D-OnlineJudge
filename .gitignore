@@ -17,3 +17,5 @@ static/
 GEMINI.md
 
 skywalking-agent/
+
+.secrets
