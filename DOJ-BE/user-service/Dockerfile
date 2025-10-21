@@ -28,7 +28,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the executable jar from the build stage
-COPY --from=build /app/user-service/target/user-service-*.jar ./app.jar
+COPY --from=build /app/user-service/target/user-service*.jar ./app.jar
 
 EXPOSE 8081
 
