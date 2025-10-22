@@ -8,11 +8,8 @@ management:
         include: health,prometheus
 
 doj:
-    db:
-        host: 127.0.0.1
-        name: doj_user
-        user: root
-        pwd: 123
+    redis:
+        host: ${DOJ_REDIS_HOST:127.0.0.1}
     swagger:
         title: 沙箱接口文档
         scan: com.decade.doj.sandbox.controller

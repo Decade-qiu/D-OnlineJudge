@@ -9,12 +9,12 @@ management:
 
 doj:
     db:
-        host: 127.0.0.1
+        host: ${DOJ_DB_HOST:127.0.0.1}
         name: doj_submission
-        user: root
-        pwd: 123
+        user: ${DOJ_DB_USER:root}
+        pwd: ${DOJ_DB_PWD:123}
     mq:
-        host: 127.0.0.1
+        host: ${DOJ_MQ_HOST:127.0.0.1}
     swagger:
         title: 沙箱接口文档
         scan: com.decade.doj.submission.controller

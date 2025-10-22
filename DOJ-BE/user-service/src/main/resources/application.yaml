@@ -9,14 +9,14 @@ management:
 
 doj:
     db:
-        host: 127.0.0.1
+        host: ${DOJ_DB_HOST:127.0.0.1}
         name: doj_user
-        user: root
-        pwd: 123
-    redis:
-        host: 127.0.0.1
+        user: ${DOJ_DB_USER:root}
+        pwd: ${DOJ_DB_PWD:123}
     mq:
-        host: 127.0.0.1
+        host: ${DOJ_MQ_HOST:127.0.0.1}
+    redis:
+        host: ${DOJ_REDIS_HOST:127.0.0.1}
     swagger:
         title: 用户服务接口文档
         scan: com.decade.doj.user.controller
