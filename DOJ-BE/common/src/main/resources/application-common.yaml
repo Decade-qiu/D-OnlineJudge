@@ -1,14 +1,14 @@
 doj:
     port:
-        gateway-service: 8080
-        user-service: 8081
-        sandbox-service: 8082
-        problem-service: 8083
-        submission-service: 8084
+        gateway-service: ${DOJ_PORT_GATEWAY:8080}
+        user-service: ${DOJ_PORT_USER:8081}
+        sandbox-service: ${DOJ_PORT_SANDBOX:8082}
+        problem-service: ${DOJ_PORT_PROBLEM:8083}
+        submission-service: ${DOJ_PORT_SUBMISSION:8084}
 
     resource:
-        location: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/files/"
-        request: "/static/"
+        location: ${DOJ_RESOURCE_LOCATION:/Users/qzj/Desktop/Development/D-OnlineJudge/static/files/}
+        request: ${DOJ_RESOURCE_REQUEST:/static/}
 
-        code-path: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/codes/"
-        problem-code-path: "/Users/qzj/Desktop/Development/D-OnlineJudge/static/problem-codes/"
+        code-path: ${DOJ_CODE_PATH:/Users/qzj/Desktop/Development/D-OnlineJudge/static/codes/}
+        problem-code-path: ${DOJ_PROBLEM_CODE_PATH:/Users/qzj/Desktop/Development/D-OnlineJudge/static/problem-codes/}
