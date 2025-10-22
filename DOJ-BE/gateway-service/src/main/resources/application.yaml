@@ -11,7 +11,7 @@ spring:
   cloud:
     sentinel:
       transport:
-        dashboard: localhost:8858
+        dashboard: ${SENTINEL_DASHBOARD_ADDR:localhost:8858}
       datasource:
         ds1:
           nacos:
