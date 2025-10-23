@@ -21,6 +21,7 @@ COPY DOJ-BE/gateway-service/src ./gateway-service/src
 
 # Build the specific service
 RUN mvn -f ./pom.xml -pl gateway-service -am clean package -DskipTests
+RUN ls -al ./gateway-service/target
 
 # Stage 2: Create the runtime image
 FROM openjdk:17-jdk-slim

@@ -21,6 +21,7 @@ COPY DOJ-BE/user-service/src ./user-service/src
 
 # Build the specific service
 RUN mvn -f ./pom.xml -pl user-service -am clean package -DskipTests
+RUN ls -al ./user-service/target
 
 # Stage 2: Create the runtime image
 FROM openjdk:17-jdk-slim
@@ -28,7 +29,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the executable jar from the build stage
-COPY --from=build /app/user-service/target/user-service*.jar ./app.jar
+COPY --from=build /app/user-service/target/user-service.jar ./app.jar
 
 EXPOSE 8081
 

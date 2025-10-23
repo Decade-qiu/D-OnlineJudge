@@ -21,6 +21,7 @@ COPY DOJ-BE/sandbox-service/src ./sandbox-service/src
 
 # Build the specific service
 RUN mvn -f ./pom.xml -pl sandbox-service -am clean package -DskipTests
+RUN ls -al ./sandbox-service/target
 
 # Stage 2: Create the runtime image
 FROM openjdk:17-jdk-slim
@@ -28,7 +29,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the executable jar from the build stage
-COPY --from=build /app/sandbox-service/target/sandbox-service*.jar ./app.jar
+COPY --from=build /app/sandbox-service/target/sandbox-service.jar ./app.jar
 
 EXPOSE 8082
 
