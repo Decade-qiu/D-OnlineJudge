@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  #-------------------- Application Services --------------------#
+  gateway-service:
+    image: decadeqzj/doj-gateway-service:latest
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    environment:
+      - NACOS_SERVER_ADDR=nacos:8848
+      - SENTINEL_DASHBOARD_ADDR=sentinel:8080
+    networks:
+      - doj
+
+  user-service:
+    image: decadeqzj/doj-user-service:latest
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DOJ_DB_HOST=mysql
+      - DOJ_MQ_HOST=rabbitmq
+      - DOJ_REDIS_HOST=redis
+    networks:
+      - doj
+
+  problem-service:
+    image: decadeqzj/doj-problem-service:latest
+    container_name: problem-service
+    ports:
+      - "8083:8083"
+    environment:
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DOJ_DB_HOST=mysql
+      - DOJ_MQ_HOST=rabbitmq
+      - DOJ_REDIS_HOST=redis
+    networks:
+      - doj
+
+  submission-service:
+    image: decadeqzj/doj-submission-service:latest
+    container_name: submission-service
+    ports:
+      - "8084:8084"
+    environment:
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DOJ_DB_HOST=mysql
+      - DOJ_MQ_HOST=rabbitmq
+    networks:
+      - doj
+
+  sandbox-service:
+    image: decadeqzj/doj-sandbox-service:latest
+    container_name: sandbox-service
+    ports:
+      - "8082:8082"
+    environment:
+      - NACOS_SERVER_ADDR=nacos:8848
+      - DOJ_REDIS_HOST=redis
+      - DOJ_RESOURCE_LOCATION=/app/static/files/
+      - DOJ_CODE_PATH=/app/static/codes/
+      - DOJ_PROBLEM_CODE_PATH=/app/static/problem-codes/
+    volumes:
+      - ./static/files:/app/static/files
+      - ./static/codes:/app/static/codes
+      - ./static/problem-codes:/app/static/problem-codes
+    networks:
+      - doj
+
+networks:
+  doj:
+    external: true
