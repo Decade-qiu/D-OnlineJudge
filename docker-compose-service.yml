@@ -67,14 +67,18 @@ services:
     environment:
       - NACOS_SERVER_ADDR=nacos:8848
       - DOJ_REDIS_HOST=redis
+      - DOJ_MQ_HOST=rabbitmq
       - DOJ_RESOURCE_LOCATION=/app/static/files/
       - DOJ_CODE_PATH=/app/static/codes/
       - DOJ_PROBLEM_CODE_PATH=/app/static/problem-codes/
+      - HOST_CODE_PATH=${PWD}/static/codes
+      - HOST_PROBLEM_CODE_PATH=${PWD}/static/problem-codes
       - JAVA_OPTS=-Xms128m -Xmx256m
     volumes:
-      - ./static/files:/app/static/files
-      - ./static/codes:/app/static/codes
-      - ./static/problem-codes:/app/static/problem-codes
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PWD}/static/files:/app/static/files
+      - ${PWD}/static/codes:/app/static/codes
+      - ${PWD}/static/problem-codes:/app/static/problem-codes
     mem_limit: 512m
     networks:
       - doj

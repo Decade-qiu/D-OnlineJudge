@@ -26,6 +26,10 @@ RUN ls -al ./sandbox-service/target
 # Stage 2: Create the runtime image
 FROM openjdk:17-jdk-slim
 
+# Install Docker 
+USER root
+RUN apt-get update && apt-get install -y docker.io
+
 WORKDIR /app
 
 # Copy the executable jar from the build stage

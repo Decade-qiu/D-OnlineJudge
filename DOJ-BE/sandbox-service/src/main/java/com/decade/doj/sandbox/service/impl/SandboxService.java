@@ -15,6 +15,7 @@ import com.decade.doj.sandbox.service.ISandboxService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -67,6 +68,30 @@ public class SandboxService implements ISandboxService {
 
     private final RabbitTemplate rabbitTemplate;
 
+    @Value("${DOJ_CODE_PATH:/app/static/codes/}")
+    private String containerCodePath;
+    
+    @Value("${HOST_CODE_PATH:}")
+    private String hostCodePath;
+
+    private String convertToHostPath(String containerPath) {
+        if (hostCodePath == null || hostCodePath.isEmpty()) {
+            log.warn("HOST_CODE_PATH 未配置，使用容器路径: {}", containerPath);
+            return containerPath;
+        }
+        
+        String normalizedContainerPath = containerCodePath.replaceAll("/$", "");
+        String normalizedHostPath = hostCodePath.replaceAll("/$", "");
+        
+        if (containerPath.startsWith(normalizedContainerPath)) {
+            String converted = containerPath.replace(normalizedContainerPath, normalizedHostPath);
+            log.debug("路径转换: {} -> {}", containerPath, converted);
+            return converted;
+        }
+        
+        return containerPath;
+    }
+
     @Override
     @Async("RunCodeThreadPool")
     public CompletableFuture<ExecuteMessage> runCodeInSandbox(String filePath, String filename, String lang) {
@@ -81,7 +106,9 @@ public class SandboxService implements ISandboxService {
         // 镜像名称
         String imageName = languageEnum.getImageName();
         // 运行时挂载目录（宿主与容器）
-        String fileDir = new File(filePath).getParent();
+        // String fileDir = new File(filePath).getParent();
+        String containerFileDir = new File(filePath).getParent();
+        String hostFileDir = convertToHostPath(containerFileDir);
         String mountPath = MOUNT_PATH;
 
         int dotIndex = filename.lastIndexOf(".");
@@ -101,7 +128,7 @@ public class SandboxService implements ISandboxService {
             // 准备 Docker 运行命令列表
             List<String> command = Arrays.asList(
                     "docker", "run", "--rm",
-                    "-v", fileDir + ":" + mountPath,
+                    "-v", hostFileDir + ":" + mountPath,
                     "--memory", languageEnum.getMemoryLimit(),
                     imageName,
                     execCmd
@@ -188,7 +215,9 @@ public class SandboxService implements ISandboxService {
         // 镜像名称
         String imageName = languageEnum.getImageName();
         // 运行时挂载目录（宿主与容器）
-        String fileDir = new File(filePath).getParent();
+        // String fileDir = new File(filePath).getParent();
+        String containerFileDir = new File(filePath).getParent();
+        String hostFileDir = convertToHostPath(containerFileDir);
         String mountPath = MOUNT_PATH;
 
         int dotIndex = filename.lastIndexOf(".");
@@ -209,7 +238,7 @@ public class SandboxService implements ISandboxService {
             // 准备 Docker 运行命令列表
             List<String> command = Arrays.asList(
                     "docker", "run", "--rm",
-                    "-v", fileDir + ":" + mountPath,
+                    "-v", hostFileDir + ":" + mountPath,
                     "--memory", languageEnum.getMemoryLimit(),
                     imageName,
                     execCmd
