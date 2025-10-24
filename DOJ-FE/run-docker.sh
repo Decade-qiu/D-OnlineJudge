@@ -22,6 +22,6 @@ fi
 
 # 3. 运行新的容器
 echo "Running new container: $CONTAINER_NAME on http://localhost:8088"
-docker run -d --name $CONTAINER_NAME -p 8088:80 $IMAGE_NAME
+docker run -d --name $CONTAINER_NAME -p 8088:80 --memory="64m" --network doj $IMAGE_NAME
 
 echo "Deployment successful!"
