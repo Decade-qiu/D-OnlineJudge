@@ -8,6 +8,8 @@ management:
         include: health,prometheus
 
 doj:
+    mq:
+        host: ${DOJ_MQ_HOST:127.0.0.1}
     redis:
         host: ${DOJ_REDIS_HOST:127.0.0.1}
     swagger:
