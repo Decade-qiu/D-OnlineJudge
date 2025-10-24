@@ -32,6 +32,35 @@
                 <el-input v-model="inputContent" :autosize="{ minRows: 1, maxRows: 10 }" type="textarea" />
             </div>
         </div>
+        <div class="output" v-if="outputVisible">
+            <div class="output-header">
+                <span>代码运行状态：</span>
+                <span :class="output?.exitValue !== 0 && output?.exitValue !== 10 ? 'error-text' : 'success-text'">
+                    {{ output?.status }}
+                    <el-icon v-if="output?.status === 'Running'" v-loading="loading" :element-loading-svg="svg"
+                        class="custom-loading-svg" element-loading-svg-view-box="-10, -10, 50, 50">
+                    </el-icon>
+                </span>
+                <div class="running-status" v-show="output?.exitValue === 0">
+                    <span>{{ timeInfo }}</span>
+                </div>
+                <div class="running-status" v-show="output?.exitValue === 0">
+                    <span>{{ memoryInfo }}</span>
+                </div>
+                <span class="closeoutput" @click="outputVisible = false">
+                    <el-icon>
+                        <Close />
+                    </el-icon>
+                </span>
+            </div>
+            <!-- 输入输出部分 -->
+            <div class="input-output-section" v-show="outputTextVis">
+                <div class="output-field">
+                    <label>输出</label>
+                    <pre class="output-content">{{ output?.message }}</pre>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
