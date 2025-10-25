@@ -32,6 +32,14 @@ public class ProblemController {
 
     private final ProblemServiceImpl problemService;
 
+    @GetMapping
+    @AdminRequired
+    @Operation(summary = "同步题目数据到elasticsearch")
+    public R<Integer> syncProblemToEs() {
+        Integer res = problemService.syncAllToElasticsearch();
+        return R.ok(res);
+    }
+
     @PostMapping
     @AdminRequired
     @Operation(summary = "新增题目")
