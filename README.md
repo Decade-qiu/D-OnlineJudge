@@ -1,38 +1,38 @@
-# D-OnlineJudge - 一个现代化的分布式在线判题系统
+# D-OnlineJudge - A Modern, Distributed Online Judging System
 
 [![Java](https://img.shields.io/badge/Java-17-blue.svg)](https://www.java.com)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.12-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-green.svg)](https://vuejs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Powered-blue.svg)](https://www.docker.com/)
 
-**D-OnlineJudge** 是一个基于 Spring Cloud Alibaba 构建的、完全容器化的分布式在线编程判题平台。它不仅实现了传统 OJ 的核心功能，更在系统架构、工程化、可观测性和用户体验上，采用了大量现代化的设计与实践。
+**D-OnlineJudge** is a fully containerized, distributed online programming judging platform built on Spring Cloud Alibaba. It not only implements the core functionalities of a traditional Online Judge but also adopts a wealth of modern design principles and engineering practices in its system architecture, observability, and user experience.
 
 ---
 
-## 🏛️ 系统架构
+## 🏛️ System Architecture
 
 ```mermaid
 graph TD
-    subgraph 用户端
-        User[<i class="fa fa-user"></i> 用户 / 管理员]
+    subgraph User End
+        User[<i class="fa fa-user"></i> User / Admin]
     end
 
-    subgraph 前端 (Vue 3)
+    subgraph Frontend (Vue 3)
         FE[DOJ-FE]
     end
 
-    subgraph 部署 & 运维
+    subgraph Deployment & DevOps
         CICD[<i class="fa fa-cogs"></i> GitHub Actions CI/CD]
         Docker[<i class="fa fa-docker"></i> Docker Compose]
     end
 
-    subgraph 可观测性体系
+    subgraph Observability Stack
         Monitor[<i class="fa fa-chart-line"></i> Prometheus + Grafana]
         Trace[<i class="fa fa-sitemap"></i> SkyWalking]
         Log[<i class="fa fa-file-alt"></i> Loki]
     end
 
-    subgraph 核心后端 (Spring Cloud)
+    subgraph Core Backend (Spring Cloud)
         Gateway[<i class="fa fa-door-open"></i> Gateway-Service]
         UserService[<i class="fa fa-users"></i> User-Service]
         ProblemService[<i class="fa fa-book"></i> Problem-Service]
@@ -40,7 +40,7 @@ graph TD
         SandboxService[<i class="fa fa-box"></i> Sandbox-Service]
     end
 
-    subgraph 核心中间件
+    subgraph Core Middleware
         Nacos[<i class="fa fa-compass"></i> Nacos]
         Sentinel[<i class="fa fa-shield-alt"></i> Sentinel]
         MySQL[<i class="fa fa-database"></i> MySQL]
@@ -56,14 +56,14 @@ graph TD
     Gateway --> ProblemService
     Gateway --> SubmissionService
 
-    SubmissionService -- 发送判题任务 --> RabbitMQ
-    RabbitMQ -- 消费判题任务 --> SandboxService
-    SandboxService -- 发送判题结果 --> RabbitMQ
-    RabbitMQ -- 消费判题结果 --> SubmissionService
+    SubmissionService -- Sends Judging Task --> RabbitMQ
+    RabbitMQ -- Consumes Judging Task --> SandboxService
+    SandboxService -- Sends Judging Result --> RabbitMQ
+    RabbitMQ -- Consumes Judging Result --> SubmissionService
 
     ProblemService <--> ES
     
-    subgraph 所有服务
+    subgraph All Services
         UserService <--> MySQL
         ProblemService <--> MySQL
         SubmissionService <--> MySQL
@@ -87,59 +87,59 @@ graph TD
     Log --> Gateway
 ```
 
-## ✨ 项目亮点与技术实现
+## ✨ Key Features & Highlights
 
-- 🚀 **现代化的微服务架构**
-  - **技术**: Spring Cloud Alibaba 全家桶。
-  - **实现**: 使用 Nacos 作为注册与配置中心，实现了服务的动态发现和集中式配置管理；使用 Sentinel 实现了网关层的流量控制和熔断降级，保证了系统的稳定性。
+- 🚀 **Modern Microservices Architecture**
+  - **Technology**: Spring Cloud Alibaba Suite.
+  - **Implementation**: Utilizes Nacos as a service registry and configuration center for dynamic service discovery and centralized configuration management. Employs Sentinel at the gateway layer for traffic control and circuit breaking, ensuring system stability.
 
-- ⚡️ **高性能全文检索**
-  - **技术**: Elasticsearch 8.x + IK 中文分词器。
-  - **实现**: 解决了传统 `MySQL LIKE` 查询的性能瓶颈。通过“双写同步”架构，将题目数据实时同步至 ES。实现了毫秒级的题目名称、描述、标签全文检索，并支持相关性排序。
+- ⚡️ **High-Performance Full-Text Search**
+  - **Technology**: Elasticsearch 8.x + IK Chinese Analyzer.
+  - **Implementation**: Overcomes the performance bottlenecks of traditional `MySQL LIKE` queries. A "dual-write" architecture synchronizes problem data to Elasticsearch in near real-time. This provides millisecond-level full-text search capabilities across problem titles, descriptions, and tags, with support for relevance scoring.
 
-- ⛓️ **全链路可观测性 (The Three Pillars)**
-  - **技术**: SkyWalking + Prometheus + Grafana + Loki。
-  - **实现**: 构建了完整的“监控、追踪、日志”三位一体的可观测性体系。SkyWalking 提供分布式链路追踪，Prometheus 和 Grafana 负责指标监控与告警，Loki 负责日志的集中聚合与查询，极大提升了线上问题的排查效率。
+- ⛓️ **Comprehensive Observability (The Three Pillars)**
+  - **Technology**: SkyWalking + Prometheus + Grafana + Loki.
+  - **Implementation**: Establishes a complete observability system integrating metrics, tracing, and logging. SkyWalking provides distributed tracing, Prometheus and Grafana handle metrics monitoring and alerting, and Loki manages centralized log aggregation and querying, dramatically improving troubleshooting efficiency for online issues.
 
-- 📦 **轻量级判题沙箱**
-  - **技术**: Docker-out-of-Docker。
-  - **实现**: `sandbox-service` 自身在容器中运行，通过挂载宿主机的 `docker.sock` 文件，巧妙地获得了调用宿主机 Docker Daemon 的能力。这使得它能动态地创建和销毁用于执行用户代码的“一次性”判题容器，实现了轻量、安全、高效的沙箱隔离。
+- 📦 **Lightweight Judging Sandbox**
+  - **Technology**: Docker-out-of-Docker.
+  - **Implementation**: The `sandbox-service` runs within a container but is capable of orchestrating the host's Docker daemon by mounting the `docker.sock` file. This allows it to dynamically create and destroy ephemeral "single-use" containers for executing user code, achieving lightweight, secure, and efficient sandboxing.
 
-- 💨 **核心业务异步化**
-  - **技术**: RabbitMQ 消息队列。
-  - **实现**: 将耗时的“判题”流程从主业务流程中剥离。`submission-service` 在接收到提交后，仅需向 MQ 投递一个任务消息即可立即返回，由 `sandbox-service` 异步消费并执行。这种设计极大地提升了系统的吞吐能力和用户体验，并增强了服务的可用性和解耦性。
+- 💨 **Asynchronous Core Business Flow**
+  - **Technology**: RabbitMQ Message Queue.
+  - **Implementation**: The time-consuming "judging" process is decoupled from the main business flow. Upon receiving a submission, the `submission-service` simply dispatches a task to RabbitMQ and returns immediately. The `sandbox-service` asynchronously consumes and processes the task. This design mulheres boosts system throughput, enhances user experience, and improves service availability and decoupling.
 
-- 🛡️ **优雅的认证与权限控制**
-  - **技术**: Gateway + Spring Interceptor + 自定义注解。
-  - **实现**: 在网关层统一进行 JWT 认证，并将用户 ID 注入请求头。下游服务通过 `ThreadLocal` 缓存用户上下文，并通过自定义的 `@AdminRequired` 注解和拦截器，实现了非侵入式的、优雅的 RBAC 权限控制。
+- 🛡️ **Elegant Authentication & Authorization**
+  - **Technology**: Gateway + Spring Interceptor + Custom Annotations.
+  - **Implementation**: JWT authentication is handled uniformly at the gateway layer, with the user ID injected into request headers. Downstream services use `ThreadLocal` to manage the user context. A custom `@AdminRequired` annotation combined with an interceptor provides a non-intrusive, elegant RBAC (Role-Based Access Control) mechanism.
 
-- ⚙️ **全流程自动化 CI/CD**
-  - **技术**: GitHub Actions。
-  - **实现**: 编写了完整的 CI/CD 流水线，实现了从“代码提交”到“自动编译、构建 Docker 镜像、推送到镜像仓库、最后部署到服务器”的全流程自动化，极大地提升了开发和交付效率。
+- ⚙️ **Fully Automated CI/CD Pipeline**
+  - **Technology**: GitHub Actions.
+  - **Implementation**: A complete CI/CD pipeline automates the entire workflow from code commit to compiling, building Docker images, pushing to a registry, and deploying to the server, significantly improving development and delivery efficiency.
 
-- 🐳 **彻底的容器化部署**
-  - **技术**: Docker + Docker Compose。
-  - **实现**: 项目的所有服务，包括所有中间件，都可通过 Docker 进行部署。通过环境变量和外部化配置，实现了在不同环境中（本地开发、服务器部署）的无缝迁移。
+- 🐳 **Thorough Containerization**
+  - **Technology**: Docker + Docker Compose.
+  - **Implementation**: All project services, including middleware, are deployed via Docker. The use of environment variables and externalized configurations allows for seamless migration between different environments (e.g., local development, server deployment).
 
-## 🛠️ 技术栈
+## 🛠️ Technology Stack
 
-| 类别 | 技术 |
+| Category | Technology |
 | :--- | :--- |
-| **后端** | Spring Boot, Spring Cloud Alibaba, Mybatis-Plus, Spring Security, JWT |
-| **前端** | Vue 3, TypeScript, Vite, Element-Plus, Pinia |
-| **数据库** | MySQL, Redis (缓存) |
-| **搜索引擎** | Elasticsearch 8.x, IK Analyzer |
-| **消息队列** | RabbitMQ |
-| **服务治理** | Nacos, Sentinel |
-| **可观测性** | SkyWalking, Prometheus, Grafana, Loki |
-| **部署** | Docker, Docker Compose, GitHub Actions |
+| **Backend** | Spring Boot, Spring Cloud Alibaba, Mybatis-Plus, Spring Security, JWT |
+| **Frontend** | Vue 3, TypeScript, Vite, Element-Plus, Pinia |
+| **Database** | MySQL, Redis (Caching) |
+| **Search Engine** | Elasticsearch 8.x, IK Analyzer |
+| **Message Queue** | RabbitMQ |
+| **Service Governance** | Nacos, Sentinel |
+| **Observability** | SkyWalking, Prometheus, Grafana, Loki |
+| **Deployment** | Docker, Docker Compose, GitHub Actions |
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-详细的部署步骤请参考 `docs/0.build.md` 文件。该文件包含了所有中间件和应用服务的详细部署命令和配置说明。
+For detailed deployment steps, please refer to the `docs/0.build.md` file, which contains comprehensive commands and configuration instructions for all middleware and application services.
 
-1.  **环境准备**: 确保您的机器已安装 Docker 和 Docker Compose。
-2.  **网络创建**: `docker network create doj`
-3.  **部署中间件**: 按照 `docs/0.build.md` 中的指南，依次部署 MySQL, Redis, RabbitMQ, Nacos, Sentinel, 以及自定义的 Elasticsearch。
-4.  **部署应用**: 修改 `docker-compose-service.yml` 中的环境变量（如果需要），然后执行 `docker-compose -f docker-compose-service.yml up -d --build`。
-5.  **访问**: 前端默认访问地址为 `http://localhost:8088`。
+1.  **Prerequisites**: Ensure Docker and Docker Compose are installed on your machine.
+2.  **Create Network**: `docker network create doj`
+3.  **Deploy Middleware**: Follow the guide in `docs/0.build.md` to deploy MySQL, Redis, RabbitMQ, Nacos, Sentinel, and the custom Elasticsearch instance.
+4.  **Deploy Applications**: Modify environment variables in `docker-compose-service.yml` if needed, then run `docker-compose -f docker-compose-service.yml up -d --build`.
+5.  **Access**: The frontend is available by default at `http://localhost:8088`.
