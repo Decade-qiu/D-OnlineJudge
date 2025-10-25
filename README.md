@@ -43,4 +43,8 @@ This guide provides the essential steps to get the D-OnlineJudge application run
 
 Once all services are running, you can access the application at `http://localhost:8088`.
 
-For more detailed build and deployment instructions, please refer to `docs/0.build.md`.
+## ✨ 项目特性
+
+- ⚡️ **高性能全文检索**: 基于 Elasticsearch 和 IK 中文分词器，提供毫秒级的题目名称、描述、标签全文检索能力。
+- 🚀 **现代化的技术栈**: 后端采用 Spring Cloud Alibaba 微服务架构，前端采用 Vue 3 + TypeScript + Vite。
+- ☁️ **全容器化部署**: 所有服务（包括中间件）均可通过 Docker 和 Docker Compose 一键启动，实现了环境的完全隔离和快速部署。
