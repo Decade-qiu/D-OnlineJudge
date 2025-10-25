@@ -40,6 +40,7 @@ services:
       - DOJ_DB_HOST=mysql
       - DOJ_MQ_HOST=rabbitmq
       - DOJ_REDIS_HOST=redis
+      - ELASTICSEARCH_URIS=http://elasticsearch:9200
       - JAVA_OPTS=-Xms128m -Xmx256m
     mem_limit: 512m
     networks:
