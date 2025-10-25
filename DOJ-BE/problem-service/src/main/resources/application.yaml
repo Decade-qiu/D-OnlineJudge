@@ -22,5 +22,9 @@ doj:
     redis:
         host: ${DOJ_REDIS_HOST:127.0.0.1}
     swagger:
-        title: 用户服务接口文档
+        title: 题目接口文档
         scan: com.decade.doj.problem.controller
+
+spring:
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URIS:http://127.0.0.1:9200}
