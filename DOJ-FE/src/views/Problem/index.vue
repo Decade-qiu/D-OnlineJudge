@@ -11,11 +11,12 @@
                 <el-option label="未开始" value="1" />
                 <el-option label="尝试中" value="2" />
             </el-select>
-            <el-select v-model="searchTag" placeholder="标签" clearable @clear="searchTag = null">
+            <!-- <el-select v-model="searchTag" placeholder="标签" clearable @clear="searchTag = null">
                 <el-option label="数组" value="数组" />
                 <el-option label="字符串" value="字符串" />
                 <el-option label="链表" value="链表" />
-            </el-select>
+            </el-select> -->
+            <el-input placeholder="请输入标签(','分割)" v-model="searchTag" clearable />
             <el-input placeholder="请输入题目名称" v-model="searchName" clearable />
         </div>
         <el-table :data="tableData" :default-sort="{ prop: 'id', order: 'ascending' }">
