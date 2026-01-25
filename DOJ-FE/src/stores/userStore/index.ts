@@ -11,6 +11,8 @@ interface UserInfo {
     username: string;
     accessToken: string;
     refreshToken: string;
+    avatar?: string;
+    role: boolean; // false = admin, true = user (based on backend logic)
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -19,7 +21,7 @@ export const useUserStore = defineStore('user', () => {
     const getUserInfo = async (form: loginForm) => {
         const res = await reqLogin(form);
         userInfo.value = res.data.data;
-    }; 
+    };
 
     const clearUserInfo = () => {
         userInfo.value = undefined;

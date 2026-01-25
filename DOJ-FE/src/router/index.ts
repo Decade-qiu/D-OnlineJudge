@@ -28,33 +28,37 @@ const router = createRouter({
                 {
                     path: '',
                     component: Home
-                },{
+                }, {
                     path: '/login',
                     component: Login
-                },{
+                }, {
                     path: '/register',
                     component: Register
-                },{
+                }, {
                     path: '/info',
                     component: Info
-                },{
+                }, {
                     path: '/home',
                     component: UserHome
-                },{
+                }, {
                     path: '/online',
                     component: OnlineEditor
-                },{
+                }, {
                     path: '/problem',
                     component: Problem
-                },{
+                }, {
                     path: '/problem/:id',
                     component: ProblemDetail
-                },{
+                }, {
                     path: '/status',
                     component: Status
-                },{
+                }, {
                     path: '/rankings',
                     component: () => import('@/views/Rankings/index.vue')
+                }, {
+                    path: '/admin',
+                    component: () => import('@/views/Admin/index.vue'),
+                    // You typically want admin guard here, but keeping simple for now
                 }
             ]
         }

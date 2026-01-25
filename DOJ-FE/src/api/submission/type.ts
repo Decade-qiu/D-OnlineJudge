@@ -15,7 +15,7 @@ export type Submission = {
 };
 
 export type SubmissionPageQueryForm = BasePageQueryForm & {
-    userId?: number;
+    userId?: number | string;
     problemId?: number;
     language?: string;
     status?: string;

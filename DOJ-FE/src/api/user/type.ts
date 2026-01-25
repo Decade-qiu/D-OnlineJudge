@@ -11,7 +11,9 @@ type dataType = {
     accessToken: string,
     refreshToken: string,
     userId: number,
-    username: string
+    username: string,
+    avatar?: string,
+    role: boolean,
 };
 export type loginResponseData = BaseResponse & {
     data: dataType

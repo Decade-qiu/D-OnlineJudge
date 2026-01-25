@@ -1,27 +1,31 @@
 import { BaseResponse, BasePageQueryForm } from '@/api/base';
 
 export type ProblemPageQueryForm = BasePageQueryForm & {
-    name: string,
-    difficulty: string,
-    tags: string,
-    status: number,
+    name?: string,
+    description?: string,
+    difficulty?: string,
+    tags?: string[],
+    status?: string,
 };
 
 export type ProblemType = {
     id: number;
     name: string;
+    description: string;
     inputStyle: string;
     outputStyle: string;
-    dataRange: string;
-    inputSample: string;
-    outputSample: string;
+    hint: string;
+    inputSample: string[];
+    outputSample: string[];
     difficulty: string;
     timeLimit: number;
     memoryLimit: number;
-    description: string;
     totalPass: number;
     totalAttempt: number;
-    tag: string;
+    tags: string[];
+    status?: string;
+    testData?: string;
+    testAns?: string;
 };
 
 export type ProblemsPageResponseData = BaseResponse & {
