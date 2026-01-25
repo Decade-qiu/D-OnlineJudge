@@ -1,6 +1,25 @@
-CREATE DATABASE doj_submission;
-USE doj_submission;
+/*
+ Navicat Premium Dump SQL
 
+ Source Server         : doj
+ Source Server Type    : MySQL
+ Source Server Version : 90400 (9.4.0)
+ Source Host           : localhost:3306
+ Source Schema         : doj_submission
+
+ Target Server Type    : MySQL
+ Target Server Version : 90400 (9.4.0)
+ File Encoding         : 65001
+
+ Date: 25/01/2026 16:43:29
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for submission
+-- ----------------------------
 DROP TABLE IF EXISTS `submission`;
 CREATE TABLE `submission` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '提交记录主键',
@@ -17,4 +36,6 @@ CREATE TABLE `submission` (
   `memory` bigint DEFAULT NULL COMMENT '内存使用（单位：KB）',
   `submit_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='代码提交记录表';
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='代码提交记录表';
+
+SET FOREIGN_KEY_CHECKS = 1;
