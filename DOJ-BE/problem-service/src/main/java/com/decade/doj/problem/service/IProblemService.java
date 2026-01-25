@@ -19,4 +19,10 @@ public interface IProblemService extends IService<Problem> {
     PageDTO<Problem> pageQuery(ProblemPageQueryDTO problemPageQueryDTO);
 
     void updateProblemStats(Long problemId, boolean isAccepted);
+
+    int syncAllToElasticsearch();
+
+    int reindexAll();
+
+    void resetProblems();
 }

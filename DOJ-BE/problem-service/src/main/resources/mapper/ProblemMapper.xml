@@ -2,4 +2,101 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.decade.doj.problem.mapper.ProblemMapper">
 
+    <resultMap id="ProblemResultMap" type="com.decade.doj.problem.domain.po.Problem">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="description" property="description" />
+        <result column="input_style" property="inputStyle" />
+        <result column="output_style" property="outputStyle" />
+        <result column="hint" property="hint" />
+        <result column="input_sample" property="inputSample" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" />
+        <result column="output_sample" property="outputSample" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" />
+        <result column="difficulty" property="difficulty" />
+        <result column="time_limit" property="timeLimit" />
+        <result column="memory_limit" property="memoryLimit" />
+        <result column="total_pass" property="totalPass" />
+        <result column="total_attempt" property="totalAttempt" />
+        <result column="test_data" property="testData" />
+        <result column="test_ans" property="testAns" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <select id="selectPageWithFilters" resultMap="ProblemResultMap">
+        SELECT
+            p.*,
+            CASE
+                WHEN EXISTS (
+                    SELECT 1 FROM doj_submission.submission s
+                    WHERE s.problem_id = p.id
+                      AND s.user_id = #{userId}
+                      AND s.status = 'Accepted'
+                ) THEN '已解决'
+                WHEN EXISTS (
+                    SELECT 1 FROM doj_submission.submission s
+                    WHERE s.problem_id = p.id
+                      AND s.user_id = #{userId}
+                ) THEN '尝试中'
+                ELSE '未开始'
+            END AS status
+        FROM problem p
+        WHERE 1 = 1
+        <if test="ids != null and ids.size > 0">
+            AND p.id IN
+            <foreach collection="ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="difficulty != null and difficulty != ''">
+            AND p.difficulty = #{difficulty}
+        </if>
+        <if test="tagNames != null and tagNames.size > 0">
+            AND EXISTS (
+                SELECT 1
+                FROM problem_tag pt
+                JOIN tag t ON pt.tag_id = t.id
+                WHERE pt.problem_id = p.id
+                  AND t.name IN
+                <foreach collection="tagNames" item="tag" open="(" separator="," close=")">
+                    #{tag}
+                </foreach>
+            )
+        </if>
+        <if test="status != null and status != ''">
+            <choose>
+                <when test="status == '已解决'">
+                    AND EXISTS (
+                        SELECT 1 FROM doj_submission.submission s
+                        WHERE s.problem_id = p.id
+                          AND s.user_id = #{userId}
+                          AND s.status = 'Accepted'
+                    )
+                </when>
+                <when test="status == '尝试中'">
+                    AND EXISTS (
+                        SELECT 1 FROM doj_submission.submission s
+                        WHERE s.problem_id = p.id
+                          AND s.user_id = #{userId}
+                    )
+                    AND NOT EXISTS (
+                        SELECT 1 FROM doj_submission.submission s
+                        WHERE s.problem_id = p.id
+                          AND s.user_id = #{userId}
+                          AND s.status = 'Accepted'
+                    )
+                </when>
+                <when test="status == '未开始'">
+                    AND NOT EXISTS (
+                        SELECT 1 FROM doj_submission.submission s
+                        WHERE s.problem_id = p.id
+                          AND s.user_id = #{userId}
+                    )
+                </when>
+                <otherwise>
+                    AND 1 = 1
+                </otherwise>
+            </choose>
+        </if>
+        ORDER BY p.id ASC
+    </select>
+
 </mapper>

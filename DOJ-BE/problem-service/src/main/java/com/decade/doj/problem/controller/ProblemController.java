@@ -6,7 +6,7 @@ import com.decade.doj.common.domain.PageDTO;
 import com.decade.doj.common.domain.R;
 import com.decade.doj.problem.domain.dto.ProblemPageQueryDTO;
 import com.decade.doj.problem.domain.po.Problem;
-import com.decade.doj.problem.service.impl.ProblemServiceImpl;
+import com.decade.doj.problem.service.IProblemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +30,30 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProblemController {
 
-    private final ProblemServiceImpl problemService;
+    private final IProblemService problemService;
 
-    @GetMapping
+    @PostMapping("/admin/sync-es")
     @AdminRequired
     @Operation(summary = "同步题目数据到elasticsearch")
     public R<Integer> syncProblemToEs() {
         Integer res = problemService.syncAllToElasticsearch();
         return R.ok(res);
+    }
+
+    @PostMapping("/admin/reindex")
+    @AdminRequired
+    @Operation(summary = "重建索引并同步题目")
+    public R<Integer> reindexProblems() {
+        Integer res = problemService.reindexAll();
+        return R.ok(res);
+    }
+
+    @PostMapping("/admin/reset")
+    @AdminRequired
+    @Operation(summary = "清空 problem 数据与 ES 索引")
+    public R<Void> resetProblems() {
+        problemService.resetProblems();
+        return R.ok();
     }
 
     @PostMapping

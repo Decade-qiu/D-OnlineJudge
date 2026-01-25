@@ -1,12 +1,10 @@
 package com.decade.doj.common.domain.po;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
-
+import com.decade.doj.common.domain.json.StringListDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -28,15 +26,19 @@ public class Problem {
 
     private String name;
 
+    private String description;
+
     private String inputStyle;
 
     private String outputStyle;
 
-    private String dataRange;
+    @JsonDeserialize(using = StringListDeserializer.class)
+    private List<String> inputSample;
 
-    private String inputSample;
+    @JsonDeserialize(using = StringListDeserializer.class)
+    private List<String> outputSample;
 
-    private String outputSample;
+    private String hint;
 
     private String difficulty;
 
@@ -44,13 +46,11 @@ public class Problem {
 
     private Integer memoryLimit;
 
-    private String description;
-
     private Integer totalPass;
 
     private Integer totalAttempt;
 
-    private String tag;
+    private List<String> tags;
 
     private String testData;
 

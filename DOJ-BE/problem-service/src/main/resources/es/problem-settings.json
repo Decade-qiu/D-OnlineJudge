@@ -1,0 +1,20 @@
+{
+  "analysis": {
+    "analyzer": {
+      "ik_max_lowercase": {
+        "tokenizer": "ik_max_word",
+        "filter": ["lowercase"]
+      },
+      "ik_smart_lowercase": {
+        "tokenizer": "ik_smart",
+        "filter": ["lowercase"]
+      }
+    },
+    "normalizer": {
+      "lowercase_normalizer": {
+        "type": "custom",
+        "filter": ["lowercase"]
+      }
+    }
+  }
+}
