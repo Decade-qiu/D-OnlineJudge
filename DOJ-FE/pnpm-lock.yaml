@@ -56,6 +56,9 @@ importers:
       katex:
         specifier: ^0.16.22
         version: 0.16.22
+      marked:
+        specifier: ^17.0.1
+        version: 17.0.1
       nprogress:
         specifier: ^0.2.0
         version: 0.2.0
@@ -87,6 +90,9 @@ importers:
       '@types/codemirror':
         specifier: ^5.60.15
         version: 5.60.16
+      '@types/marked':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@types/nprogress':
         specifier: ^0.2.3
         version: 0.2.3
@@ -615,6 +621,10 @@ packages:
 
   '@types/lodash@4.17.20':
     resolution: {integrity: sha512-H3MHACvFUEiujabxhaI/ImO6gUrd8oOurg7LQtS7mbwIXA/cUqWrvBsaeJ23aZEPk1TAYkurjfMbSELfoCXlGA==}
+
+  '@types/marked@6.0.0':
+    resolution: {integrity: sha512-jmjpa4BwUsmhxcfsgUit/7A9KbrC48Q0q8KvnY107ogcjGgTFDlIL3RpihNpx2Mu1hM4mdFQjoVc4O6JoGKHsA==}
+    deprecated: This is a stub types definition. marked provides its own type definitions, so you do not need this installed.
 
   '@types/node@24.6.2':
     resolution: {integrity: sha512-d2L25Y4j+W3ZlNAeMKcy7yDsK425ibcAOO2t7aPTz6gNMH0z2GThtwENCDc0d/Pw9wgyRqE5Px1wkV7naz8ang==}
@@ -1863,6 +1873,11 @@ packages:
     resolution: {integrity: sha512-4y7uGv8bd2WdM9vpQsiQNo41Ln1NvhvDRuVt0k2JZQ+ezN2uaQes7lZeZ+QQUHOLQAtDaBJ+7wCbi+ab/KFs+w==}
     engines: {node: '>=0.10.0'}
 
+  marked@17.0.1:
+    resolution: {integrity: sha512-boeBdiS0ghpWcSwoNm/jJBwdpFaMnZWRzjA6SkUMYb40SVaN1x7mmfGKp0jvexGcx+7y2La5zRZsYFZI6Qpypg==}
+    engines: {node: '>= 20'}
+    hasBin: true
+
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
@@ -3091,6 +3106,10 @@ snapshots:
       '@types/lodash': 4.17.20
 
   '@types/lodash@4.17.20': {}
+
+  '@types/marked@6.0.0':
+    dependencies:
+      marked: 17.0.1
 
   '@types/node@24.6.2':
     dependencies:
@@ -4592,6 +4611,8 @@ snapshots:
   map-visit@1.0.0:
     dependencies:
       object-visit: 1.0.1
+
+  marked@17.0.1: {}
 
   math-intrinsics@1.1.0: {}
 
