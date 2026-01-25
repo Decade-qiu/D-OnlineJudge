@@ -75,7 +75,9 @@ const handleFullScreen = () => {
     gap: 50px;
     height: 3rem;
     padding: 0 1em;
-    background-color: #FFFFFF;
+    background-color: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
 
     .item {
         display: inline-flex;
@@ -84,14 +86,21 @@ const handleFullScreen = () => {
         label {
             display: inline-block;
             margin-right: 0.2em;
+            color: var(--text-secondary);
         }
 
         .full-button {
             border: none;
             background: none;
+            color: var(--text-primary);
+            cursor: pointer;
 
             .full-icon {
                 font-size: 1.5rem;
+            }
+            
+            &:hover {
+                color: var(--primary-start);
             }
         }
 
@@ -104,10 +113,19 @@ const handleFullScreen = () => {
     button,
     select {
         margin: 0;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        padding: 4px 8px;
+        border-radius: 4px;
+        
+        &:focus {
+            outline: none;
+            border-color: var(--primary-start);
+        }
     }
 
     select {
-        max-width: 3em;
         max-width: 8em;
     }
 }

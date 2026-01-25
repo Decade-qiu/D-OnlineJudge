@@ -1,52 +1,208 @@
 @use 'sass:math';
 
-// layout
-$navbar-height: 3rem;
-$banner-height: 25rem;
-$footbar-height: 4rem;
-$container-width: 960px;
-$mobile-width: 420px;
+// ================================
+// D-OnlineJudge Design System
+// Modern Dark Theme Variables
+// ================================
 
-// colors
-$white: #ffffff;
-$black: #000000;
-$widget-primary: #0075ff;
-$npm-primary: #bb161b;
-$github-dimmed: #22272e;
-$github-attention: #c69026;
-$github-text-primary: #0366d6;
-$github-sponsor-primary: rgb(234, 74, 170);
-$twitter-primary: #1d9bf0;
-$twitter-x-primary: #000000;
+// ========== Color Palette ==========
 
-// theme
-$header-bg: var(--theme-header);
-$banner-bg: var(--theme-banner);
-$body-bg: var(--theme-body);
-$border-color: var(--theme-border);
+// Primary Gradient Colors
+$primary-start: #667eea;
+$primary-end: #764ba2;
+$primary-gradient: linear-gradient(135deg, $primary-start 0%, $primary-end 100%);
 
-$link-color: var(--link-color);
-$text-color: var(--text-color);
+// Accent Colors
+$accent-cyan: #00d4ff;
+$accent-green: #00f5a0;
+$accent-orange: #ff9a3c;
+$accent-pink: #ff6b9d;
+$accent-purple: #a855f7;
+
+// Status Colors
+$success: #10b981;
+$success-light: rgba(16, 185, 129, 0.15);
+$warning: #f59e0b;
+$warning-light: rgba(245, 158, 11, 0.15);
+$danger: #ef4444;
+$danger-light: rgba(239, 68, 68, 0.15);
+$info: #3b82f6;
+$info-light: rgba(59, 130, 246, 0.15);
+
+// Difficulty Colors
+$difficulty-easy: #10b981;
+$difficulty-medium: #f59e0b;
+$difficulty-hard: #ef4444;
+
+// ========== Dark Theme ==========
+$dark-bg-primary: #0f0f23;
+$dark-bg-secondary: #1a1a2e;
+$dark-bg-tertiary: #16213e;
+$dark-bg-card: rgba(26, 26, 46, 0.8);
+$dark-bg-elevated: rgba(30, 30, 60, 0.6);
+
+$dark-border: rgba(255, 255, 255, 0.08);
+$dark-border-light: rgba(255, 255, 255, 0.12);
+
+$dark-text-primary: #ffffff;
+$dark-text-secondary: rgba(255, 255, 255, 0.7);
+$dark-text-muted: rgba(255, 255, 255, 0.5);
+$dark-text-disabled: rgba(255, 255, 255, 0.3);
+
+// ========== Light Theme ==========
+$light-bg-primary: #f8fafc;
+$light-bg-secondary: #ffffff;
+$light-bg-tertiary: #f1f5f9;
+$light-bg-card: rgba(255, 255, 255, 0.9);
+
+$light-border: rgba(0, 0, 0, 0.08);
+$light-border-light: rgba(0, 0, 0, 0.12);
+
+$light-text-primary: #1e293b;
+$light-text-secondary: #64748b;
+$light-text-muted: #94a3b8;
+
+
+
+// ========== Layout ==========
+$navbar-height: 64px;
+$footer-height: 60px;
+$container-max: 1400px;
+$container-padding: 24px;
+
+// ========== Spacing ==========
+$space-xs: 4px;
+$space-sm: 8px;
+$space-md: 16px;
+$space-lg: 24px;
+$space-xl: 32px;
+$space-2xl: 48px;
+$space-3xl: 64px;
+
+// ========== Border Radius ==========
+$radius-sm: 6px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-full: 9999px;
+
+// ========== Typography ==========
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-base: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+$font-size-3xl: 30px;
+$font-size-4xl: 36px;
+$font-size-5xl: 48px;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// ========== Transitions ==========
+$transition-fast: 150ms ease;
+$transition-normal: 300ms ease;
+$transition-slow: 500ms ease;
+
+// ========== Z-Index ==========
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-fixed: 300;
+$z-modal-backdrop: 400;
+$z-modal: 500;
+$z-tooltip: 600;
+
+// ========== Breakpoints ==========
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// ========== Mixins ==========
+
+// Responsive
+@mixin mobile {
+  @media (max-width: #{$breakpoint-md - 1}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) and (max-width: #{$breakpoint-lg - 1}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+// Glass Effect
+@mixin glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+
+// Gradient Text
+@mixin gradient-text {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// Card Style
+@mixin card {
+  background: var(--bg-card);
+  border-radius: $radius-lg;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+}
+
+// Hover Glow
+@mixin hover-glow {
+  transition: box-shadow $transition-normal, transform $transition-normal;
+  
+  &:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+}
+
+// ========== Compatibility ==========
+$border-color: var(--border-color);
+$text-color: var(--text-primary);
 $text-secondary: var(--text-secondary);
 $text-disabled: var(--text-disabled);
-$text-divider: var(--text-divider);
+$link-color: var(--primary-start);
+$bg-color: var(--bg-primary);
+$header-bg: var(--bg-elevated);
+$body-bg: var(--bg-primary);
 
-// sizes
-$xs-radius: 1px;
-$sm-radius: 2px;
-$lg-radius: 4px;
+// More Compatibility
+$font-size-small: $font-size-xs;
+$font-size-large: $font-size-lg;
+$font-size-huge: $font-size-xl;
 
-// times
-$transition-time: 0.15s;
+$gap: $space-md;
+$sm-gap: $space-sm;
+$xs-gap: $space-xs;
+$lg-gap: $space-lg;
 
-// gaps
-$gap: 1rem; // ~14px
-$sm-gap: $gap * 0.618; // ~8.6px
-$xs-gap: math.div($sm-gap, 2); // ~4.4px
-$lg-gap: $sm-gap * 2; // ~17px
-
-// fonts
-$font-size-small: 12px;
-$font-size-base: 14px;
-$font-size-large: 18px;
-$font-size-huge: 22px;
+$white: #ffffff;
+$black: #000000;

@@ -1,76 +1,97 @@
 <template>
     <div class="rankings-page">
-        <el-card class="rank-card">
-            <template #header>
-                <div class="card-header">
-                    <el-icon :size="30" color="#f1c40f">
-                        <Trophy />
-                    </el-icon>
-                    <h1>用户排行榜</h1>
-                </div>
-            </template>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9H4.5a2.5 2.5 0 010-5H6"/>
+                    <path d="M18 9h1.5a2.5 2.5 0 000-5H18"/>
+                    <path d="M4 22h16"/>
+                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                    <path d="M18 2H6v7a6 6 0 0012 0V2z"/>
+                </svg>
+                排行榜
+            </h1>
+            <p class="page-desc">展示最优秀的编程高手</p>
+        </div>
 
-            <el-table :data="rankings" style="width: 100%" v-loading="loading" stripe class="rank-table">
+        <!-- Top 3 Podium removed as requested -->
+        
 
-                <el-table-column label="排名" width="120" align="center">
+
+        <!-- Rankings Table -->
+        <div class="table-container card-glass">
+            <el-table 
+                :data="rankings" 
+                class="rankings-table"
+                v-loading="loading"
+            >
+                <el-table-column label="排名" width="100" align="center">
                     <template #default="{ row }">
                         <div class="rank-cell">
-                            <el-icon v-if="row.rank <= 3" :class="`rank-icon rank-${row.rank}`">
-                                <Trophy />
-                            </el-icon>
-                            <span class="rank-number">{{ row.rank }}</span>
+                            <span v-if="row.rank <= 3" class="rank-medal" :class="`rank-${row.rank}`">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0012 0V2z"/>
+                                </svg>
+                            </span>
+                            <span v-else class="rank-number">{{ row.rank }}</span>
                         </div>
                     </template>
                 </el-table-column>
 
                 <el-table-column label="用户" min-width="200">
                     <template #default="{ row }">
-                        <div class="user-info-cell">
-                            <el-avatar :size="40" :src="'/api' + row.avatar" />
+                        <div class="user-cell">
+                            <el-avatar :size="40" :src="row.avatar ? '/api' + row.avatar : ''" class="user-avatar">
+                                {{ row.username?.charAt(0) }}
+                            </el-avatar>
                             <span class="username">{{ row.username }}</span>
                         </div>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="分数" width="250" align="center" sortable>
+                <el-table-column label="积分" width="150" align="center" sortable>
                     <template #default="{ row }">
-                        <span :class="getScoreClass(row.score)">{{ row.score }}</span>
+                        <span class="score" :class="getScoreClass(row.score)">{{ row.score }}</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="常用语言" width="150" align="center">
+                <el-table-column label="常用语言" width="130" align="center">
                     <template #default="{ row }">
-                        <div :class="['language-cell', `lang-${row.mostUsedLanguage}`]">
-                            <i :class="getLangIconClass(row.mostUsedLanguage)"></i>
-                            <span>{{ row.mostUsedLanguage.toUpperCase() }}</span>
-                        </div>
+                        <span class="lang-tag" :class="row.mostUsedLanguage">
+                            {{ formatLanguage(row.mostUsedLanguage) }}
+                        </span>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="解题数 (易/中/难)" width="240" align="center">
+                <el-table-column label="解题数" width="200" align="center">
                     <template #default="{ row }">
                         <div class="solved-cell">
-                            <el-tag type="success" effect="light" round>{{ row.easySolve }}</el-tag>
-                            <el-tag type="warning" effect="light" round>{{ row.middleSolve }}</el-tag>
-                            <el-tag type="danger" effect="light" round>{{ row.hardSolve }}</el-tag>
+                            <span class="solved-tag easy">{{ row.easySolve }}</span>
+                            <span class="solved-tag medium">{{ row.middleSolve }}</span>
+                            <span class="solved-tag hard">{{ row.hardSolve }}</span>
                         </div>
                     </template>
                 </el-table-column>
-
             </el-table>
 
             <div class="pagination-container">
-                <el-pagination background layout="prev, pager, next" :total="total" :page-size="pageSize"
-                    @current-change="handlePageChange" />
+                <el-pagination 
+                    background 
+                    layout="prev, pager, next" 
+                    :total="total" 
+                    :page-size="pageSize"
+                    @current-change="handlePageChange" 
+                />
             </div>
-        </el-card>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { ElCard, ElTable, ElTableColumn, ElPagination, ElAvatar, ElTag, ElIcon, vLoading } from 'element-plus';
-import { Trophy } from '@element-plus/icons-vue';
+import { ElTable, ElTableColumn, ElPagination, ElAvatar } from 'element-plus';
 import { reqRankings } from '@/api/user';
 
 interface RankItem {
@@ -94,7 +115,6 @@ const pageSize = ref(20);
 const fetchRankings = async (page: number) => {
     loading.value = true;
     const res = await reqRankings({ pageNo: page, pageSize: pageSize.value });
-    console.log(res);
     if (res.data.code === 200) {
         rankings.value = res.data.data.list;
         total.value = res.data.data.total;
@@ -103,19 +123,16 @@ const fetchRankings = async (page: number) => {
 };
 
 const getScoreClass = (score: number) => {
-    if (score >= 1700) return 'score-tier-1'; // 传说
-    if (score >= 1500) return 'score-tier-2'; // 史诗
-    if (score >= 1300) return 'score-tier-3'; // 稀有
-    if (score >= 1100) return 'score-tier-4'; // 优秀
-    return 'score-tier-5'; // 普通
+    if (score >= 1700) return 'legendary';
+    if (score >= 1500) return 'epic';
+    if (score >= 1300) return 'rare';
+    if (score >= 1100) return 'good';
+    return 'normal';
 };
 
-const getLangIconClass = (lang: string) => {
-    const baseClass = 'lang-icon';
-    if (lang === 'java') return `${baseClass} fa-brands fa-java`;
-    if (lang === 'python') return `${baseClass} fa-brands fa-python`;
-    if (lang === 'cpp') return `${baseClass} fa-brands fa-cuttlefish`;
-    return baseClass;
+const formatLanguage = (lang: string) => {
+    const map: Record<string, string> = { 'cpp': 'C++', 'java': 'Java', 'python': 'Python' };
+    return map[lang] || lang?.toUpperCase();
 };
 
 const handlePageChange = (page: number) => {
@@ -123,153 +140,185 @@ const handlePageChange = (page: number) => {
     fetchRankings(page);
 };
 
-onMounted(() => {
-    fetchRankings(currentPage.value);
-});
+onMounted(() => fetchRankings(currentPage.value));
 </script>
 
 <style lang="scss" scoped>
+
+
 .rankings-page {
-    padding: 24px;
-    background-color: #f0f2f5;
-    min-height: calc(100vh - 50px);
-}
-
-.rank-card {
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.card-header {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-
-    h1 {
-        margin: 0;
-        font-size: 24px;
-        color: #333;
-    }
+    flex-direction: column;
+    gap: $space-lg;
 }
 
-.rank-table {
-    :deep(.el-table__header-wrapper) {
-        th {
-            background-color: #fafafa !important;
-            color: #606266;
-            font-weight: 600;
+.page-header {
+    .page-title {
+        display: flex;
+        align-items: center;
+        gap: $space-sm;
+        font-size: $font-size-2xl;
+        font-weight: $font-weight-bold;
+        margin-bottom: $space-xs;
+        
+        svg {
+            width: 28px;
+            height: 28px;
+            color: #ffd700;
         }
     }
+    
+    .page-desc {
+        color: var(--text-secondary);
+        font-size: $font-size-sm;
+    }
 }
+
+// Podium
+.podium-section {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: $space-lg;
+    padding: $space-xl 0;
+}
+
+.podium-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: $space-lg;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: $radius-lg;
+    position: relative;
+    transition: all $transition-normal;
+    
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .rank-badge {
+        position: absolute;
+        top: -12px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: $radius-full;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-bold;
+        color: white;
+    }
+    
+    &.first {
+        padding-bottom: $space-2xl;
+        .rank-badge { background: #ffd700; }
+        .crown {
+            position: absolute;
+            top: -35px;
+            color: #ffd700;
+            svg { width: 32px; height: 32px; }
+        }
+    }
+    &.second .rank-badge { background: #c0c0c0; }
+    &.third .rank-badge { background: #cd7f32; }
+    
+    .podium-avatar {
+        margin-bottom: $space-sm;
+        border: 3px solid var(--border-light);
+        background: var(--primary-gradient);
+        color: white;
+        font-weight: $font-weight-bold;
+    }
+    
+    .podium-name {
+        font-weight: $font-weight-semibold;
+        color: var(--text-primary);
+        margin-bottom: $space-xs;
+    }
+    
+    .podium-score {
+        font-size: $font-size-sm;
+        color: var(--text-muted);
+    }
+}
+
+// Table
+.table-container { padding: 0; overflow: hidden; }
 
 .rank-cell {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 8px;
-
-    .rank-icon {
-        font-size: 24px;
-
-        &.rank-1 {
-            color: #ffd700;
-        }
-
-        // Gold
-        &.rank-2 {
-            color: #c0c0c0;
-        }
-
-        // Silver
-        &.rank-3 {
-            color: #cd7f32;
-        }
-
-        // Bronze
+    
+    .rank-medal {
+        svg { width: 24px; height: 24px; }
+        &.rank-1 { color: #ffd700; }
+        &.rank-2 { color: #c0c0c0; }
+        &.rank-3 { color: #cd7f32; }
     }
-
+    
     .rank-number {
-        font-weight: bold;
-        font-size: 1.2em;
+        font-weight: $font-weight-bold;
+        color: var(--text-secondary);
     }
 }
 
-.user-info-cell {
+.user-cell {
     display: flex;
     align-items: center;
-
-    .username {
-        margin-left: 12px;
-        font-weight: 500;
-        color: #303133;
+    gap: $space-md;
+    
+    .user-avatar {
+        background: var(--primary-gradient);
+        color: white;
+        font-weight: $font-weight-semibold;
     }
+    
+    .username { font-weight: $font-weight-medium; }
 }
 
-.language-cell {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-weight: 500;
+.score {
+    font-weight: $font-weight-bold;
+    &.legendary { color: #a855f7; }
+    &.epic { color: #f97316; }
+    &.rare { color: #3b82f6; }
+    &.good { color: #22c55e; }
+    &.normal { color: var(--text-muted); }
+}
 
-    &.lang-java {
-        color: #f8981d;
-    }
-
-    &.lang-python {
-        color: #3776ab;
-    }
-
-    &.lang-cpp {
-        color: #850505;
-    }
-
-    .lang-icon {
-        font-size: 22px;
-    }
+.lang-tag {
+    padding: $space-xs $space-sm;
+    border-radius: $radius-sm;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    &.cpp { background: rgba(#00599c, 0.15); color: #00599c; }
+    &.java { background: rgba(#f8981d, 0.15); color: #f8981d; }
+    &.python { background: rgba(#3776ab, 0.15); color: #3776ab; }
 }
 
 .solved-cell {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: $space-sm;
+}
+
+.solved-tag {
+    padding: $space-xs $space-sm;
+    border-radius: $radius-sm;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    &.easy { background: rgba($success, 0.15); color: $success; }
+    &.medium { background: rgba($warning, 0.15); color: $warning; }
+    &.hard { background: rgba($danger, 0.15); color: $danger; }
 }
 
 .pagination-container {
-    margin-top: 24px;
+    padding: $space-lg;
     display: flex;
     justify-content: center;
+    border-top: 1px solid var(--border-color);
 }
-
-// Score Tiers
-.score-tier-1 {
-    font-weight: bold;
-    color: #a335ee;
-}
-
-// 传说紫
-.score-tier-2 {
-    font-weight: bold;
-    color: #ff8000;
-}
-
-// 史诗橙
-.score-tier-3 {
-    font-weight: bold;
-    color: #0070dd;
-}
-
-// 稀有蓝
-.score-tier-4 {
-    font-weight: bold;
-    color: #19be6b;
-}
-
-// 优秀绿
-.score-tier-5 {
-    font-weight: bold;
-    color: #909399;
-}
-
-// 普通灰</style>
+</style>

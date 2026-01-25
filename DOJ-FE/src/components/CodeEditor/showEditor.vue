@@ -4,8 +4,8 @@
             <codemirror v-model="code" :style="{
                 width: config.width,
                 height: config.height,
-                backgroundColor: '#fff',
-                color: '#333',
+                backgroundColor: 'var(--bg-primary)',
+                color: 'var(--text-primary)',
                 fontSize: fontSizeStr,
             }" placeholder="Please enter the code." :extensions="extensions" :disabled="true"
                 :indent-with-tab="true" :tab-size="config.tabSize" @update="handleStateUpdate" @ready="handleReady" />
@@ -223,7 +223,8 @@ const log = console.log
         justify-content: space-between;
         align-items: center;
         font-size: 90%;
-        background-color: #fff;
+        background-color: var(--bg-elevated);
+        border-top: 1px solid var(--border-color);
 
         .buttons {
             .item {
@@ -232,9 +233,9 @@ const log = console.log
                 justify-content: center;
                 align-items: center;
                 background-color: transparent;
-                border: 1px dashed $border-color;
+                border: 1px dashed var(--border-color);
                 font-size: $font-size-small;
-                color: $text-secondary;
+                color: var(--text-secondary);
                 cursor: pointer;
 
                 .iconfont {
@@ -242,13 +243,14 @@ const log = console.log
                 }
 
                 &:hover {
-                    color: $text-color;
-                    border-color: $text-color;
+                    color: var(--text-primary);
+                    border-color: var(--text-primary);
                 }
             }
         }
 
         .infos {
+            color: var(--text-secondary);
             .item {
                 margin-left: 2em;
                 display: inline-block;
@@ -259,16 +261,17 @@ const log = console.log
 
     .output {
         margin-top: 20px;
-        border: 1px solid #ddd;
+        border: 1px solid var(--border-color);
         border-radius: 4px;
         padding: 20px;
-        background-color: #f9f9f9;
+        background-color: var(--bg-elevated);
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 
         .output-header {
             display: flex;
             justify-content: flex-start;
             //margin-bottom: 10px;
+            color: var(--text-primary);
 
             .closeoutput {
                 margin-left: auto;
@@ -276,14 +279,14 @@ const log = console.log
             }
 
             .running-status {
-                background-color: #fff;
-                border: 1px solid #ddd;
+                background-color: var(--bg-primary);
+                border: 1px solid var(--border-color);
                 border-radius: 4px;
                 margin-left: 10px;
                 padding: 0 10px;
 
                 span {
-                    color: #e74c3c;
+                    color: var(--danger);
                     font-size: 16px;
                 }
             }
@@ -304,12 +307,12 @@ const log = console.log
 
             /* 根据状态动态改变颜色 */
             .error-text {
-                color: #e74c3c;
+                color: var(--danger);
                 /* 红色表示错误 */
             }
 
             .success-text {
-                color: #2ecc71;
+                color: var(--success);
                 /* 绿色表示成功 */
             }
         }
@@ -330,26 +333,26 @@ const log = console.log
                 font-size: 14px;
                 margin-bottom: 5px;
                 font-weight: bold;
-                color: #555;
+                color: var(--text-secondary);
             }
 
             .input-content {
-                background-color: #fff;
-                border: 1px solid #ddd;
+                background-color: var(--bg-primary);
+                border: 1px solid var(--border-color);
                 border-radius: 4px;
                 padding: 10px;
                 font-size: 14px;
-                color: #333;
+                color: var(--text-primary);
                 line-height: 1.5;
             }
 
             .output-content {
-                background-color: #fff;
-                border: 1px solid #ddd;
+                background-color: var(--bg-primary);
+                border: 1px solid var(--border-color);
                 border-radius: 4px;
                 padding: 10px;
                 font-size: 14px;
-                color: #333;
+                color: var(--text-primary);
                 line-height: 1.5;
                 white-space: pre-wrap;
                 word-wrap: break-word;

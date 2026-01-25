@@ -1,0 +1,74 @@
+
+
+// ========== CSS Variables (Theme Support) ==========
+:root {
+  // Colors
+  --primary-start: #{$primary-start};
+  --primary-end: #{$primary-end};
+  --primary-gradient: #{$primary-gradient};
+  
+  --accent-cyan: #{$accent-cyan};
+  --accent-green: #{$accent-green};
+  --accent-orange: #{$accent-orange};
+  --accent-pink: #{$accent-pink};
+  
+  --success: #{$success};
+  --success-light: #{$success-light};
+  --warning: #{$warning};
+  --warning-light: #{$warning-light};
+  --danger: #{$danger};
+  --danger-light: #{$danger-light};
+  --info: #{$info};
+  --info-light: #{$info-light};
+  
+  // Dark theme as default
+  --bg-primary: #{$dark-bg-primary};
+  --bg-secondary: #{$dark-bg-secondary};
+  --bg-tertiary: #{$dark-bg-tertiary};
+  --bg-card: #{$dark-bg-card};
+  --bg-elevated: #{$dark-bg-elevated};
+  
+  --border-color: #{$dark-border};
+  --border-light: #{$dark-border-light};
+  
+  --text-primary: #{$dark-text-primary};
+  --text-secondary: #{$dark-text-secondary};
+  --text-muted: #{$dark-text-muted};
+  --text-disabled: #{$dark-text-disabled};
+  
+  // Shadows
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.3);
+  
+  // Glass effect
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 12px;
+}
+
+// Light theme override
+[data-theme="light"] {
+  --bg-primary: #{$light-bg-primary};
+  --bg-secondary: #{$light-bg-secondary};
+  --bg-tertiary: #{$light-bg-tertiary};
+  --bg-card: #{$light-bg-card};
+  --bg-elevated: rgba(255, 255, 255, 0.8);
+  
+  --border-color: #{$light-border};
+  --border-light: #{$light-border-light};
+  
+  --text-primary: #{$light-text-primary};
+  --text-secondary: #{$light-text-secondary};
+  --text-muted: #{$light-text-muted};
+  --text-disabled: #cbd5e1;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.15);
+  
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
