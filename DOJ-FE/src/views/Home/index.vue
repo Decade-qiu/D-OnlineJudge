@@ -4,13 +4,37 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-// Stats data (can be fetched from API)
+// Stats data
 const stats = ref([
-    { label: '累计提交', value: '526,262', icon: 'upload' },
-    { label: '今日提交', value: '128', icon: 'today' },
-    { label: '题目总数', value: '1,024', icon: 'book' },
-    { label: '活跃用户', value: '3,892', icon: 'users' },
+    { label: '累计提交', value: '0', icon: 'upload' },
+    { label: '今日提交', value: '0', icon: 'today' },
+    { label: '题目总数', value: '0', icon: 'book' },
+    { label: '活跃用户', value: '0', icon: 'users' },
 ]);
+
+// Fetch stats from API
+import { reqStats } from '@/api/stats';
+
+const formatNumber = (num: number): string => {
+    return num.toLocaleString('en-US');
+};
+
+const fetchStats = async () => {
+    try {
+        const res = await reqStats();
+        if (res.data.code === 200) {
+            const data = res.data.data;
+            stats.value = [
+                { label: '累计提交', value: formatNumber(data.totalSubmissions), icon: 'upload' },
+                { label: '今日提交', value: formatNumber(data.todaySubmissions), icon: 'today' },
+                { label: '题目总数', value: formatNumber(data.totalProblems), icon: 'book' },
+                { label: '活跃用户', value: formatNumber(data.activeUsers), icon: 'users' },
+            ];
+        }
+    } catch (e) {
+        console.error('Failed to fetch stats', e);
+    }
+};
 
 // Announcements
 import { reqAnnouncementList } from '@/api/announcement';
@@ -89,6 +113,7 @@ const features = ref([
 ]);
 
 onMounted(() => {
+    fetchStats();
     fetchAnnouncements();
 });
 
