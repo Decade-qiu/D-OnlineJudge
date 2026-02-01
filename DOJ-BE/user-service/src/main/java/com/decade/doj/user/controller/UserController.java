@@ -6,6 +6,7 @@ import com.decade.doj.common.config.properties.ResourceProperties;
 import com.decade.doj.common.domain.PageQueryDTO;
 import com.decade.doj.common.domain.PageDTO;
 import com.decade.doj.common.domain.R;
+import com.decade.doj.common.domain.vo.StatsVO;
 import com.decade.doj.user.domain.dto.LoginDTO;
 import com.decade.doj.user.domain.dto.RegisterDTO;
 import com.decade.doj.user.domain.dto.UpdPwdDTO;
@@ -94,6 +95,12 @@ public class UserController {
         return userService.getRankings(pageQueryDTO);
     }
 
+    @GetMapping("/stats")
+    @Operation(summary = "获取首页统计数据")
+    public R<StatsVO> getStats() {
+        return R.ok(userService.getStats());
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "查询用户接口")
     public R<InfoVO> getUser(@PathVariable("id") @NotNull Long id) {
@@ -112,3 +119,4 @@ public class UserController {
     }
 
 }
+

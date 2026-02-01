@@ -1,11 +1,14 @@
 package com.decade.doj.user.service.impl;
 
 import com.decade.doj.common.client.ProblemClient;
+import com.decade.doj.common.client.SubmissionClient;
 import com.decade.doj.common.config.properties.JwtProperties;
 import com.decade.doj.common.domain.PageDTO;
 import com.decade.doj.common.domain.PageQueryDTO;
 import com.decade.doj.common.domain.R;
 import com.decade.doj.common.domain.po.Problem;
+import com.decade.doj.common.domain.vo.StatsVO;
+import com.decade.doj.common.domain.vo.SubmissionStatsVO;
 import com.decade.doj.common.exception.BadRequestException;
 import com.decade.doj.common.exception.ForbiddenException;
 import com.decade.doj.common.config.custom.JwtTool;
@@ -53,6 +56,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private final StringRedisTemplate redisTemplate;
     private final AppNameProperties appNameProperties;
     private final ProblemClient problemClient;
+    private final SubmissionClient submissionClient;
 
     @PostConstruct
     public void initRankings() {
@@ -256,5 +260,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .setSubscribe(null);
         updateById(user);
         return R.ok();
+    }
+
+    @Override
+    public StatsVO getStats() {
+        // 获取提交统计
+        R<SubmissionStatsVO> submissionStatsR = submissionClient.getStats();
+        SubmissionStatsVO submissionStats = submissionStatsR.success() ? submissionStatsR.getData() : new SubmissionStatsVO(0L, 0L);
+
+        // 获取题目总数
+        R<Long> problemCountR = problemClient.getCount();
+        Long problemCount = problemCountR.success() ? problemCountR.getData() : 0L;
+
+        // 获取用户总数 (活跃用户)
+        long activeUsers = this.count();
+
+        return StatsVO.builder()
+                .totalSubmissions(submissionStats.getTotalSubmissions())
+                .todaySubmissions(submissionStats.getTodaySubmissions())
+                .totalProblems(problemCount)
+                .activeUsers(activeUsers)
+                .build();
     }
 }

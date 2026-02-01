@@ -12,4 +12,7 @@ public interface ProblemClient {
     @GetMapping("/problem/{id}")
     R<Problem> getProblemById(@PathVariable Long id);
 
+    @GetMapping("/problem/count")
+    R<Long> getCount();
+
 }

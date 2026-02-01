@@ -3,6 +3,7 @@ package com.decade.doj.user.service;
 import com.decade.doj.common.domain.PageDTO;
 import com.decade.doj.common.domain.PageQueryDTO;
 import com.decade.doj.common.domain.R;
+import com.decade.doj.common.domain.vo.StatsVO;
 import com.decade.doj.user.domain.dto.LoginDTO;
 import com.decade.doj.user.domain.dto.RegisterDTO;
 import com.decade.doj.user.domain.dto.UpdPwdDTO;
@@ -34,4 +35,6 @@ public interface IUserService extends IService<User> {
     R<PageDTO<RankVO>> getRankings(PageQueryDTO pageQueryDTO);
 
     void handleProblemSolved(Long userId, Long problemId);
+
+    StatsVO getStats();
 }

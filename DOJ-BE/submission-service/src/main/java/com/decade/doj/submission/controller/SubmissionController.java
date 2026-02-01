@@ -3,6 +3,7 @@ package com.decade.doj.submission.controller;
 import com.decade.doj.common.domain.PageDTO;
 import com.decade.doj.common.domain.R;
 import com.decade.doj.common.domain.vo.ExecuteMessage;
+import com.decade.doj.common.domain.vo.SubmissionStatsVO;
 import com.decade.doj.common.utils.UserContext;
 import com.decade.doj.submission.domain.dto.SubmissionPageQueryDTO;
 import com.decade.doj.submission.domain.po.Submission;
@@ -36,6 +37,12 @@ public class SubmissionController {
     public R<PageDTO<Submission>> page(SubmissionPageQueryDTO problemPageQueryDTO) {
         PageDTO<Submission> res = submissionService.pageQuery(problemPageQueryDTO);
         return R.ok(res);
+    }
+
+    @GetMapping("/stats")
+    @Operation(summary = "获取提交统计")
+    public R<SubmissionStatsVO> getStats() {
+        return R.ok(submissionService.getStats());
     }
 
     @GetMapping("/match/{id}")

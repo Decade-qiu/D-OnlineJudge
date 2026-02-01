@@ -86,6 +86,12 @@ public class ProblemController {
         return R.ok(problemService.list());
     }
 
+    @GetMapping("/count")
+    @Operation(summary = "获取题目总数")
+    public R<Long> getCount() {
+        return R.ok(problemService.count());
+    }
+
     @GetMapping("/page")
     @Operation(summary = "分页获取题目列表")
     public R<PageDTO<Problem>> page(ProblemPageQueryDTO problemPageQueryDTO) {

@@ -1,6 +1,7 @@
 package com.decade.doj.submission.service;
 
 import com.decade.doj.common.domain.PageDTO;
+import com.decade.doj.common.domain.vo.SubmissionStatsVO;
 import com.decade.doj.submission.domain.dto.SubmissionPageQueryDTO;
 import com.decade.doj.submission.domain.po.Submission;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -12,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface ISubmissionService extends IService<Submission> {
     PageDTO<Submission> pageQuery(SubmissionPageQueryDTO submissionPageQueryDTO);
+
+    SubmissionStatsVO getStats();
 }
