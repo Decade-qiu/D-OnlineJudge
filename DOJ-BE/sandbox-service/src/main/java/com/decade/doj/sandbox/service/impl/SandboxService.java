@@ -12,11 +12,11 @@ import com.decade.doj.sandbox.domain.vo.ExecuteMessage;
 import com.decade.doj.sandbox.domain.vo.JudgingTask;
 import com.decade.doj.sandbox.enums.LanguageEnum;
 import com.decade.doj.sandbox.service.ISandboxService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -30,9 +30,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class SandboxService implements ISandboxService {
+
+    private final RabbitTemplate rabbitTemplate;
+    private final ThreadPoolTaskExecutor runCodeExecutor;
+
+    public SandboxService(
+            RabbitTemplate rabbitTemplate,
+            @Qualifier("RunCodeThreadPool") ThreadPoolTaskExecutor runCodeExecutor
+    ) {
+        this.rabbitTemplate = rabbitTemplate;
+        this.runCodeExecutor = runCodeExecutor;
+    }
 
     /**
      * 通过占位符数量构造最终执行命令，例如：
@@ -66,7 +76,6 @@ public class SandboxService implements ISandboxService {
     // 挂载目录
     private static final String MOUNT_PATH = "/app";
 
-    private final RabbitTemplate rabbitTemplate;
 
     @Value("${DOJ_CODE_PATH:/app/static/codes/}")
     private String containerCodePath;
@@ -93,10 +102,11 @@ public class SandboxService implements ISandboxService {
     }
 
     @Override
-    @Async("RunCodeThreadPool")
     public CompletableFuture<ExecuteMessage> runCodeInSandbox(String filePath, String filename, String lang) {
-        ExecuteMessage result = _runCodeInSandbox(filePath, filename, lang);
-        return CompletableFuture.completedFuture(result);
+        return CompletableFuture.supplyAsync(
+                () -> _runCodeInSandbox(filePath, filename, lang),
+                runCodeExecutor
+        );
     }
 
     private ExecuteMessage _runCodeInSandbox(String filePath, String filename, String lang) {
@@ -189,10 +199,11 @@ public class SandboxService implements ISandboxService {
     }
 
     @Override
-    @Async("RunCodeThreadPool")
     public CompletableFuture<ExecuteMessage> runCodeInSandboxWI(String localPath, String inputname, String filename, String lang) {
-        ExecuteMessage result = _runCodeInSandboxWI(localPath, inputname, filename, lang, null);
-        return CompletableFuture.completedFuture(result);
+        return CompletableFuture.supplyAsync(
+                () -> _runCodeInSandboxWI(localPath, inputname, filename, lang, null),
+                runCodeExecutor
+        );
     }
 
     @Override

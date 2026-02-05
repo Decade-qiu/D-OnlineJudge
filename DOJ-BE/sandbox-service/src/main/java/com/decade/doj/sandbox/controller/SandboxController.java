@@ -47,8 +47,8 @@ public class SandboxController {
     private final StringRedisTemplate redisTemplate;
 
     @PostMapping("/code")
-    @Operation(summary = "运行代码文件(同步执行)")
-    public CompletableFuture<R<ExecuteMessage>> runCode(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) throws IOException {
+    @Operation(summary = "运行代码文件(异步执行)")
+    public CompletableFuture<R<ExecuteMessage>> runCode(@RequestParam("file") MultipartFile file, @RequestParam("language") @NotBlank String lang) {
         if (file.isEmpty()) {
             return CompletableFuture.completedFuture(R.error("上传的文件不能为空!"));
         }
@@ -57,16 +57,20 @@ public class SandboxController {
             return CompletableFuture.completedFuture(R.error("不支持的编程语言: " + lang));
         }
 
-        String path = saveFile(file, resourceProperties.getCodePath(), null)[0];
-
-        return sandboxService
-                .runCodeInSandbox(path, file.getOriginalFilename(), lang)
-                .thenApply(R::ok);
+        try {
+            String path = saveFile(file, resourceProperties.getCodePath(), null)[0];
+            return sandboxService
+                    .runCodeInSandbox(path, file.getOriginalFilename(), lang)
+                    .thenApply(R::ok);
+        } catch (IOException e) {
+            log.error("保存代码文件失败", e);
+            return CompletableFuture.completedFuture(R.error("文件保存失败: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/problem")
-    @Operation(summary = "运行题目代码(同步执行)")
-    public CompletableFuture<R<ExecuteMessage>> runProblem(@RequestParam("file") MultipartFile file, @RequestParam("input") MultipartFile input, @RequestParam("language") @NotBlank String lang, @RequestParam("pid") Long pid) throws IOException {
+    @Operation(summary = "运行题目代码(异步执行)")
+    public CompletableFuture<R<ExecuteMessage>> runProblem(@RequestParam("file") MultipartFile file, @RequestParam("input") MultipartFile input, @RequestParam("language") @NotBlank String lang, @RequestParam("pid") Long pid) {
         if (file.isEmpty()) {
             return CompletableFuture.completedFuture(R.error("上传的文件不能为空!"));
         }
@@ -75,13 +79,18 @@ public class SandboxController {
             return CompletableFuture.completedFuture(R.error("不支持的编程语言: " + lang));
         }
 
-        String[] Paths = saveFile(file, resourceProperties.getCodePath(), null);
-        String codePath = Paths[0];
-        saveFile(input, resourceProperties.getCodePath(), Paths[1]);
+        try {
+            String[] Paths = saveFile(file, resourceProperties.getCodePath(), null);
+            String codePath = Paths[0];
+            saveFile(input, resourceProperties.getCodePath(), Paths[1]);
 
-        return sandboxService
-                .runCodeInSandboxWI(codePath, input.getOriginalFilename(), file.getOriginalFilename(), lang)
-                .thenApply(R::ok);
+            return sandboxService
+                    .runCodeInSandboxWI(codePath, input.getOriginalFilename(), file.getOriginalFilename(), lang)
+                    .thenApply(R::ok);
+        } catch (IOException e) {
+            log.error("保存代码/输入文件失败", e);
+            return CompletableFuture.completedFuture(R.error("文件保存失败: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/validate")
