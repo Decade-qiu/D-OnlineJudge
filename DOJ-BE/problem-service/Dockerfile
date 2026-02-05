@@ -24,7 +24,7 @@ RUN mvn -f ./pom.xml -pl problem-service -am clean package -DskipTests
 RUN ls -al ./problem-service/target
 
 # Stage 2: Create the runtime image
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
